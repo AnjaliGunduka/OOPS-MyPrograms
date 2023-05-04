@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="MavenProjectWizardLocationPage">
+		<list key="location">
+			<item value="D:\Jdbc\StudentDetails\build"/>
+			<item value="D:\Jdbc\StudentDetails"/>
+		</list>
+		<list key="projectNameTemplate">
+			<item value="[artifactId]"/>
+			<item value="[artifactId]-TRUNK"/>
+			<item value="[artifactId]-[version]"/>
+			<item value="[groupId].[artifactId]"/>
+			<item value="[groupId].[artifactId]-[version]"/>
+			<item value="[name]"/>
+		</list>
+	</section>
+	<section name="MavenProjectWizardArchetypePage">
+		<item key="catalog" value="internal"/>
+		<list key="projectNameTemplate">
+			<item value="[artifactId]"/>
+			<item value="[artifactId]-TRUNK"/>
+			<item value="[artifactId]-[version]"/>
+			<item value="[groupId].[artifactId]"/>
+			<item value="[groupId].[artifactId]-[version]"/>
+			<item value="[name]"/>
+		</list>
+	</section>
+	<section name="Maven2ProjectWizardArchifactPage">
+		<list key="package">
+			<item value="com.student.info.jdbc.LinkedHahmapExample"/>
+			<item value="com.student.info.jdbc.ExamplesEnum"/>
+			<item value="com.student.info.jdbc.StudentsInformation"/>
+			<item value="com.student.info.jdbc.StuInfo"/>
+			<item value="com.student.info.jdbc.st"/>
+			<item value="com.student.info.jdbc.StudentDetail"/>
+		</list>
+		<list key="groupId">
+			<item value="com.student.info.jdbc"/>
+		</list>
+		<list key="artifactId">
+			<item value="LinkedHahmapExample"/>
+			<item value="ExamplesEnum"/>
+			<item value="StudentsInformation"/>
+			<item value="StuInfo"/>
+			<item value="st"/>
+			<item value="StudentDetail"/>
+		</list>
+		<list key="projectNameTemplate">
+			<item value="[artifactId]"/>
+			<item value="[artifactId]-TRUNK"/>
+			<item value="[artifactId]-[version]"/>
+			<item value="[groupId].[artifactId]"/>
+			<item value="[groupId].[artifactId]-[version]"/>
+			<item value="[name]"/>
+		</list>
+		<list key="version">
+			<item value="0.0.1-SNAPSHOT"/>
+		</list>
+	</section>
+	<section name="MavenProjectWizardArtifactPage">
+		<list key="groupId">
+		</list>
+		<list key="name">
+		</list>
+		<list key="artifactId">
+		</list>
+		<list key="projectNameTemplate">
+			<item value="[artifactId]"/>
+			<item value="[artifactId]-TRUNK"/>
+			<item value="[artifactId]-[version]"/>
+			<item value="[groupId].[artifactId]"/>
+			<item value="[groupId].[artifactId]-[version]"/>
+			<item value="[name]"/>
+		</list>
+		<list key="version">
+			<item value="0.0.1-SNAPSHOT"/>
+		</list>
+	</section>
+	<section name="org.eclipse.m2e.core.pom.overview">
+	</section>
+	<section name="org.eclipse.m2e.core.pom.dependencies">
+	</section>
+	<section name="wizardPage">
+		<list key="groupId">
+			<item value="Jdbc.connection.jsp"/>
+			<item value="JdbcUserInfo"/>
+			<item value="JdbcUsingUserInfo"/>
+			<item value="UserInformationUsingJdbc"/>
+			<item value="StudentsLibraryInfo"/>
+			<item value="StudentInfo"/>
+		</list>
+		<list key="name">
+			<item value="Jdbc.connection.jsp"/>
+			<item value="JdbcUserInfo"/>
+			<item value="JdbcUsingUserInfo"/>
+			<item value="UserInformationUsingJdbc"/>
+			<item value="StudentsLibraryInfo"/>
+			<item value="StudentInfo"/>
+		</list>
+		<list key="artifactId">
+			<item value="Jdbc.connection.jsp"/>
+			<item value="JdbcUserInfo"/>
+			<item value="JdbcUsingUserInfo"/>
+			<item value="UserInformationUsingJdbc"/>
+			<item value="StudentsLibraryInfo"/>
+			<item value="StudentInfo"/>
+		</list>
+		<list key="version">
+			<item value="0.0.1-SNAPSHOT"/>
+		</list>
+	</section>
+</section>

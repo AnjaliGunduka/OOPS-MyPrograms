@@ -1,0 +1,18 @@
+package Classes;
+
+public class Incrementingvalues {
+	int a = 8;
+
+	
+	public Incrementingvalues() {
+		super();
+		a++;//incement the value
+		System.out.println(a);
+	}
+
+
+	public static void main(String[] args) {
+		Incrementingvalues a1=new Incrementingvalues();
+		
+	}
+}

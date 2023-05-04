@@ -1,0 +1,66 @@
+package com.payment.streams.controllertest;
+
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.payment.streams.controller.UserController;
+import com.payment.streams.model.User;
+import com.payment.streams.service.UserService;
+import com.testoper.bankservice.util.DataBuilder;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@ExtendWith(SpringExtension.class)
+@WebMvcTest(controllers = UserController.class)
+@ActiveProfiles("test")
+public class UserControllerTest {
+	@Autowired
+	MockMvc mockMvc;
+	@MockBean
+	UserService userService;
+
+//	@Test
+//	public void findById() throws Exception {
+//		given(userService.findById(Mockito.anyLong())).willReturn(new User(1L, "anju", "g", "anjali@"));
+//
+//		mockMvc.perform(get("/users/{id}").contentType(MediaType.APPLICATION_JSON_VALUE))
+//		ResultActions perform = mockMvc.perform(mockHttpServletRequestBuilder);
+//		MvcResult mvcResult = perform.andReturn();
+//		.andExpect(status().isOk());
+//	}
+	@Test
+	public void findById() throws Exception {
+	when(userService.findById(Mockito.anyLong())).thenReturn(new User(1L, "anju", "g", "anjali@"));
+	MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders
+			.get("/bankService/v1/banks/25").contentType(MediaType.APPLICATION_JSON_VALUE);
+	ResultActions perform = mockMvc.perform(mockHttpServletRequestBuilder);
+	MvcResult mvcResult = perform.andReturn();
+	Assertions.assertEquals(200, mvcResult.getResponse().getStatus());
+}
+}

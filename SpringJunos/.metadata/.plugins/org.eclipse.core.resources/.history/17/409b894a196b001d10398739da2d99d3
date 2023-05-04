@@ -1,0 +1,15 @@
+package com.junodx.api.connectors.aws.sns;
+
+import software.amazon.awssdk.services.sns.model.PublishResponse;
+
+public class SnsMessageResponse {
+    PublishResponse response;
+
+    public PublishResponse getResponse() {
+        return response;
+    }
+
+    public void setResponse(PublishResponse response) {
+        this.response = response;
+    }
+}

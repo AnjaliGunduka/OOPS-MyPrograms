@@ -1,0 +1,1 @@
+Welcome to Juno, ${firstName}! Please activate your Kit and Account

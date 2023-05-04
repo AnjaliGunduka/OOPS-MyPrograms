@@ -1,0 +1,5 @@
+package com.jdbc.spring.hiber.model;
+
+public class User {
+
+}

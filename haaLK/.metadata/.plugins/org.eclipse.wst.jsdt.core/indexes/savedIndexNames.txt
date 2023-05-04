@@ -1,0 +1,17 @@
+INDEX VERSION 1.4+D:\haaLK\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+2123408349.index
+564067944.index
+4168980058.index
+1847342776.index
+1361424168.index
+2690224176.index
+499297106.index
+1374726868.index
+2998154679.index
+1041265767.index
+2063189978.index
+1536269625.index
+3177122722.index
+1568752041.index
+3856213004.index
+1569471833.index

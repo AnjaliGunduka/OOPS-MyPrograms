@@ -1,0 +1,19 @@
+INDEX VERSION 1.131
+D:\Jdbc\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\103565514.index
+\ProductsInfo\src\main\java
+D:\Jdbc\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1491924711.index
+\Jdbc.connection.jsp\src\main\java
+D:\Jdbc\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\578524082.index
+\StuInfo\src\main\resources
+D:\Jdbc\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2587050634.index
+\StudentsLibraryInfo\src\main\java
+D:\Jdbc\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2756036980.index
+\StudentDetail\src\main\resources
+D:\Jdbc\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1032729317.index
+\st\src\main\resources
+D:\Jdbc\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\677304770.index
+\STD\src\main\java
+D:\Jdbc\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3873040420.index
+\StudentsInformation\src\main\resources
+D:\Jdbc\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3924416630.index
+\StudentInfo\src\main\java

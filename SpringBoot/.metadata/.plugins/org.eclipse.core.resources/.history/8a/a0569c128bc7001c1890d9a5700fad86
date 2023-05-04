@@ -1,0 +1,28 @@
+spring:
+  cache:
+    type: redis
+    redis:
+      time-to-live: 60000
+      cache-null-values: true
+management:
+    endpoints:
+        web:
+            exposure:
+                include: '*'
+server:
+    port: 8683
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: Tiger
+        url: jdbc:mysql://localhost:3306/studentServices
+        username: root
+        hikari:
+           initialization-fail-timeout: 0
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL57Dialect
+        generate-ddl: true
+        hibernate:
+            ddl-auto: create
+            naming:
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        show-sql: true

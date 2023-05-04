@@ -1,0 +1,12 @@
+
+•
+java:S1192m"aDefine a constant instead of duplicating this literal "Jwt token generated successfully" 5 times.(ØÖÿ»øÿÿÿÿH¬LRCRITICALZ
+CODE_SMELL
+m	java:S107¾"<Method has 9 parameters, which is greater than 7 authorized.(½–Á¯üÿÿÿÿH²LRMAJORZ
+CODE_SMELL
+‘
+java:S1192s"bDefine a constant instead of duplicating this literal "Authentication details are saved." 5 times.(±‹ö™H¦LRCRITICALZ
+CODE_SMELL
+
+java:S3776T"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(¨ÍÂ…H³LRCRITICALZ
+CODE_SMELL

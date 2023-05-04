@@ -1,0 +1,29 @@
+
+~
+java:S1128	"KRemove this unused import 'springfox.documentation.builders.PathSelectors'.(âİ¸ñ8Ø¤ê0HÆmRMINORZ
+CODE_SMELL
+‹
+java:S1128"XRemove this unused import 'springfox.documentation.swagger2.annotations.EnableSwagger2'.(ùÔ¨8Ø¤ê0HÒmRMINORZ
+CODE_SMELL
+
+java:S1128"NRemove this unused import 'springfox.documentation.spring.web.plugins.Docket'.(‡éÔå8Ø¤ê0HĞmRMINORZ
+CODE_SMELL
+
+java:S1128
+"URemove this unused import 'springfox.documentation.builders.RequestHandlerSelectors'.(òßª¿ıÿÿÿÿ8Ø¤ê0HÈmRMINORZ
+CODE_SMELL
+w
+java:S1128"DRemove this unused import 'springfox.documentation.service.Contact'.(×÷’Ã8Ø¤ê0HÌmRMINORZ
+CODE_SMELL
+}
+java:S1128"JRemove this unused import 'springfox.documentation.spi.DocumentationType'.(ÉêÉ¥8Ø¤ê0HÎmRMINORZ
+CODE_SMELL
+j
+java:S1128"2Remove this unused import 'java.util.Collections'.(¢³ïÓşÿÿÿÿ8Ø¤ê0HÂmRMINORZ
+CODE_SMELL
+{
+java:S1128"HRemove this unused import 'org.springframework.context.annotation.Bean'.(‚î‰Ş8Ø¤ê0HÄmRMINORZ
+CODE_SMELL
+|
+java:S1128"DRemove this unused import 'springfox.documentation.service.ApiInfo'.(ŸÈ÷àûÿÿÿÿ8Ø¤ê0HÊmRMINORZ
+CODE_SMELL

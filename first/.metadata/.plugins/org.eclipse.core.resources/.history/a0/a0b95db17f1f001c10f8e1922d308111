@@ -1,0 +1,5 @@
+package com.kb.dao;
+
+public class EmployeeDAOImpl {
+
+}

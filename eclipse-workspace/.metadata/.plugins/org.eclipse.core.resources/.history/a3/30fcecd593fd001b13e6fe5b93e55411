@@ -1,0 +1,16 @@
+package Classes;
+
+public class StaticVariable {
+
+	int rollno;// instance variable
+	static String name;// static variable
+
+	public StaticVariable(int rollno) {
+		super();
+		this.rollno = rollno;
+	}
+
+	public static void main(String[] args) {
+        
+	}
+}

@@ -1,0 +1,15 @@
+jdbc.driverClassName = com.mysql.jdbc.Driver
+ 
+jdbc.url = jdbc:mysql://<u>localhost</u>:3306/<u>stm</u>
+ 
+jdbc.username = root
+ 
+jdbc.password = root
+ 
+hibernate.dialect = org.hibernate.dialect.MySQL5InnoDBDialect
+ 
+hibernate.show_sql = true
+ 
+hibernate.format_sql = true
+ 
+hibernate.hbm2ddl.auto = update

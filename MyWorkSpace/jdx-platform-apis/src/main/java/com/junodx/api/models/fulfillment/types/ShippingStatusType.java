@@ -1,0 +1,20 @@
+package com.junodx.api.models.fulfillment.types;
+
+public enum ShippingStatusType {
+    AWAITING_ASSEMBLY,
+    ASSEMBLED,
+    LABEL_CREATED,
+    DELIVERED_TO_CARRIER,
+    SHIPPED,
+    RETURN_SHIPPED,
+    EN_ROUTE_TO_DESTINATION,
+    ARRIVING_TODAY,
+    RETURN_ARRIVING_TODAY,
+    ARRIVED,
+    RETURN_ARRIVED,
+    DELAYED,
+    RETURN_DELAYED,
+    CANCELLED,
+    REQUIRES_REVIEW,
+    CLOSED
+}

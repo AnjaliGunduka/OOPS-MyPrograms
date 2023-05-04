@@ -1,0 +1,73 @@
+Manifest-Version: 1.0
+Build-Jdk-Spec: 15
+Class-Path: spring-boot-starter-data-jpa-2.6.3.jar spring-boot-starter-a
+ op-2.6.3.jar aspectjweaver-1.9.7.jar spring-boot-starter-jdbc-2.6.3.jar
+  HikariCP-4.0.3.jar spring-jdbc-5.3.15.jar jakarta.transaction-api-1.3.
+ 3.jar jakarta.persistence-api-2.2.3.jar hibernate-core-5.6.4.Final.jar 
+ jboss-logging-3.4.3.Final.jar byte-buddy-1.11.22.jar antlr-2.7.7.jar ja
+ ndex-2.4.2.Final.jar classmate-1.5.1.jar hibernate-commons-annotations-
+ 5.1.2.Final.jar jaxb-runtime-2.3.5.jar txw2-2.3.5.jar istack-commons-ru
+ ntime-3.0.12.jar spring-data-jpa-2.6.1.jar spring-data-commons-2.6.1.ja
+ r spring-orm-5.3.15.jar spring-context-5.3.15.jar spring-tx-5.3.15.jar 
+ spring-beans-5.3.15.jar slf4j-api-1.7.33.jar spring-aspects-5.3.15.jar 
+ spring-boot-starter-security-2.6.3.jar spring-boot-starter-2.6.3.jar sp
+ ring-boot-starter-logging-2.6.3.jar logback-classic-1.2.10.jar logback-
+ core-1.2.10.jar log4j-to-slf4j-2.17.1.jar log4j-api-2.17.1.jar jul-to-s
+ lf4j-1.7.33.jar snakeyaml-1.29.jar spring-aop-5.3.15.jar spring-securit
+ y-config-5.6.1.jar spring-security-web-5.6.1.jar spring-expression-5.3.
+ 15.jar spring-boot-starter-web-2.6.3.jar spring-boot-starter-json-2.6.3
+ .jar jackson-datatype-jdk8-2.13.1.jar jackson-datatype-jsr310-2.13.1.ja
+ r jackson-module-parameter-names-2.13.1.jar spring-web-5.3.15.jar sprin
+ g-webmvc-5.3.15.jar spring-boot-configuration-processor-2.6.3.jar sprin
+ g-boot-devtools-2.6.3.jar spring-boot-2.6.3.jar spring-boot-autoconfigu
+ re-2.6.3.jar postgresql-42.3.1.jar checker-qual-3.5.0.jar jakarta.annot
+ ation-api-1.3.5.jar jakarta.xml.bind-api-2.3.3.jar jakarta.activation-a
+ pi-1.2.2.jar spring-core-5.3.15.jar spring-jcl-5.3.15.jar hibernate-typ
+ es-55-2.14.0.jar jackson-module-jaxb-annotations-2.13.1.jar jackson-ann
+ otations-2.13.1.jar jackson-core-2.13.1.jar spring-security-core-5.6.1.
+ jar spring-security-crypto-5.6.1.jar mvc-auth-commons-1.2.0.jar auth0-1
+ .15.0.jar okhttp-3.14.9.jar okio-1.17.2.jar logging-interceptor-3.14.9.
+ jar java-jwt-3.9.0.jar jwks-rsa-0.9.0.jar guava-27.1-jre.jar failureacc
+ ess-1.0.1.jar listenablefuture-9999.0-empty-to-avoid-conflict-with-guav
+ a.jar jsr305-3.0.2.jar error_prone_annotations-2.2.0.jar j2objc-annotat
+ ions-1.1.jar animal-sniffer-annotations-1.17.jar javax.servlet-api-4.0.
+ 1.jar bcprov-jdk15on-1.64.jar validation-api-2.0.1.Final.jar aws-java-s
+ dk-core-1.11.604.jar commons-logging-1.1.3.jar httpclient-4.5.13.jar ht
+ tpcore-4.4.15.jar ion-java-1.0.2.jar jackson-databind-2.13.1.jar jackso
+ n-dataformat-cbor-2.13.1.jar joda-time-2.8.1.jar aws-java-sdk-rds-1.11.
+ 661.jar jmespath-java-1.11.661.jar protocol-core-2.17.172.jar sdk-core-
+ 2.17.172.jar reactive-streams-1.0.3.jar annotations-2.17.172.jar utils-
+ 2.17.172.jar http-client-spi-2.17.172.jar sns-2.17.172.jar aws-query-pr
+ otocol-2.17.172.jar auth-2.17.172.jar json-utils-2.17.172.jar eventstre
+ am-1.0.1.jar regions-2.17.172.jar aws-core-2.17.172.jar metrics-spi-2.1
+ 7.172.jar apache-client-2.17.172.jar netty-nio-client-2.17.172.jar nett
+ y-codec-http-4.1.73.Final.jar netty-codec-http2-4.1.73.Final.jar netty-
+ codec-4.1.73.Final.jar netty-transport-4.1.73.Final.jar netty-resolver-
+ 4.1.73.Final.jar netty-common-4.1.73.Final.jar netty-buffer-4.1.73.Fina
+ l.jar netty-handler-4.1.73.Final.jar netty-tcnative-classes-2.0.46.Fina
+ l.jar netty-transport-classes-epoll-4.1.73.Final.jar netty-transport-na
+ tive-unix-common-4.1.73.Final.jar netty-reactive-streams-http-2.0.5.jar
+  netty-reactive-streams-2.0.5.jar s3-2.17.172.jar aws-xml-protocol-2.17
+ .172.jar arns-2.17.172.jar profiles-2.17.172.jar nimbus-jose-jwt-4.23.j
+ ar jcip-annotations-1.0-1.jar json-smart-2.4.7.jar accessors-smart-2.4.
+ 7.jar asm-9.1.jar commons-io-2.11.0.jar jjwt-0.9.1.jar javax.ws.rs-api-
+ 2.0.jar jersey-server-3.0.4.jar jersey-client-2.35.jar jakarta.ws.rs-ap
+ i-2.1.6.jar jakarta.inject-api-2.0.0.jar jakarta.validation-api-2.0.2.j
+ ar jersey-common-2.35.jar jakarta.inject-2.6.1.jar osgi-resource-locato
+ r-1.0.3.jar opencsv-5.6.jar commons-text-1.9.jar commons-beanutils-1.9.
+ 4.jar commons-collections-3.2.2.jar commons-collections4-4.4.jar stripe
+ -java-20.114.0.jar gson-2.9.0.jar shippo-java-client-3.2.0.jar spring-b
+ oot-starter-mail-2.7.0.jar spring-context-support-5.3.15.jar jakarta.ma
+ il-1.6.7.jar jakarta.activation-1.2.2.jar javax.mail-1.5.2.jar activati
+ on-1.1.jar freemarker-2.3.31.jar commons-lang3-3.12.0.jar commons-codec
+ -1.9.jar springdoc-openapi-ui-1.6.9.jar springdoc-openapi-webmvc-core-1
+ .6.9.jar springdoc-openapi-common-1.6.9.jar swagger-core-2.2.0.jar jack
+ son-dataformat-yaml-2.13.1.jar swagger-annotations-2.2.0.jar swagger-mo
+ dels-2.2.0.jar swagger-ui-4.11.1.jar webjars-locator-core-0.48.jar clas
+ sgraph-4.8.147.jar kms-2.17.172.jar aws-json-protocol-2.17.172.jar thir
+ d-party-jackson-core-2.17.172.jar
+Implementation-Title: api
+Implementation-Version: 0.0.1-SNAPSHOT
+Main-Class: com.junodx.api.ApiApplication
+Created-By: Maven Integration for Eclipse
+

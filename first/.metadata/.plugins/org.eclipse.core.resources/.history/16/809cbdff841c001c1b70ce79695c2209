@@ -1,0 +1,70 @@
+<html>
+ 
+<head>
+ 
+<meta http-equiv=<em>"Content-Type"</em> content=<em>"text/html; charset=UTF-8"</em>>
+ 
+<title>JSP List Product Records</title>
+ 
+</head>
+ 
+<body>
+ 
+<div align=<em>"center"</em>>
+ 
+<table border=<em>"1"</em> cellpadding=<em>"15"</em>>
+ 
+<caption><u><</u><u>h2</u> <u>style</u><u>="</u><u>background-color</u><u>: </u><em><u>#11632E</u></em><u>; </u><u>color</u><u>:</u><em><u>#FFFFFF</u></em><u>;</u><u>align</u><u>:</u><em><u>center</u></em><u>"</u><u>></u>List of Products</h2></caption>
+ 
+<tr>
+ 
+<th>ID</th>
+ 
+<th>Name</th>
+ 
+<th>Price</th>
+ 
+<th>Type</th>
+ 
+<th>Action</th>
+ 
+</tr>
+ 
+<c:forEach var=<em>"product"</em> items=<em>"</em>${msg}<em>"</em>>
+ 
+<c:url var=<em>"deletelink"</em> value=<em>"deleteproduct"</em>>
+ 
+<c:param name=<em>"pid"</em> value=<em>"</em>${product.productId}<em>"</em>></c:param>
+ 
+</c:url>
+ 
+<tr>
+ 
+<td><c:out value="${product.productId}<em>"</em> /></td>
+ 
+<td><c:out value=<em>"</em>${product.productName}<em>"</em> /></td>
+ 
+<td><c:out value=<em>"</em>${product.productPrice}<em>"</em> /></td>
+ 
+<td><c:out value=<em>"</em>${product.productType}<em>"</em> /></td>
+ 
+ 
+ 
+<td><a href=<em>"</em>${deletelink}<em>"</em>>Delete</a></td>
+ 
+</tr>
+ 
+</c:forEach>
+ 
+</table>
+ 
+<c:url var="back_home" value="backtoindex"/>
+ 
+<a href="${back_home}">< Return to Home Page</a>
+ 
+</div>
+ 
+</body>
+ 
+</html>
+ 

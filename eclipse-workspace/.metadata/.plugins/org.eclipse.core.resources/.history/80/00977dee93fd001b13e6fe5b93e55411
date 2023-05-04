@@ -1,0 +1,19 @@
+package Classes;
+
+public class StaticVariable {
+
+	int rollno;// instance variable
+	static String name;// static variable
+
+	public StaticVariable(int rollno) {
+		super();
+		this.rollno = rollno;
+	}
+
+	public static void main(String[] args) {
+		StaticVariable a=new StaticVariable(534);
+		name="Anjali";
+		System.out.println(a.rollno);
+		System.out.println("my name is"+name);
+	}
+}

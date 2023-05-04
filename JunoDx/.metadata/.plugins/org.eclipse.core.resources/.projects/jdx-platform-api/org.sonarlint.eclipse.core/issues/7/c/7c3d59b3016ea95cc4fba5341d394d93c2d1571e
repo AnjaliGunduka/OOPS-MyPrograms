@@ -1,0 +1,45 @@
+
+ˆ
+java:S26298"\Invoke method(s) only conditionally. Use the built-in formatting to construct this argument.(Æü£FH²§RMAJORZ
+CODE_SMELL
+d
+java:S2629:"7Use the built-in formatting to construct this argument.(íà…ÕH³§RMAJORZ
+CODE_SMELL
+‰
+java:S2629A"\Invoke method(s) only conditionally. Use the built-in formatting to construct this argument.(õä§÷H´§RMAJORZ
+CODE_SMELL
+{
+java:S22599"PA "NullPointerException" could be thrown; "refreshXifinToken()" can return null.(ÓşûĞşÿÿÿÿHµ§RMAJORZBUG
+m
+java:S34578"AFormat specifiers should be used instead of string concatenation.(Æü£FH¸§RMAJORZ
+CODE_SMELL
+n
+java:S3457:"AFormat specifiers should be used instead of string concatenation.(íà…ÕH¹§RMAJORZ
+CODE_SMELL
+n
+java:S3457A"AFormat specifiers should be used instead of string concatenation.(õä§÷Hº§RMAJORZ
+CODE_SMELL
+n
+java:S3457G"AFormat specifiers should be used instead of string concatenation.(»±ÜÙH»§RMAJORZ
+CODE_SMELL
+n
+java:S3457d"AFormat specifiers should be used instead of string concatenation.(»±ÜÙH¼§RMAJORZ
+CODE_SMELL
+q
+java:S1128"DRemove this unused import 'com.fasterxml.jackson.databind.JsonNode'.(–×ªH½§RMINORZ
+CODE_SMELL
+d
+java:S1128"7Remove this unused import 'com.google.gson.JsonObject'.(µÊ´½H¿§RMINORZ
+CODE_SMELL
+„
+java:S1128	"WRemove this unused import 'com.junodx.api.controllers.salesforce.SalesforceController'.(Ñº–ßHÁ§RMINORZ
+CODE_SMELL
+g
+java:S1128"5Remove this unused import 'java.nio.charset.Charset'.(ü¶ØŸıÿÿÿÿHÃ§RMINORZ
+CODE_SMELL
+]
+java:S1128"0Remove this unused import 'java.util.ArrayList'.(÷‰îƒHÅ§RMINORZ
+CODE_SMELL
+]
+java:S1128"+Remove this unused import 'java.util.List'.(Õë±ÄøÿÿÿÿHÇ§RMINORZ
+CODE_SMELL

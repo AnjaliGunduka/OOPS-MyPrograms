@@ -1,0 +1,25 @@
+
+†
+java:S37766"RRefactor this method to reduce its Cognitive Complexity from 25 to the 15 allowed.(õšàäúÿÿÿÿHìKRCRITICALZ
+CODE_SMELL
+h	java:S125Ú"<This block of commented-out lines of code should be removed.(‘à²šHŽLRMAJORZ
+CODE_SMELL
+˜
+java:S4165ˆ"lRemove this useless assignment; "commissionList" already holds the assigned value along all execution paths.(ðï…yHèKRMAJORZ
+CODE_SMELL
+r
+java:S2259["HA "NullPointerException" could be thrown; "ticketType" is nullable here.(à€¥ÈøÿÿÿÿHäKRMAJORZBUG
+s
+java:S1128"GRemove this unused import 'com.bmt.onboarding.response.RecordResponse'.(Ã±ðÿHŸLRMINORZ
+CODE_SMELL
+q
+java:S11241"EReorder the modifiers to comply with the Java Language Specification.(ÐÇµãHéKRMINORZ
+CODE_SMELL
+]
+java:S1128"1Remove this unused import 'java.math.BigInteger'.(»Çâ€HLRMINORZ
+CODE_SMELL
+h	java:S125À"<This block of commented-out lines of code should be removed.(‘à²šHÿKRMAJORZ
+CODE_SMELL
+˜
+java:S4165‹"lRemove this useless assignment; "commissionList" already holds the assigned value along all execution paths.(ðï…yHçKRMAJORZ
+CODE_SMELL

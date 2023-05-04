@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="com.student.library.services.entity.StudentBookIssue"/>
+    <fullyQualifiedTypeName name="com.student.library.services.enums.RequestedStudent"/>
+    <fullyQualifiedTypeName name="com.student.library.services.request.StudentBookIssueRequest"/>
+    <fullyQualifiedTypeName name="com.student.library.services.entity.Book"/>
+    <fullyQualifiedTypeName name="com.student.library.services.entity.RequestBook"/>
+</qualifiedTypeNameHistroy>

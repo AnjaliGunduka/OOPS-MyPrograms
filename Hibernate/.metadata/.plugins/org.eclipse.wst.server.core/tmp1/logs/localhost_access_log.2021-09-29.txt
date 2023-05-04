@@ -1,0 +1,14 @@
+127.0.0.1 - - [29/Sep/2021:09:31:35 +0530] "GET / HTTP/1.1" 404 751
+0:0:0:0:0:0:0:1 - - [29/Sep/2021:09:31:36 +0530] "GET /SpringMVC_HibernateCRUD/ HTTP/1.1" 404 682
+0:0:0:0:0:0:0:1 - - [29/Sep/2021:09:32:22 +0530] "GET /SpringMVC_HibernateCRUD/ HTTP/1.1" 404 682
+0:0:0:0:0:0:0:1 - - [29/Sep/2021:09:32:29 +0530] "GET /SpringMVC_HibernateCRUD/studentform HTTP/1.1" 200 501
+0:0:0:0:0:0:0:1 - - [29/Sep/2021:09:33:20 +0530] "POST /SpringMVC_HibernateCRUD/addStudent HTTP/1.1" 500 16723
+0:0:0:0:0:0:0:1 - - [29/Sep/2021:09:34:37 +0530] "GET /SpringMVC_HibernateCRUD/studentform HTTP/1.1" 200 501
+0:0:0:0:0:0:0:1 - - [29/Sep/2021:09:34:48 +0530] "POST /SpringMVC_HibernateCRUD/addStudent HTTP/1.1" 500 16723
+127.0.0.1 - - [29/Sep/2021:09:35:32 +0530] "GET / HTTP/1.1" 404 751
+0:0:0:0:0:0:0:1 - - [29/Sep/2021:09:35:33 +0530] "GET /SpringMVC_HibernateCRUD/ HTTP/1.1" 404 682
+0:0:0:0:0:0:0:1 - - [29/Sep/2021:09:35:40 +0530] "GET /SpringMVC_HibernateCRUD/studentform HTTP/1.1" 200 501
+0:0:0:0:0:0:0:1 - - [29/Sep/2021:09:35:53 +0530] "POST /SpringMVC_HibernateCRUD/addStudent HTTP/1.1" 302 -
+0:0:0:0:0:0:0:1 - - [29/Sep/2021:09:35:55 +0530] "GET /SpringMVC_HibernateCRUD/getAllStudents HTTP/1.1" 200 403
+127.0.0.1 - - [29/Sep/2021:12:22:53 +0530] "GET / HTTP/1.1" 404 751
+0:0:0:0:0:0:0:1 - - [29/Sep/2021:12:22:54 +0530] "GET /SpringMVC_HibernateCRUD/ HTTP/1.1" 404 682

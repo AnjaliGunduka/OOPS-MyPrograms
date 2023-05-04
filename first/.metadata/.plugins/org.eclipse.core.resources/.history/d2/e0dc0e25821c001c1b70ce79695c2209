@@ -1,0 +1,42 @@
+<html>
+ 
+<head>
+ 
+<meta http-equiv=<em>>
+ 
+<title>Add New Stock Product</title>
+ 
+</head>
+ 
+<body>
+<div align=<em>>
+ 
+<form method=<em>"POST"</em> action=<em>"addproduct"</em>>
+ 
+ 
+ 
+<table style="align: <em>center</em>; background-color:<em>#F1E6E6</em>; border=0; cellpadding=5">
+ 
+<caption><u><</u><u>h2</u> <u>style</u><u>="</u><u>background-color</u><u>: </u><em><u>#11632E</u></em><u>; </u><u>color</u><u>:</u><em><u>#FFFFFF</u></em><u>;</u><u>align</u><u>:</u><em><u>center</u></em><u>"</u><u>></u>Add New Product</h2></caption>
+ 
+<tr> <td> Enter Product Name:</td><td><input type=<em>"text"</em> name=<em>"productName"</em>></td>   </tr>
+ 
+<tr> <td> Enter Product Price:</td><td><input type=<em>"text"</em> name=<em>"productPrice"</em>></td>   </tr>
+ 
+<tr> <td> Enter Product Category:</td><td><input type=<em>"text"</em> name=<em>"productType"</em>></td>   </tr>
+ 
+</table>
+ 
+<input type=<em>"submit"</em> value=<em>"Add Product>>"</em>>
+ 
+</form>
+ 
+<c:url var=<em>"back_home"</em> value=<em>"backtoindex"</em> />
+ 
+<a href=<em>"</em>${back_home}<em>"</em>> <u><</u>< Return to Home Page</a>
+ 
+</div>
+ 
+</body>
+ 
+</html>

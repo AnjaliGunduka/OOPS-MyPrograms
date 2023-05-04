@@ -1,0 +1,24 @@
+package com.hiber.Service;
+
+import org.springframework.stereotype.Service;
+
+import com.hiber.controller.ProductService;
+@Service("ps")
+public class ProductServiceImpl implements ProductService{
+	@Autowired
+	ProductDAO productDAO;
+	public List getAllProducts() {
+		return productDAO.getAllProducts();
+ 
+	}
+ 
+	public boolean addProduct(Product product) {
+		productDAO.addProduct(product);
+		return true;
+	}
+ 
+	public boolean deleteProduct(int productId) {
+		return productDAO.deleteProduct(productId);
+ 
+	}
+}

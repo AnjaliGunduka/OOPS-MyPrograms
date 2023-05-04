@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+    <!-- DispatcherServlet Context: defines this servlet's request-processing 
+        infrastructure -->
+
+    <!-- Enables the Spring MVC @Controller programming model -->
+    <tx:annotation-driven transaction-manager="hibernateTransactionManager"/>
+
+    <!-- Handles HTTP GET requests for /resources/** by efficiently serving 
+        up static resources in the ${webappRoot}/resources directory -->
+    <resources mapping="/resources/**" location="/resources/" />
+
+
+    <!-- Resolves views selected for rendering by @Controllers to .jsp resources 
+        in the /WEB-INF/views directory -->
+    <beans:bean
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <beans:property name="prefix" value="/WEB-INF/views/" />
+        <beans:property name="suffix" value=".jsp" />
+    </beans:bean>
+
+    <beans:bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+        destroy-method="close">
+        <beans:property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <beans:property name="url" value="jdbc:mysql://localhost/assessme" />
+        <beans:property name="username" value="assessme" />
+        <beans:property name="password" value="assessme" />
+    </beans:bean>
+
+     <beans:bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+    <beans:property name="annotatedClasses">
+        <beans:list>
+            <beans:value>org.assessme.com.entity.User</beans:value>
+        </beans:list>
+    </beans:property>
+        <beans:property name="dataSource" ref="dataSource" />
+        <beans:property name="packagesToScan" value="org.assessme.com.controller.entity" />
+        <beans:property name="hibernateProperties">
+            <beans:props>
+                <beans:prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</beans:prop>
+                <beans:prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</beans:prop>
+                <beans:prop key="hibernate.show_sql">true</beans:prop>
+                <beans:prop key="hibernate.hbm2ddl.auto">update</beans:prop>
+            </beans:props>
+        </beans:property>
+    </beans:bean>
+
+    <context:component-scan base-package="org.assessme.com." />
+
+    <beans:bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <beans:property name="mediaTypes">
+            <beans:map>
+                <beans:entry key="html" value="text/html" />
+                <beans:entry key="json" value="application/json" />
+            </beans:map>
+        </beans:property>
+        <beans:property name="defaultViews">
+            <beans:list>
+                <beans:bean
+                    class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+                    <beans:property name="prefixJson" value="true" />
+                </beans:bean>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+<beans:bean id="hibernateTransactionManager"
+        class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <beans:property name="sessionFactory" ref="sessionFactory" />
+    </beans:bean>
+
+</beans:beans>

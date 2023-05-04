@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Built-By: anjalig
+Build-Jdk: 16.0.2
+Implementation-Title: spring-cloud-feign
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: com.example
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-boot
+ -starter-parent/spring-cloud-feign
+Created-By: Maven Integration for Eclipse
+

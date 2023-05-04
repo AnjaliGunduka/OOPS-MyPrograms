@@ -1,0 +1,49 @@
+
+Q
+java:S1128"Remove this duplicated import.(Ë”ÖÏ8ŠÐ¬³ë0HñxRMINORZ
+CODE_SMELL
+s	java:S125"<This block of commented-out lines of code should be removed.(»ž•ûÿÿÿÿ8ÞïÔ³ë0H©yRMAJORZ
+CODE_SMELL
+{
+java:S1128"HRemove this unused import 'org.springframework.boot.WebApplicationType'.(ðŽŒ²8™’Õ³ë0HøyRMINORZ
+CODE_SMELL
+Ž
+java:S1128"VRemove this unused import 'org.springframework.boot.builder.SpringApplicationBuilder'.(«ÝÒøÿÿÿÿ8™’Õ³ë0HúyRMINORZ
+CODE_SMELL
+Œ
+java:S1128"TRemove this unused import 'org.springframework.cloud.client.DefaultServiceInstance'.(±öøôÿÿÿÿÿ8™’Õ³ë0HüyRMINORZ
+CODE_SMELL
+€
+java:S1128	"MRemove this unused import 'org.springframework.cloud.client.ServiceInstance'.(¡‡¨ã8™’Õ³ë0HþyRMINORZ
+CODE_SMELL
+Š
+java:S1128
+"WRemove this unused import 'org.springframework.cloud.client.loadbalancer.LoadBalanced'.(Éâ¦‡8™’Õ³ë0H€zRMINORZ
+CODE_SMELL
+™
+java:S1128"aRemove this unused import 'org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient'.(šÑÄ‘øÿÿÿÿ8™’Õ³ë0H‚zRMINORZ
+CODE_SMELL
+œ
+java:S1128"dRemove this unused import 'org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier'.(¿ê¬Èúÿÿÿÿ8™’Õ³ë0H„zRMINORZ
+CODE_SMELL
+‰
+java:S1128"WRemove this unused import 'org.springframework.context.ConfigurableApplicationContext'.(ÉšêC8™’Õ³ë0H†zRMINORZ
+CODE_SMELL
+{
+java:S1128"HRemove this unused import 'org.springframework.context.annotation.Bean'.(‚î‰Þ8™’Õ³ë0HˆzRMINORZ
+CODE_SMELL
+‰
+java:S1128"QRemove this unused import 'org.springframework.context.annotation.Configuration'.(¬²Úäþÿÿÿÿ8™’Õ³ë0HŠzRMINORZ
+CODE_SMELL
+
+java:S1128"WRemove this unused import 'org.springframework.web.reactive.function.client.WebClient'.(¬àŽ•ýÿÿÿÿ8™’Õ³ë0HŒzRMINORZ
+CODE_SMELL
+p
+java:S1128"8Remove this unused import 'reactor.core.publisher.Flux'.(·äÍÆøÿÿÿÿ8™’Õ³ë0HŽzRMINORZ
+CODE_SMELL
+e
+java:S1128"-Remove this unused import 'java.util.Arrays'.(î–˜Éüÿÿÿÿ8™’Õ³ë0HzRMINORZ
+CODE_SMELL
+c
+java:S1128"+Remove this unused import 'java.util.List'.(Õë±Äøÿÿÿÿ8™’Õ³ë0H’zRMINORZ
+CODE_SMELL

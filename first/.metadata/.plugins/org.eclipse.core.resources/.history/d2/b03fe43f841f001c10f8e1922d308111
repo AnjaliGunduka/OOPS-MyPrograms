@@ -1,0 +1,5 @@
+package net.codejava.customer;
+
+public class Customer {
+
+}

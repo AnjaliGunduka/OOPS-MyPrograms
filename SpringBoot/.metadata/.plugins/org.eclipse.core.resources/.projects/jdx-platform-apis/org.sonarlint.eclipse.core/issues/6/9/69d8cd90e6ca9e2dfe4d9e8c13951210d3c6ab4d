@@ -1,0 +1,88 @@
+
+g
+java:S1141}"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿHÕÿRMAJORZ
+CODE_SMELL
+[
+java:S5411…"(Use a primitive boolean expression here.(İü¨óÿÿÿÿÿH×ÿRMINORZ
+CODE_SMELL
+[
+java:S5411‡"(Use a primitive boolean expression here.(İ×ïĞıÿÿÿÿHÚÿRMINORZ
+CODE_SMELL
+c
+java:S4973º"<Strings and Boxed types should be compared using "equals()".(ÈÃĞÁHİÿRMAJORZBUG
+p
+java:S2583ó"DChange this condition so that it does not always evaluate to "false"(õ¼æèıÿÿÿÿHáÿRMAJORZBUG
+e
+java:S2387U"1"mapper" is the name of a field in "ServiceBase".(íÉûÿÿÿÿHåÿRBLOCKERZ
+CODE_SMELL
+‚
+java:S3776d"RRefactor this method to reduce its Cognitive Complexity from 91 to the 15 allowed.(½æŸ›HæÿRCRITICALZ
+CODE_SMELL
+c
+java:S1135s"2Complete the task associated to this TODO comment.(ø°˜³øÿÿÿÿHª€	RINFOZ
+CODE_SMELL
+i	java:S125¶"<This block of commented-out lines of code should be removed.(ÿƒ—‘H«€	RMAJORZ
+CODE_SMELL
+q
+java:S1155ğ">Use isEmpty() to check whether the collection is empty or not.(©Œ¹öıÿÿÿÿH¬€	RMINORZ
+CODE_SMELL
+ˆ
+java:S3776·"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(ÉÕ×ÿÿÿÿÿH¯€	RCRITICALZ
+CODE_SMELL
+ˆ
+java:S3776Í"RRefactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.(Âá‹öüÿÿÿÿH¹€	RCRITICALZ
+CODE_SMELL
+d
+java:S1135Ú"2Complete the task associated to this TODO comment.(Â™˜¡úÿÿÿÿHÅ€	RINFOZ
+CODE_SMELL
+…
+java:S2737‰"WAdd logic to this catch clause or eliminate it and rethrow the exception automatically.(ö™ûHÆ€	RMINORZ
+CODE_SMELL
+o
+java:S1128"=Remove this unused import 'com.amazonaws.event.DeliveryMode'.(¹ù‡¾ÿÿÿÿÿHÇ€	RMINORZ
+CODE_SMELL
+
+java:S1128"ORemove this unused import 'com.fasterxml.jackson.core.JsonProcessingException'.(ßÔïÇûÿÿÿÿHÉ€	RMINORZ
+CODE_SMELL
+|
+java:S1128"ORemove this unused import 'com.junodx.api.dto.mappers.CommerceMapStructMapper'.(„á…ÇHË€	RMINORZ
+CODE_SMELL
+{
+java:S1128"ORemove this unused import 'com.junodx.api.dto.models.commerce.PendingOrderDto'.(½ÏÃHÍ€	RMINORZ
+CODE_SMELL
+‚
+java:S1128"URemove this unused import 'com.junodx.api.dto.models.commerce.PendingTransactionDto'.(şì²HÏ€	RMINORZ
+CODE_SMELL
+n
+java:S1128"ARemove this unused import 'com.junodx.api.models.auth.Authority'.(Â–¸ÓHÑ€	RMINORZ
+CODE_SMELL
+
+java:S1128"SRemove this unused import 'com.junodx.api.models.commerce.types.PaymentMethodType'.(Â¢aHÓ€	RMINORZ
+CODE_SMELL
+
+java:S1128"RRemove this unused import 'com.junodx.api.models.fulfillment.FulfillmentProvider'.(’ûÛåHÕ€	RMINORZ
+CODE_SMELL
+w
+java:S1128"JRemove this unused import 'com.junodx.api.models.inventory.InventoryItem'.(¦ŠŒ¬H×€	RMINORZ
+CODE_SMELL
+
+java:S1128#"[Remove this unused import 'com.junodx.api.services.fulfillment.FulfillmentProviderService'.(ÕÑù°ûÿÿÿÿHÙ€	RMINORZ
+CODE_SMELL
+u
+java:S1128%"CRemove this unused import 'com.junodx.api.services.lab.KitService'.(ˆ«õìüÿÿÿÿHÛ€	RMINORZ
+CODE_SMELL
+|
+java:S1128&"JRemove this unused import 'com.junodx.api.services.lab.LaboratoryService'.(¼÷ŒüÿÿÿÿHİ€	RMINORZ
+CODE_SMELL
+s
+java:S1128)"ARemove this unused import 'com.stripe.exception.StripeException'.(şÏßòúÿÿÿÿHß€	RMINORZ
+CODE_SMELL
+j
+java:S11283"8Remove this unused import 'java.util.stream.Collectors'.(Óóº´úÿÿÿÿHá€	RMINORZ
+CODE_SMELL
+V
+java:S1068S"*Remove this unused "logger" private field.(—Õ¯kHã€	RMAJORZ
+CODE_SMELL
+\
+java:S1068U"*Remove this unused "mapper" private field.(íÉûÿÿÿÿHå€	RMAJORZ
+CODE_SMELL

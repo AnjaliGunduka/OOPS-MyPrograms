@@ -1,0 +1,36 @@
+package com.example.demo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class LambdaExpresionsApplication {
+
+	public static void main(String[] args) {
+		
+		
+		/**
+		 * 1.Using LambdaExpressions
+		 * 
+		 */
+	List<Integer> list=new ArrayList<Integer>();
+	list.add(1);
+	list.add("");
+		
+		
+		
+		
+		
+		
+		
+		
+		SpringApplication.run(LambdaExpresionsApplication.class, args);
+	}
+
+	
+	
+	
+}

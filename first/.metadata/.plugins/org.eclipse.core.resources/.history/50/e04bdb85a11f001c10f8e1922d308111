@@ -1,0 +1,5 @@
+package com.emp.dao;
+
+public interface EmployeeDAO {
+
+}

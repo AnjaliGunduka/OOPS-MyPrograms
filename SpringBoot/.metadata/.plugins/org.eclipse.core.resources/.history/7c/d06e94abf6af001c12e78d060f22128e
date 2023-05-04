@@ -1,0 +1,34 @@
+package com.spring.demo;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
+
+import com.spring.demo.entity.Person;
+import com.spring.demo.service.PeopleManagementService;
+
+@SpringBootApplication
+public class PaginationUsingDataJpa1Application {
+	@Autowired
+	private PeopleManagementService peopleManagementService;
+
+	public static void main(String[] args) {
+		SpringApplication.run(PaginationUsingDataJpa1Application.class, args);
+	}
+
+	
+	public void run(String... args) throws Exception {
+		List<Person> list = peopleManagementService.findByLastName("Kumar");
+
+		list.forEach(System.out::println);
+	}
+
+
+	
+	
+	
+}

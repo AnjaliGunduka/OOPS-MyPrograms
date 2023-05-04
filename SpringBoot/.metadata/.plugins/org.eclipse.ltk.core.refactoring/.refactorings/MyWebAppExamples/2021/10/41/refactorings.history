@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;HomeController.java&apos; to &apos;SpringBootSwaggerExampleSecureApp/src/main/java/com.spring.demo&apos;&#x0D;&#x0A;- Original project: &apos;MyWebAppExamples&apos;&#x0D;&#x0A;- Destination element: &apos;SpringBootSwaggerExampleSecureApp/src/main/java/com.spring.demo&apos;&#x0D;&#x0A;- Original element: &apos;com.web.demo.HomeController.java&apos;" description="Copy compilation unit" destination="=SpringBootSwaggerExampleSecureApp/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.spring.demo" element1="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.web.demo{HomeController.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1633241997464" units="1" version="1.0"/>
+</session>

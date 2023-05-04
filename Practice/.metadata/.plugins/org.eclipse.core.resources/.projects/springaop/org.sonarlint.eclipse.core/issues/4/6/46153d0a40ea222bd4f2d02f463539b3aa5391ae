@@ -1,0 +1,11 @@
+
+ˆ	java:S117x"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(–¢ÛÁþÿÿÿÿ8¥Ÿð¶é0HûWRMINORZ
+CODE_SMELL
+s	java:S125\"<This block of commented-out lines of code should be removed.(Ùå·™üÿÿÿÿ8øõäµé0HùNRMAJORZ
+CODE_SMELL
+•
+java:S41446"]Update this method so that its implementation is not identical to "generateToken" on line 44.(êÀÈäøÿÿÿÿ8Žî ¶é0H¦TRMAJORZ
+CODE_SMELL
+y
+java:S1128"ARemove this unused import 'org.apache.commons.lang3.StringUtils'.(Øœ¼ºúÿÿÿÿ8ÿ°ò¶é0H‰XRMINORZ
+CODE_SMELL

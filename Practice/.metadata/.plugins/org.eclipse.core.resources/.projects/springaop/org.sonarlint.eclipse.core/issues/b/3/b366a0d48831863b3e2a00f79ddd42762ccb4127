@@ -1,0 +1,19 @@
+
+`
+java:S3740"/Provide the parametrized type for this generic.(ø“¤€ýÿÿÿÿH¤JRMAJORZ
+CODE_SMELL
+ˆ
+java:S1488("\Immediately return this expression instead of assigning it to the temporary variable "save".(²ÿšÕH¥JRMINORZ
+CODE_SMELL
+~	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÑðöÑÿÿÿÿÿH¨JRMINORZ
+CODE_SMELL
+b
+java:S1135 "2Complete the task associated to this TODO comment.(» æžÿÿÿÿÿH©JRINFOZ
+CODE_SMELL
+i	java:S106&"9Replace this use of System.out or System.err by a logger.(ðÎßÀúÿÿÿÿHªJRMAJORZ
+CODE_SMELL
+€
+java:S21593"VRemove this call to "equals"; comparisons between unrelated types always return false.(¼ÖûˆÿÿÿÿÿH«JRMAJORZBUG
+p
+java:S1128"?Remove this unused import 'javax.validation.constraints.Email'.(¸àô¹üÿÿÿÿH¬JRMINORZ
+CODE_SMELL

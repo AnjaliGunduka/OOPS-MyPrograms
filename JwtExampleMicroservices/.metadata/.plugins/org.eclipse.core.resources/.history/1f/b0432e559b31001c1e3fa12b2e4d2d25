@@ -1,0 +1,19 @@
+server:
+    port: 6666
+spring:
+    application:
+        name: apigateway
+zuul:
+    routes:
+        bank-service:
+            path: /bankService/**
+            url: http://localhost:8085/
+            stripPrefix: false
+        payment-service:
+            path: /paymentService/**
+            url: http://localhost:5555/
+            stripPrefix: false
+    sensitiveHeaders: Cookie,Set-Cookie
+    host:
+        connect-timeout-millis: 10000
+        socket-timeout-millis: 1000000

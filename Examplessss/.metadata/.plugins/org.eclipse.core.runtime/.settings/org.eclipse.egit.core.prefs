@@ -1,0 +1,4 @@
+GitRepositoriesView.GitDirectories=D\:\\Examplessss\\payment-service\\.git;D\:\\Examplessss\\bank-service\\.git;
+GitRepositoriesView.GitDirectories.relative=payment-service\\.git;bank-service\\.git;
+core_autoIgnoreDerivedResources=false
+eclipse.preferences.version=1

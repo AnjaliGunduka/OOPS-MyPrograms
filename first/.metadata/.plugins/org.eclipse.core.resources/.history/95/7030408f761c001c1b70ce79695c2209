@@ -1,0 +1,5 @@
+package com.jdbc.spring.hiber.dao;
+
+public interface UserDAO {
+
+}

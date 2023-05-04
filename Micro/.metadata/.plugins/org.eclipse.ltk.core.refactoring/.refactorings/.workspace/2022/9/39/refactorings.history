@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename Java project &apos;jdx-platform-apis&apos; to &apos;jdx-platform-api&apos;&#x0D;&#x0A;- Original element: &apos;jdx-platform-apis&apos;&#x0D;&#x0A;- Renamed element: &apos;jdx-platform-apis&apos;&#x0D;&#x0A;- Update references to refactored element" description="Rename Java project &apos;jdx-platform-apis&apos;" flags="7" id="org.eclipse.jdt.ui.rename.java.project" input="=jdx-platform-apis" name="jdx-platform-api" references="true" stamp="1663823922997" version="1.0"/>
+</session>

@@ -1,0 +1,28 @@
+package com.Calci.maths;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.Test;
+
+import junit.framework.TestCase;
+
+public class CalculatorTest extends TestCase {
+
+	@Test
+	void testing()
+	{
+		System.out.println("Hi");
+	}
+	@Test
+void testAdd() {
+		
+		int expected = 8;
+//		int actual = Calculator.add(5, 3);
+		int actual = Cal.add(5, 3);
+		assertEquals(expected, actual);
+		System.out.println("It Passes the Test");
+		System.out.println("actual value is:-" + actual);
+		
+	}
+	
+}

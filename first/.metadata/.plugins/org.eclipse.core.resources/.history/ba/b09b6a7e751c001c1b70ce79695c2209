@@ -1,0 +1,34 @@
+<%@ page isELIgnored="false"%>
+<html>
+<head>
+<title>Spring MVC user registration and login example using
+	JdbcTemplate + MySQL</title>
+</head>
+<body>
+	<div align="center">
+        <h1>New/Edit User</h1>
+        <table>
+            <form action="save" method="post" modelAttribute="user">
+            <hidden path="id"/>
+            <tr>
+                <td>Username:</td>
+                <td><input path="username"/></td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td><input path="email"/></td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td><input password path="password"/></td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center">
+                    <input type="submit" value="Save">
+                </td>
+            </tr>        
+            </form>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+D:\E-commerce\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+3980650008.index
+1710792454.index
+140940788.index
+3733888264.index
+752384839.index
+1020235376.index

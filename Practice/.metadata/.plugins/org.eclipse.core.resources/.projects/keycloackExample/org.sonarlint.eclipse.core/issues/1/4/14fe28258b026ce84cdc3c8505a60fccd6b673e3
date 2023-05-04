@@ -1,0 +1,7 @@
+
+‰
+java:S1488,"]Immediately return this expression instead of assigning it to the temporary variable "oauth".(š¨òHçlRMINORZ
+CODE_SMELL
+f
+java:S1874&"5Remove this use of "tokenEndpoint"; it is deprecated.(«×¹ŠüÿÿÿÿHêlRMINORZ
+CODE_SMELL

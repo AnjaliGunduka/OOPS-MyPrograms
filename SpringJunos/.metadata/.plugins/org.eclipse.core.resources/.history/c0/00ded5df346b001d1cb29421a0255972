@@ -1,0 +1,1183 @@
+package com.junodx.api.services.fulfillment;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TimeZone;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.gson.Gson;
+import com.junodx.api.connectors.shippo.payloads.ShippoShipmentPayload;
+import com.junodx.api.connectors.shippo.payloads.ShippoStatusPayload;
+import com.junodx.api.controllers.lab.actions.TestReportUpdateActions;
+import com.junodx.api.models.commerce.DataBuilderOrder;
+import com.junodx.api.models.fulfillment.FulfillmentProvider;
+import com.junodx.api.models.providers.DataBuilder;
+import com.junodx.api.repositories.commerce.OrderRepository;
+import com.junodx.api.repositories.fulfillment.FulfillmentProviderRepository;
+import com.junodx.api.repositories.fulfillment.FulfillmentRepository;
+import com.junodx.api.repositories.fulfillment.ShippingCarrierRepository;
+import com.junodx.api.repositories.fulfillment.ShippingDetailsRepository;
+import com.junodx.api.repositories.fulfillment.ShippingMethodRepository;
+import com.junodx.api.repositories.fulfillment.ShippingStatusRepository;
+import com.junodx.api.repositories.fulfillment.ShippingTargetRepository;
+import com.junodx.api.repositories.fulfillment.ShippingTransactionRepository;
+import com.junodx.api.services.auth.UserServiceImpl;
+import com.junodx.api.services.commerce.OrderService;
+import com.junodx.api.services.commerce.ProductService;
+import com.junodx.api.services.exceptions.JdxServiceException;
+import com.junodx.api.services.lab.KitService;
+import com.junodx.api.services.mail.MailService;
+import com.shippo.Shippo;
+import com.shippo.exception.APIConnectionException;
+import com.shippo.exception.APIException;
+import com.shippo.exception.AuthenticationException;
+import com.shippo.exception.InvalidRequestException;
+import com.shippo.model.Address;
+import com.shippo.model.Address.ValidationResults;
+import com.shippo.model.Rate;
+import com.shippo.model.Transaction;
+import com.shippo.net.APIResource;
+
+import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.util.HashMap;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+@SpringBootTest(classes = JacksonAutoConfiguration.class)
+public class ShipmentServiceTest {
+
+	@Mock
+	OrderService orderService;
+
+	@Mock
+	ProductService productService;
+
+	@Mock
+	OrderRepository orderRepository;
+
+	@Mock
+	private MailService mailService;
+
+	@Mock
+	private UserServiceImpl userService;
+
+	@Mock
+	FulfillmentProviderRepository fulfillmentProviderRepository;
+
+	@Mock
+	ShippingCarrierRepository shippingCarrierRepository;
+
+	@Mock
+	ShippingMethodRepository shippingMethodRepository;
+
+	@Mock
+	ShippingDetailsRepository shippingDetailsRepository;
+
+	@Mock
+	ShippingStatusRepository shippingStatusRepository;
+
+	@Mock
+	ShippingTargetRepository shippingTargetRepository;
+
+	@Mock
+	FulfillmentRepository fulfillmentRepository;
+
+	@Mock
+	ShippingTransactionRepository shippingTransactionRepository;
+
+	@Mock
+	FulfillmentProviderService fulfillmentProviderService;
+
+	@Mock
+	private ObjectMapper mapper;
+	@Mock
+	Transaction transaction;
+	@Mock
+	com.shippo.model.Transaction transactions;
+	@Spy
+	@InjectMocks
+	private ShipmentService shipmentService;
+	private TypeReference<Map<String, Object>> mapType;
+
+	@BeforeEach
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		Shippo.apiKey = "shippo_test_cf1b6d0655e59fc6316880580765066038ef20d8";
+		// Some tests make assertions on response models based on whether a test api key
+		// is used
+		Shippo.apiKeyIsTest = true;
+		Shippo.DEBUG = true;
+		Shippo.apiVersion = "2018-02-08";
+	}
+	@Test
+	void givenJsonString() throws JsonProcessingException {
+		String request = new Gson().toJson(DataBuilderOrder.mockTestReport().getSampleNumber());
+		List<ShippoShipmentPayload> expectedBookList = new ArrayList<>();
+		expectedBookList.add(DataBuilderOrder.mockShippoShipmentPayload());
+		List<ShippoShipmentPayload> bookList = mapper.convertValue(request,
+				new TypeReference<List<ShippoShipmentPayload>>() {
+				});
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT);
+		mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+		when(mapper.convertValue(request, new TypeReference<List<ShippoShipmentPayload>>() {
+		})).thenReturn(expectedBookList);
+		//assertThat(bookList).isEqualTo(expectedBookList);
+		shipmentService.createShipmentAndGetOptions(DataBuilderOrder.mockShippoShipmentPayload(), true);
+	}
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testcreateShipmentAndGetOptionss() throws AuthenticationException, InvalidRequestException,
+			APIConnectionException, APIException, JsonProcessingException {
+		try (MockedStatic mockStatic = mockStatic(com.shippo.model.Address.class)) {
+			String request = new Gson().toJson(DataBuilderOrder.mockTestReport().getSampleNumber());
+			ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+			ObjectMapper objmapper = new ObjectMapper();
+			String inputJson = objmapper.writeValueAsString(request);
+			System.out.println(inputJson);
+			Map<String, Object> details = new LinkedHashMap<>();
+			List<ShippoShipmentPayload> expectedBookList = new ArrayList<>();
+			expectedBookList.add(DataBuilderOrder.mockShippoShipmentPayload());
+			TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {
+			};
+			mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+			mapper.enable(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT);
+			mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+//			Map<String, Object> bookList = mapper.convertValue(inputJson, mapType);
+//			when(bookList).thenReturn(details);
+			Address address = new Address();
+			JsonNode jsonNode = Mockito.spy(JsonNode.class);
+			when(mapper.readTree(request)).thenReturn(jsonNode);
+			List<ShippoShipmentPayload> bookList = mapper.convertValue(jsonNode,
+					new TypeReference<List<ShippoShipmentPayload>>() {
+					});
+			when(bookList).thenReturn(expectedBookList);
+			assertThat(bookList.get(0)).isInstanceOf(ShippoShipmentPayload.class);
+			assertThat(bookList).isEqualTo(expectedBookList);
+			ValidationResults validationResults = address.new ValidationResults();
+			address.setCity("city");
+			address.setIsComplete(true);
+			address.setValidationResults(validationResults);
+			mockStatic.when(() -> com.shippo.model.Address.create(anyMap())).thenReturn(address);
+			assertTrue(address.getIsComplete());
+			shipmentService.createShipmentAndGetOptions(DataBuilderOrder.mockShippoShipmentPayload(), true);
+		}
+	}
+
+	
+
+//	@SuppressWarnings("unchecked")
+//	@Test
+//	public void testcreateShipmentAndGetOptionss()
+//			throws AuthenticationException, InvalidRequestException, APIConnectionException, APIException {
+//		try (MockedStatic mockStatic = mockStatic(com.shippo.model.Address.class)) {
+//			ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+//			Address address = new Address();
+//			ValidationResults validationResults = address.new ValidationResults();
+//			address.setCity("city");
+//			address.setIsComplete(true);
+//			address.setValidationResults(validationResults);
+//			mockStatic.when(() -> com.shippo.model.Address.create(anyMap())).thenReturn(address);
+//			assertTrue(address.getIsComplete());
+//			shipmentService.createShipmentAndGetOptions(DataBuilderOrder.mockShippoShipmentPayload(), false);
+//		}
+//	}
+
+	@Test
+	public void testValidCreate()
+			throws AuthenticationException, InvalidRequestException, APIConnectionException, APIException {
+		Address address = DataBuilderOrder.getMockAdd();
+		assertTrue(address.getIsComplete());
+		assertEquals(Shippo.apiKeyIsTest, address.isTest());
+
+	}
+
+	@Test
+	void testcreateShipmentOptionsForOrder() throws JsonProcessingException {
+		String request = new Gson().toJson(DataBuilderOrder.mockShippoShipmentPayload().toString());
+		DataBuilderOrder.lineItemsShipmentOptions.add(DataBuilderOrder.mockOrderLineItemShipmentPayload());
+		DataBuilderOrder.fulfillmentShipmentPayload.add(DataBuilderOrder.mockFulfillment());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockOrderShipmentOptions()));
+		when(productService.get(Mockito.any())).thenReturn(Optional.of(DataBuilderOrder.mockProduct()));
+		Map<String, Object> shipmentMap = new HashMap<String, Object>();
+		HashMap<String, Object> extraMap = new HashMap<String, Object>();
+		extraMap.put("is_return", true);
+		shipmentMap.put("extra", extraMap);
+		ObjectMapper objmapper = new ObjectMapper();
+		String inputJson = objmapper.writeValueAsString(request);
+		System.out.println(inputJson);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		mapper.configure(DeserializationFeature.USE_LONG_FOR_INTS, true);
+		when(mapper.readValue(request, any(TypeReference.class)))
+				.thenReturn(DataBuilderOrder.mockShippoShipmentPayload());
+		assertEquals(
+				shipmentService.createShipmentOptionsForOrder(DataBuilderOrder.mockOrderShipmentPayload()).getClass(),
+				DataBuilderOrder.mockMultipleRatesPayload().getClass());
+	}
+
+	@Test
+	public void tescreateShipmentOptionsForOrderException() throws JdxServiceException {
+		when(orderRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.createShipmentOptionsForOrder(DataBuilderOrder.mockOrderShipmentPayload()));
+	}
+
+	@Test
+	public void tescreateShipmentOptionsForOrderLineItemIdException() throws JdxServiceException {
+		when(orderRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockOrderShipmentOptions()));
+		assertThrows(JdxServiceException.class, () -> shipmentService
+				.createShipmentOptionsForOrder(DataBuilderOrder.mockOrderShipmentPayloadLineItemId()));
+	}
+
+	@Test
+	public void tescreateShipmentOptionsForOrderLineItemException() throws JdxServiceException {
+		DataBuilderOrder.lineitem.add(DataBuilderOrder.mockOrderLineitem());
+		when(orderRepository.findById(Mockito.any())).thenReturn(Optional.of(DataBuilderOrder.mockOrderitem()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.createShipmentOptionsForOrder(DataBuilderOrder.mockOrderShipmentPayload()));
+	}
+
+	@Test
+	public void tescreateShipmentOptionsForLaboratoryOrderDetailsException() throws JdxServiceException {
+		DataBuilderOrder.lineitemLaboratoryOrderDetails.add(DataBuilderOrder.mockOrderLineitemLaboratoryOrderDetails());
+		when(orderRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockOrderitemLaboratoryOrderDetails()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.createShipmentOptionsForOrder(DataBuilderOrder.mockOrderShipmentPayload()));
+	}
+
+	@Test
+	public void tescreateShipmentOptionsForLaboratoryOrderDetailsNullException() throws JdxServiceException {
+		DataBuilderOrder.lineitemLaboratoryOrderDetails
+				.add(DataBuilderOrder.mockOrderLineitemLaboratoryOrderDetailsEmpty());
+		when(orderRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockOrderitemLaboratoryOrderDetails()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.createShipmentOptionsForOrder(DataBuilderOrder.mockOrderShipmentPayload()));
+	}
+
+	@Test
+	public void tescreateShipmentOptionsForFulfillmentsException() throws JdxServiceException {
+		DataBuilderOrder.lineitemFulfillmentss.add(DataBuilderOrder.mockOrderLineitemFulfillmentss());
+		DataBuilderOrder.OrderLineitemfulfillmentss.add(DataBuilderOrder.mockFulfillmentDiffId());
+		when(orderRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockOrderitemFulfillmentss()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.createShipmentOptionsForOrder(DataBuilderOrder.mockOrderShipmentPayload()));
+	}
+
+	@Test
+	public void tescreateShipmentOptionsForProductException() throws JdxServiceException {
+		DataBuilderOrder.lineitemProduct.add(DataBuilderOrder.mockOrderLineitemProduct());
+		DataBuilderOrder.OrderLineitemProduct.add(DataBuilderOrder.mockFulfillment());
+		when(orderRepository.findById(Mockito.any())).thenReturn(Optional.of(DataBuilderOrder.mockOrderitemProduct()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.createShipmentOptionsForOrder(DataBuilderOrder.mockOrderShipmentPayload()));
+	}
+
+	@Test
+	public void testcreateShipmentAndGetOptions() throws JsonProcessingException, APIException, AuthenticationException,
+			InvalidRequestException, APIConnectionException {
+		TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {
+		};
+		String request = new Gson().toJson(DataBuilderOrder.mockShippoShipmentPayload().getAddressFrom().getCity());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "shippo_test_bb41542ecd8d5563afaf39427a82d14985e15dcc");
+		Map<String, Object> shipmentMap = new HashMap<String, Object>();
+		HashMap<String, Object> extraMap = new HashMap<String, Object>();
+		extraMap.put("is_return", true);
+		shipmentMap.put("extra", extraMap);
+		ObjectMapper objmapper = new ObjectMapper();
+		String inputJson = objmapper.writeValueAsString(request);
+		System.out.println(inputJson);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+		mapper.enable(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		mapper.configure(DeserializationFeature.USE_LONG_FOR_INTS, true);
+		mapper.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false);
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, false);
+		mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		when(mapper.convertValue(request, typeRef)).thenReturn(shipmentMap);
+		List<Rate> createShipmentAndGetOptions = shipmentService
+				.createShipmentAndGetOptions(DataBuilderOrder.mockShippoShipmentPayload(), true);
+	}
+
+	@Test
+	void testsaveShippingDetails() throws JsonProcessingException, APIException, AuthenticationException,
+			InvalidRequestException, APIConnectionException {
+		DataBuilderOrder.lineItemsShippingDetails.add(DataBuilderOrder.mockOrderLineItemShippingDetails());
+		DataBuilderOrder.fulfillmentShippingDetails.add(DataBuilderOrder.mockFulfillment());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingDetails()));
+		when(productService.get(Mockito.any())).thenReturn(Optional.of(DataBuilderOrder.mockProduct()));
+		// when(com.shippo.model.Order.create(Mockito.anyMap())).thenReturn(DataBuilderOrder.mockOrdershippo());
+		when(shippingCarrierRepository.findShippingCarrierByName(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingCarrier()));
+		when(orderService.updateOrderFromShipping(Mockito.any(), Mockito.any(), Mockito.any()))
+				.thenReturn(DataBuilderOrder.mockOrderShippingDetails());
+		assertEquals(
+				shipmentService.saveShippingDetails(DataBuilderOrder.mockShippoCreateLabelRequest(),
+						DataBuilder.userDetailsImpl).getClass(),
+				DataBuilderOrder.mockMultipleShippingLabelsDto().getClass());
+	}
+
+	@Test
+	public void tesaveShippingDetailsForOrderException() throws JdxServiceException {
+		when(orderRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+		assertThrows(JdxServiceException.class, () -> shipmentService
+				.saveShippingDetails(DataBuilderOrder.mockShippoCreateLabelRequest(), DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	public void tesaveShippingDetailsForOrderLineItemIdException() throws JdxServiceException {
+		when(orderRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingDetails()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.saveShippingDetails(DataBuilderOrder.mockShippoCreateLabelRequestLineItemId(),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	public void testsaveShippingDetailsForOrderLineItemException() throws JdxServiceException {
+		DataBuilderOrder.lineitem.add(DataBuilderOrder.mockOrderLineitem());
+		when(orderRepository.findById(Mockito.any())).thenReturn(Optional.of(DataBuilderOrder.mockOrderitem()));
+		assertThrows(JdxServiceException.class, () -> shipmentService
+				.saveShippingDetails(DataBuilderOrder.mockShippoCreateLabelRequest(), DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	public void testsaveShippingDetailsForFulfillmentsException() throws JdxServiceException {
+		DataBuilderOrder.lineitemFulfillments.add(DataBuilderOrder.mockOrderLineitemFulfillments());
+		DataBuilderOrder.OrderLineitemfulfillments.add(DataBuilderOrder.mockFulfillmentDiffId());
+		when(orderRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockOrderitemFulfillments()));
+		assertThrows(JdxServiceException.class, () -> shipmentService
+				.saveShippingDetails(DataBuilderOrder.mockShippoCreateLabelRequest(), DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	public void testsaveShippingDetailsForProductException() throws JdxServiceException {
+		DataBuilderOrder.lineitemProduct.add(DataBuilderOrder.mockOrderLineitemProduct());
+		DataBuilderOrder.OrderLineitemProduct.add(DataBuilderOrder.mockFulfillment());
+		when(orderRepository.findById(Mockito.any())).thenReturn(Optional.of(DataBuilderOrder.mockOrderitemProduct()));
+		assertThrows(JdxServiceException.class, () -> shipmentService
+				.saveShippingDetails(DataBuilderOrder.mockShippoCreateLabelRequest(), DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testgetLabelObjects()
+			throws APIException, AuthenticationException, InvalidRequestException, APIConnectionException {
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentLabel()));
+		doReturn(transactions).when(transaction).retrieve("89L");
+		when(productService.get(Mockito.any())).thenReturn(Optional.of(DataBuilderOrder.mockProduct()));
+		shipmentService.getLabelObjects("8fdf6101-f19a-4154-a36f-521528d02654", true);
+	}
+
+	@Test
+	public void testgetLabelObjectsFulfillmentException() throws JdxServiceException {
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(fulfillmentRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.getLabelObjects("8fdf6101-f19a-4154-a36f-521528d02654", true));
+	}
+
+	@Test
+	public void testgetLabelObjectsFulfillmentShippingDetailsException() throws JdxServiceException {
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentShippingDetails()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.getLabelObjects("8fdf6101-f19a-4154-a36f-521528d02654", true));
+	}
+
+	@Test
+	public void testgetLabelObjectsFulfillmentShippingDetailsgetToMethodException() throws JdxServiceException {
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentShippingDetailsgetToMethod()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.getLabelObjects("8fdf6101-f19a-4154-a36f-521528d02654", true));
+	}
+
+	@Test
+	public void testgetLabelObjectsFulfillmentShippingDetailsgetReturnMethodException() throws JdxServiceException {
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentShippingDetailsgetReturnMethod()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.getLabelObjects("8fdf6101-f19a-4154-a36f-521528d02654", true));
+	}
+
+	@Test
+	void testupdateCustomerShipmentAddress() {
+		String[] includes = {};
+		DataBuilderOrder.lineItemsShipmentOptions.add(DataBuilderOrder.mockOrderLineItemShipmentPayload());
+		DataBuilderOrder.fulfillmentShipmentPayload.add(DataBuilderOrder.mockFulfillment());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl)).thenReturn(Optional.of(DataBuilderOrder.mockOrderShipmentOptions()));
+		when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		shipmentService.updateCustomerShipmentAddress(DataBuilderOrder.mockUpdateCustomerToAddress(),
+				DataBuilder.userDetailsImpl);
+
+	}
+
+	@Test
+	public void testupdateCustomerShipmentAddressForOrderException() throws JdxServiceException {
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.updateCustomerShipmentAddress(DataBuilderOrder.mockUpdateCustomerToAddress(),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	public void testupdateCustomerShipmentAddressForOrderLineItemException() throws JdxServiceException {
+		String[] includes = {};
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		DataBuilderOrder.lineitem.add(DataBuilderOrder.mockOrderLineitem());
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl)).thenReturn(Optional.of(DataBuilderOrder.mockOrderitem()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.updateCustomerShipmentAddress(DataBuilderOrder.mockUpdateCustomerToAddress(),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	public void testupdateCustomerShipmentAddressForFulfillmentsException() throws JdxServiceException {
+		String[] includes = {};
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		DataBuilderOrder.lineitemFulfillments.add(DataBuilderOrder.mockOrderLineitemFulfillments());
+		DataBuilderOrder.OrderLineitemfulfillments.add(DataBuilderOrder.mockFulfillmentDiffId());
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderitemFulfillments()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.updateCustomerShipmentAddress(DataBuilderOrder.mockUpdateCustomerToAddress(),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	public void testupdateCustomerShipmentAddressPayLoadException() throws JdxServiceException {
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.updateCustomerShipmentAddress(null, DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testupdateShippingStatusForOrder() {
+		String[] includes = {};
+		DataBuilderOrder.lineItemsShippingStatus.add(DataBuilderOrder.mockOrderLineItemShippingStatus());
+		DataBuilderOrder.fulfillmentShippingStatus.add(DataBuilderOrder.mockFulfillment());
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRunShippingStatus());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl)).thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingStatus()));
+		when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+				"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", true,
+				DataBuilder.userDetailsImpl);
+
+	}
+
+	@Test
+	public void testupdateShippingStatusForOrderForOrderLineItemException() throws JdxServiceException {
+		String[] includes = {};
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		DataBuilderOrder.lineItemsShippingDetails.add(DataBuilderOrder.mockOrderLineitem());
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderitemupdateShipping()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+						"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", true,
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	public void testupdateShippingStatusForOrderForFulfillmentException() throws JdxServiceException {
+		String[] includes = {};
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		DataBuilderOrder.lineitemupdateShippingFulfillment
+				.add(DataBuilderOrder.mockOrderLineitemupdateShippingFulfillments());
+		DataBuilderOrder.OrderLineitemupdateShippingfulfillments.add(DataBuilderOrder.mockFulfillmentDiffId());
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderitemupdateShippingFulfillment()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+						"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", true,
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	public void testupdateShippingStatusForOrderFororderIdException() throws JdxServiceException {
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.updateShippingStatusForOrder(null, "845dba6b-4c0f-4cc9-ba77-62e7216bd692",
+						"8fdf6101-f19a-4154-a36f-521528d02654", true, DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	public void testupdateShippingStatusForOrderForOrderException() throws JdxServiceException {
+		String[] includes = {};
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl)).thenReturn(Optional.empty());
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+						"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", true,
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testupdateShippingStatusForElseOrder() {
+		String[] includes = {};
+		DataBuilderOrder.lineItemsShippingElseStatus.add(DataBuilderOrder.mockOrderLineItemShippingElseStatus());
+		DataBuilderOrder.fulfillmentShippingElseStatus.add(DataBuilderOrder.mockFulfillment());
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRunShippingStatus());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingElseStatus()));
+		when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+				"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", false,
+				DataBuilder.userDetailsImpl);
+
+	}
+
+	@Test
+	void testupdateShippingStatusForOrderTwoDay() {
+		String[] includes = {};
+		DataBuilderOrder.lineItemsShippingStatusTwoDay.add(DataBuilderOrder.mockOrderLineItemShippingStatusTwoDay());
+		DataBuilderOrder.fulfillmentShippingStatusTwoDay.add(DataBuilderOrder.mockFulfillmentTwoDay());
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRunShippingStatus());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingStatusTwoDay()));
+		when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+				"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", true,
+				DataBuilder.userDetailsImpl);
+
+	}
+
+	@Test
+	void testsendShippedEmail() {
+		DataBuilderOrder.lineItemsShippedEmail.add(DataBuilderOrder.mockOrderLineItemShippingStatusTwoDay());
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.sendShippedEmail(DataBuilderOrder.mockOrderShippedEmail()));
+	}
+
+	@Test
+	void testupdateShippingStatusForOrderElseTwoDay() {
+		String[] includes = {};
+		DataBuilderOrder.lineItemsShippingStatusElseTwoDay
+				.add(DataBuilderOrder.mockOrderLineItemShippingStatusElseTwoDay());
+		DataBuilderOrder.fulfillmentShippingStatusElseTwoDay.add(DataBuilderOrder.mockFulfillmentElseTwoDay());
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRunShippingStatus());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingStatusElseTwoDay()));
+		when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+				"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", false,
+				DataBuilder.userDetailsImpl);
+
+	}
+
+	@Test
+	void testupdateShippingStatusForOrderFirstClass() {
+		String[] includes = {};
+		DataBuilderOrder.lineItemsShippingStatusFirstClass
+				.add(DataBuilderOrder.mockOrderLineItemShippingStatusFirstClass());
+		DataBuilderOrder.fulfillmentShippingStatusFirstClass.add(DataBuilderOrder.mockFulfillmentFirstClass());
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRunShippingStatus());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingStatusFirstClass()));
+		when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+				"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", true,
+				DataBuilder.userDetailsImpl);
+
+	}
+
+	@Test
+	void testupdateShippingStatusForOrderElseFirstClass() {
+		String[] includes = {};
+		DataBuilderOrder.lineItemsShippingStatusElseFirstClass
+				.add(DataBuilderOrder.mockOrderLineItemShippingStatusElseFirstClass());
+		DataBuilderOrder.fulfillmentShippingStatusElseFirstClass.add(DataBuilderOrder.mockFulfillmentFirstClass());
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRunShippingStatus());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingStatusElseFirstClass()));
+		when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+				"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", false,
+				DataBuilder.userDetailsImpl);
+
+	}
+
+	@Test
+	void testupdateShippingStatusForOrderOver() {
+		String[] includes = {};
+		DataBuilderOrder.lineItemsShippingStatusOver.add(DataBuilderOrder.mockOrderLineItemShippingStatusOver());
+		DataBuilderOrder.fulfillmentShippingStatusOver.add(DataBuilderOrder.mockFulfillmentOver());
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRunShippingStatus());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingStatusOver()));
+		when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+				"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", true,
+				DataBuilder.userDetailsImpl);
+
+	}
+
+	@Test
+	void testupdateShippingStatusForOrderElseOver() {
+		String[] includes = {};
+		DataBuilderOrder.lineItemsShippingStatusElseOver
+				.add(DataBuilderOrder.mockOrderLineItemShippingStatusElseOver());
+		DataBuilderOrder.fulfillmentShippingStatusElseOver.add(DataBuilderOrder.mockFulfillmentElseOver());
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRunShippingStatus());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingStatusElseOver()));
+		when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+				"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", false,
+				DataBuilder.userDetailsImpl);
+
+	}
+
+	@Test
+	void testupdateShippingStatusForOrderDefault() {
+		String[] includes = {};
+		DataBuilderOrder.lineItemsShippingStatusDefault.add(DataBuilderOrder.mockOrderLineItemShippingStatusDefault());
+		DataBuilderOrder.fulfillmentShippingStatusDefault.add(DataBuilderOrder.mockFulfillmentDefault());
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRunShippingStatus());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingStatusDefault()));
+		when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+				"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", true,
+				DataBuilder.userDetailsImpl);
+
+	}
+
+	@Test
+	void testupdateShippingStatusForOrderElseDefault() {
+		String[] includes = {};
+		DataBuilderOrder.lineItemsShippingStatusElseDefault
+				.add(DataBuilderOrder.mockOrderLineItemShippingStatusElseDefault());
+		DataBuilderOrder.fulfillmentShippingStatusElseDefault.add(DataBuilderOrder.mockFulfillmentElseDefault());
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRunShippingStatus());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(orderService.findOneByOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8", includes,
+				DataBuilderOrder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockOrderShippingStatusElseDefault()));
+		when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		shipmentService.updateShippingStatusForOrder("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+				"845dba6b-4c0f-4cc9-ba77-62e7216bd692", "8fdf6101-f19a-4154-a36f-521528d02654", false,
+				DataBuilder.userDetailsImpl);
+	}
+
+	@Test
+	void testupdateShipmentStatusFromAddress_Issue() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatus());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(
+				shipmentService.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayload()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+
+	}
+
+	@Test
+	void testupdateShipmentStatusException() {
+		assertThrows(JdxServiceException.class, () -> shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadgetTracking()));
+	}
+
+	@Test
+	void testupdateShipmentStatusFromPackage_Accepted() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadPackage_Accepted()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusForshippingMethodException() {
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayload()));
+	}
+
+	@Test
+	void testupdateShipmentStatusFromContact_Carrier() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadContact_Carrier()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFromdelayed() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloaddelayed())
+				.getClass(), DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFromdelivery_attempted() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloaddelivery_attempted())
+				.getClass(), DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFromdelivery_rescheduled() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloaddelivery_rescheduled())
+				.getClass(), DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFromdelivery_scheduled() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloaddelivery_scheduled())
+				.getClass(), DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFromlocation_inaccessible() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadlocation_inaccessible())
+				.getClass(), DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFromnotice_left() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadnotice_left()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFromout_for_delivery() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippos()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadout_for_delivery()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFrompackage_arrived() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadpackage_arrived()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFrompackage_damaged() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadpackage_damaged()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFrompackage_departed() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadpackage_departed()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFrompackage_forwarded() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadpackage_forwarded()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFrompackage_held() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadpackage_held()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFrompackage_processed() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadpackage_processed()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFrompackage_processing() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadpackage_processing())
+				.getClass(), DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFrompickup_available() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadpickup_available()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFromreschedule_delivery() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadreschedule_delivery())
+				.getClass(), DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFromDelieved() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadDelieved())
+				.getClass(), DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFromReturned() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadReturned())
+				.getClass(), DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testupdateShipmentStatusFromPreTransit() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.orderStatusHistoryShippo.add(DataBuilderOrder.mockOrderStatusKit());
+		ReflectionTestUtils.setField(shipmentService, "apiKey", "SHIPPO_KEY");
+		when(shippingMethodRepository.findShippingMethodByTrackingCode(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockShippingMethodShippo()));
+		// when(orderRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockOrderShipmentOptions());
+		assertEquals(shipmentService
+				.updateShipmentStatusFromShippo(DataBuilderOrder.mockShippoStatusPayloadPreTransit()).getClass(),
+				DataBuilderOrder.mockOrder().getClass());
+	}
+
+	@Test
+	void testcancelFulfillemnt() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentcancel()));
+		when(fulfillmentProviderService.getDefaultProvider())
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentProvider()));
+		shipmentService.cancelFulfillemnt("8fdf6101-f19a-4154-a36f-521528d02654", Optional.of(true),
+				DataBuilder.userDetailsImpl);
+	}
+
+	@Test
+	void testcancelFulfillemntForCurrentStatusException() {
+		DataBuilderOrder.shippingStatuCurrentStatus.add(DataBuilderOrder.mockShippingStatusCurrentStatus());
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentCurrentStatus()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.cancelFulfillemnt("8fdf6101-f19a-4154-a36f-521528d02654", Optional.of(true),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testcancelFulfillemntForCurrentStatusAnotherException() {
+		DataBuilderOrder.shippingStatuCurrentStatusAnother
+				.add(DataBuilderOrder.mockShippingStatusCurrentStatusAnother());
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentCurrentStatusAnother()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.cancelFulfillemnt("8fdf6101-f19a-4154-a36f-521528d02654", Optional.of(true),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testcancelFulfillemntForCurrentStatusCancelledException() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentCancelled()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.cancelFulfillemnt("8fdf6101-f19a-4154-a36f-521528d02654", Optional.of(true),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testcancelFulfillemntForgetReportException() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRungetReport());
+		when(fulfillmentRepository.findById(Mockito.any())).thenReturn(Optional.of(DataBuilderOrder.mockFulfillment()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.cancelFulfillemnt("8fdf6101-f19a-4154-a36f-521528d02654", Optional.of(true),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testcancelFulfillemntForgetReportStatusException() {
+		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRungetReportStatus());
+		DataBuilderOrder.getReportStatus.add(DataBuilderOrder.mockLaboratoryStatusReportStatus());
+		DataBuilderOrder.statusReportStatus.add(DataBuilderOrder.mockLaboratoryStatusReportStatus());
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentReportStatus()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.cancelFulfillemnt("8fdf6101-f19a-4154-a36f-521528d02654", Optional.of(true),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testcancelFulfillemntcustomerException() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentcustomer()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.cancelFulfillemnt("8fdf6101-f19a-4154-a36f-521528d02654", Optional.of(true),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testcancelFulfillemntProductException() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentProduct()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.cancelFulfillemnt("8fdf6101-f19a-4154-a36f-521528d02654", Optional.of(true),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testcreateNewFulfillment() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		when(fulfillmentProviderService.findProviderFromAddress(Mockito.any(), Mockito.any()))
+				.thenReturn(DataBuilderOrder.mockFulfillmentProvider());
+		shipmentService.createNewFulfillment(DataBuilderOrder.mockProduct(), DataBuilderOrder.mockUser(),
+				DataBuilder.getMockAddress(), DataBuilderOrder.mockLaboratory(), true, false);
+	}
+
+	@Test
+	void testcreateNewFulfillmentException() {
+		when(fulfillmentProviderService.findProviderFromAddress(Mockito.any(), Mockito.any())).thenReturn(null);
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.createNewFulfillment(DataBuilderOrder.mockProduct(), DataBuilderOrder.mockUser(),
+						DataBuilder.getMockAddress(), DataBuilderOrder.mockLaboratory(), true, false));
+	}
+
+	@Test
+	void testcancelFulfillemntlaboratoryException() {
+		DataBuilderOrder.shippingStatuss.add(DataBuilderOrder.mockShippingStatus());
+		when(fulfillmentRepository.findById(Mockito.any()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockFulfillmentLaboratory()));
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.cancelFulfillemnt("8fdf6101-f19a-4154-a36f-521528d02654", Optional.of(true),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testcancelFulfillemntForfulfillmentToCancelException() {
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.cancelFulfillemnt("8fdf6101-f19a-4154-a36f-521528d02654", Optional.of(true),
+						DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testcancelFulfillemntForfulfillmentIdException() {
+		assertThrows(JdxServiceException.class,
+				() -> shipmentService.cancelFulfillemnt(null, Optional.of(true), DataBuilder.userDetailsImpl));
+	}
+
+	@Test
+	void testgetEstimatedShipmentTime() {
+		String timezone = "America/Los_Angeles";
+		shipmentService.getEstimatedShipmentTime(timezone);
+	}
+
+	@Test
+	void testgetEstimatedShipmentTimeAnothers() {
+		String timezone = "America/Los_Angeles";
+		Calendar nowPst = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+		// Calendar.getInstance(nowPst.get(Calendar.AM_PM), 0);
+		shipmentService.getEstimatedShipmentTime(timezone);
+	}
+
+	@Test
+	void testgetEstimatedShipmentTimeAnother() {
+		String timezone = null;
+		shipmentService.getEstimatedShipmentTime(timezone);
+	}
+}

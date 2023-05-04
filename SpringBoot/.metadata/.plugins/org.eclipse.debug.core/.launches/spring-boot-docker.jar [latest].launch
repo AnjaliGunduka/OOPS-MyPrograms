@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.linuxtools.docker.ui.buildDockerImageLaunchConfigurationType">
+    <stringAttribute key="dockerConnection" value="http://127.0.0.1:2375"/>
+    <stringAttribute key="dockerfileName" value="dockerfile"/>
+    <stringAttribute key="repoName" value="spring-boot-docker.jar"/>
+    <stringAttribute key="sourcePathLocation" value="/spring-boot-docker"/>
+    <booleanAttribute key="sourcePathWorkspaceRelativeLocation" value="true"/>
+</launchConfiguration>

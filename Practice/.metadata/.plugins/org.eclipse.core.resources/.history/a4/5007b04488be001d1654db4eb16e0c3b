@@ -1,0 +1,18 @@
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import com.javatechie.spring.consul.api.EnableDiscoveryClient;
+import com.javatechie.spring.consul.api.RestController;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+@RestController
+public class UserConsul1Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(UserConsul1Application.class, args);
+	}
+
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename local variable &apos;loginBean&apos; in &apos;com.login.bean.LoginController.submit(...)&apos; to &apos;login&apos;&#x0D;&#x0A;- Original project: &apos;LoginPageMvc&apos;&#x0D;&#x0A;- Original element: &apos;com.login.bean.LoginController.submit(Model, Login).loginBean&apos;&#x0D;&#x0A;- Renamed element: &apos;loginBean&apos;&#x0D;&#x0A;- Update references to refactored element" description="Rename local variable &apos;loginBean&apos;" id="org.eclipse.jdt.ui.rename.local.variable" input="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.login.bean{LoginController.java[LoginController~submit~QModel;~QLogin;@loginBean!687!726!718!726!QLogin;!0!true" name="login" references="true" stamp="1632298097743" version="1.0"/>
+</session>

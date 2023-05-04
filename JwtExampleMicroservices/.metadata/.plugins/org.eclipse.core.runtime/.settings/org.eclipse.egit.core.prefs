@@ -1,0 +1,4 @@
+GitRepositoriesView.GitDirectories=D\:\\JwtExampleMicroservices\\api-gateway-service\\.git;D\:\\JwtExampleMicroservices\\payment-service\\.git;D\:\\JwtExampleMicroservices\\bank-service\\.git;
+GitRepositoriesView.GitDirectories.relative=api-gateway-service\\.git;payment-service\\.git;bank-service\\.git;
+core_autoIgnoreDerivedResources=false
+eclipse.preferences.version=1

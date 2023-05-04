@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.junodx.api.services.commerce.OrderServiceTests
+-------------------------------------------------------------------------------
+Tests run: 158, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.033 s - in com.junodx.api.services.commerce.OrderServiceTests

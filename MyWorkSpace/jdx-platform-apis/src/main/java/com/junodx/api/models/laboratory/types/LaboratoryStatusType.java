@@ -1,0 +1,24 @@
+package com.junodx.api.models.laboratory.types;
+
+public enum LaboratoryStatusType {
+    NO_KIT_ASSIGNED,
+    KIT_ASSIGNED,
+    KIT_CODES_UPDATED,
+    KIT_ACTIVATED,
+    NOT_YET_RECEIVED,
+    RECEIVED,
+    ACCESSIONED,
+    PLATED,
+    LAB_PROCESSING,
+    IN_SEQUENCING,
+    IN_BIOINFORMATICS,
+    AWAITING_RESULTS,
+    AWAITING_APPROVAL,
+    APPROVED,
+    RESULT_AWAITING_REVIEW,
+    SIGNED_OUT,
+    CLOSED,
+    REFLEX,
+    RETEST,
+    REDRAW
+}

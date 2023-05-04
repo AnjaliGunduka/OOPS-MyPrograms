@@ -1,0 +1,45 @@
+2021-10-16 13:43:19.481  INFO 20212 --- [main] c.c.m.V.VaccinationCenterApplication     : Starting VaccinationCenterApplication using Java 16.0.2 on nblap214 with PID 20212 (D:\JwtExampleMicroservices\VaccinationExample\target\classes started by anjalig in D:\JwtExampleMicroservices\VaccinationExample)
+2021-10-16 13:43:19.484  INFO 20212 --- [main] c.c.m.V.VaccinationCenterApplication     : No active profile set, falling back to default profiles: default
+2021-10-16 13:43:20.196  INFO 20212 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2021-10-16 13:43:20.237  INFO 20212 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 33 ms. Found 1 JPA repository interfaces.
+2021-10-16 13:43:20.391  INFO 20212 --- [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=1a23829d-6e35-3bb4-86d9-4df04b0a98de
+2021-10-16 13:43:20.697  INFO 20212 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 9987 (http)
+2021-10-16 13:43:20.705  INFO 20212 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2021-10-16 13:43:20.705  INFO 20212 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.53]
+2021-10-16 13:43:20.836  INFO 20212 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2021-10-16 13:43:20.837  INFO 20212 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1310 ms
+2021-10-16 13:43:20.990  INFO 20212 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2021-10-16 13:43:21.035  INFO 20212 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.32.Final
+2021-10-16 13:43:21.153  INFO 20212 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2021-10-16 13:43:21.242  INFO 20212 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2021-10-16 13:43:21.246  WARN 20212 --- [main] com.zaxxer.hikari.util.DriverDataSource  : Registered driver with driverClassName=com.mysql.jdbc.Driver was not found, trying direct instantiation.
+2021-10-16 13:43:21.575  INFO 20212 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2021-10-16 13:43:21.589  INFO 20212 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2021-10-16 13:43:22.237  INFO 20212 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2021-10-16 13:43:22.246  INFO 20212 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2021-10-16 13:43:22.607  WARN 20212 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2021-10-16 13:43:22.734  INFO 20212 --- [main] pertySourcedRequestMappingHandlerMapping : Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2021-10-16 13:43:24.099  INFO 20212 --- [main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2021-10-16 13:43:24.163  WARN 20212 --- [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'; nested exception is org.springframework.boot.web.server.PortInUseException: Port 9987 is already in use
+2021-10-16 13:43:24.165  INFO 20212 --- [main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2021-10-16 13:43:24.166  INFO 20212 --- [main] .SchemaDropperImpl$DelayedDropActionImpl : HHH000477: Starting delayed evictData of schema as part of SessionFactory shut-down'
+2021-10-16 13:43:24.207  INFO 20212 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2021-10-16 13:43:24.216  INFO 20212 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2021-10-16 13:43:24.218  INFO 20212 --- [main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2021-10-16 13:43:24.229  INFO 20212 --- [main] ConditionEvaluationReportLoggingListener : 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2021-10-16 13:43:24.241 ERROR 20212 --- [main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 9987 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 9987 or configure this application to listen on another port.
+

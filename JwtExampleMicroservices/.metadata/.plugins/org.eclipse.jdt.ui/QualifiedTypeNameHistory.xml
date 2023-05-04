@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter"/>
+    <fullyQualifiedTypeName name="lombok.RequiredArgsConstructor"/>
+    <fullyQualifiedTypeName name="org.springframework.security.config.annotation.web.configuration.EnableWebSecurity"/>
+    <fullyQualifiedTypeName name="org.springframework.beans.factory.annotation.Autowired"/>
+    <fullyQualifiedTypeName name="org.springframework.security.crypto.password.PasswordEncoder"/>
+    <fullyQualifiedTypeName name="com.spring.demo.CreateUserRequest"/>
+    <fullyQualifiedTypeName name="com.spring.demo.UserRepository"/>
+    <fullyQualifiedTypeName name="com.codedecode.microservices.CitizenService.repositories.CitizenRepo"/>
+    <fullyQualifiedTypeName name="com.codedecode.microservices.CitizenService.services.Citizenservice"/>
+    <fullyQualifiedTypeName name="com.codedecode.microservices.CitizenService.Entity.Citizen"/>
+    <fullyQualifiedTypeName name="com.codedecode.microservices.CitizenService.Citizenservice"/>
+    <fullyQualifiedTypeName name="java.util.List"/>
+    <fullyQualifiedTypeName name="com.codedecode.microservices.VaccinationCenter.VaccinationResponse"/>
+    <fullyQualifiedTypeName name="org.hibernate.mapping.Map"/>
+    <fullyQualifiedTypeName name="java.util.Map"/>
+    <fullyQualifiedTypeName name="com.codedecode.microservices.VaccinationCenter.Entity.VaccinationCenter"/>
+    <fullyQualifiedTypeName name="com.codedecode.microservices.VaccinationCenter.Model.Citizen"/>
+    <fullyQualifiedTypeName name="com.codedecode.microservices.VaccinationCenter.VaccineService"/>
+    <fullyQualifiedTypeName name="com.codedecode.microservices.VaccinationCenter.Repos.CenterRepo"/>
+    <fullyQualifiedTypeName name="com.devglan.commons.DataStore"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestBody"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.PostMapping"/>
+    <fullyQualifiedTypeName name="org.apache.commons.lang3.RandomUtils"/>
+    <fullyQualifiedTypeName name="io.swagger.annotations.AuthorizationScope"/>
+    <fullyQualifiedTypeName name="io.swagger.models.Contact"/>
+    <fullyQualifiedTypeName name="org.springframework.cloud.openfeign.EnableFeignClients"/>
+    <fullyQualifiedTypeName name="org.springframework.boot.autoconfigure.SpringBootApplication"/>
+    <fullyQualifiedTypeName name="springfox.documentation.swagger2.annotations.EnableSwagger2"/>
+    <fullyQualifiedTypeName name="org.springframework.boot.SpringApplication"/>
+    <fullyQualifiedTypeName name="org.springframework.stereotype.Service"/>
+    <fullyQualifiedTypeName name="com.devglan.commons.Product"/>
+    <fullyQualifiedTypeName name="com.devglan.customerservice.feign.config.CustomFeignConfig"/>
+    <fullyQualifiedTypeName name="java.net.HttpURLConnection"/>
+    <fullyQualifiedTypeName name="feign.okhttp.OkHttpClient"/>
+    <fullyQualifiedTypeName name="java.util.concurrent.TimeUnit"/>
+</qualifiedTypeNameHistroy>

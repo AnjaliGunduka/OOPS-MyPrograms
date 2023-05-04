@@ -1,0 +1,1167 @@
+package com.junodx.api.services.lab;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.junodx.api.controllers.SortType;
+import com.junodx.api.controllers.lab.types.TestReportSortBy;
+import com.junodx.api.dto.mappers.LaboratoryMapStructMapper;
+import com.junodx.api.dto.models.laboratory.TestReportsReviewResultsDto;
+import com.junodx.api.models.auth.Authority;
+import com.junodx.api.models.commerce.DataBuilderOrder;
+import com.junodx.api.models.commerce.DataBuilderorderExample;
+import com.junodx.api.models.commerce.Order;
+import com.junodx.api.models.commerce.OrderLineItem;
+import com.junodx.api.models.commerce.Product;
+import com.junodx.api.models.commerce.types.OrderStatusType;
+import com.junodx.api.models.commerce.types.ProductType;
+import com.junodx.api.models.core.types.IntervalType;
+import com.junodx.api.models.laboratory.BatchRun;
+import com.junodx.api.models.laboratory.Kit;
+import com.junodx.api.models.laboratory.LaboratoryOrder;
+import com.junodx.api.models.laboratory.TestReport;
+import com.junodx.api.models.laboratory.TestRun;
+import com.junodx.api.models.laboratory.reports.types.SignedOutType;
+import com.junodx.api.models.laboratory.types.ReportConfiguration;
+import com.junodx.api.models.laboratory.types.ReportType;
+import com.junodx.api.models.laboratory.types.RetestActionType;
+import com.junodx.api.models.providers.DataBuilder;
+import com.junodx.api.repositories.commerce.OrderLineItemRepository;
+import com.junodx.api.repositories.commerce.OrderRepository;
+import com.junodx.api.repositories.lab.KitRepository;
+import com.junodx.api.repositories.lab.TestReportRepository;
+import com.junodx.api.repositories.lab.TestRunRepository;
+import com.junodx.api.services.auth.UserDetailsImpl;
+import com.junodx.api.services.auth.UserService;
+import com.junodx.api.services.commerce.OrderService;
+import com.junodx.api.services.exceptions.JdxServiceException;
+import com.junodx.api.services.mail.MailService;
+
+@ExtendWith(MockitoExtension.class)
+public class TestReportServiceTest {
+	@Mock
+	private TestReportRepository testReportRepository;
+
+	@Mock
+	private LaboratoryOrderService laboratoryOrderService;
+
+	@Mock
+	private OrderRepository orderRepository;
+
+	@Mock
+	private UserService userService;
+
+	@Mock
+	private OrderService orderService;
+
+	@Mock
+	private TestRunRepository testRunRepository;
+
+	@Mock
+	private TestRunService testRunService;
+
+	@Mock
+	private KitRepository kitRepository;
+
+	@Mock
+	private LaboratoryService laboratoryService;
+
+	@Mock
+	private MailService mailService;
+
+	@Mock
+	private OrderLineItemRepository orderLineItemRepository;
+
+	@Mock
+	private BatchRunService batchRunService;
+	@Mock
+	private LaboratoryMapStructMapper laboratoryMapStructMapper;
+	@Mock
+	private ObjectMapper mapper;
+	@Spy
+	@InjectMocks
+	private TestReportService testReportService;
+
+	@BeforeEach
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+	}
+
+	@Test
+	void testgetTestReport() {
+		String[] includes = { "anjali", "gunduka" };
+		when(testReportRepository.findById(Mockito.anyString()))
+				.thenReturn(Optional.of(DataBuilderOrder.mockTestReport()));
+		assertEquals(testReportService.getTestReport("1L", includes, DataBuilder.getMockUserDetailsImpl()).getClass(),
+				Optional.of(DataBuilderOrder.mockTestReport()).getClass());
+	}
+
+	@Test
+	void testgetAllTestReports() {
+		List<TestReport> testReport = new ArrayList<>();
+		testReport.add(DataBuilderOrder.mockTestReport());
+		Pageable paging = PageRequest.of(0, 2);
+		final Page<TestReport> pages = new PageImpl<>(testReport, paging, 5);
+		when(testReportRepository.findAll(paging)).thenReturn(pages);
+		assertEquals(testReportService.getAllTestReports(paging), pages);
+	}
+
+	@Test
+	void testgetAllTestReportsAnother() {
+		List<TestReport> testReport = new ArrayList<>();
+		testReport.add(DataBuilderOrder.mockTestReport());
+		Pageable paging = PageRequest.of(0, 2);
+		final Page<TestReport> pages = new PageImpl<>(testReport, paging, 5);
+		// when(laboratoryService.getDefaultLaboratory()).thenReturn(Optional.of(DataBuilderOrder.mockLaboratory()));
+		when(testReportRepository.findTestReportsByLabId("1L", paging)).thenReturn(pages);
+		assertEquals(testReportService.getAllTestReports(Optional.of("1L"), paging), pages);
+	}
+
+	@Test
+	public void testgetAllTestReportsException() throws JdxServiceException {
+		Pageable paging = PageRequest.of(0, 2);
+		JdxServiceException e = assertThrows(JdxServiceException.class,
+				() -> testReportService.getAllTestReports(Optional.empty(), paging));
+		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+	}
+
+	@Test
+	void testgetAllTestReportsByPatientId() {
+		List<TestReport> testReport = new ArrayList<>();
+		testReport.add(DataBuilderOrder.mockTestReport());
+		Pageable paging = PageRequest.of(0, 2);
+		final Page<TestReport> pages = new PageImpl<>(testReport, paging, 5);
+		// when(laboratoryService.getDefaultLaboratory()).thenReturn(Optional.of(DataBuilderOrder.mockLaboratory()));
+		when(testReportRepository.findTestReportsByPatient_IdAndSignedOutTypeAndReportConfigurationAndAvailable("1L",
+				SignedOutType.AUTOMATIC, ReportConfiguration.FST, true, paging)).thenReturn(pages);
+		assertEquals(testReportService.getAllTestReportsByPatientId("1L", SignedOutType.AUTOMATIC,
+				ReportConfiguration.FST, true, paging), pages);
+	}
+
+	@Test
+	void testgetAllTestReportsByLabOrderId() {
+		List<TestReport> testReport = new ArrayList<>();
+		testReport.add(DataBuilderOrder.mockTestReport());
+		Pageable paging = PageRequest.of(0, 2);
+		final Page<TestReport> pages = new PageImpl<>(testReport, paging, 5);
+		when(testReportRepository.findTestReportsByLaboratoryOrderIdAndSignedOutTypeAndReportConfigurationAndAvailable(
+				"1L", SignedOutType.AUTOMATIC, ReportConfiguration.FST, true, paging)).thenReturn(pages);
+		assertEquals(testReportService.getAllTestReportsByLabOrderId("1L", SignedOutType.AUTOMATIC,
+				ReportConfiguration.FST, true, paging), pages);
+	}
+
+	@Test
+	void testgetAllTestReportsBySampleNumber() {
+		List<TestReport> testReport = new ArrayList<>();
+		testReport.add(DataBuilderOrder.mockTestReport());
+		Pageable paging = PageRequest.of(0, 2);
+		final Page<TestReport> pages = new PageImpl<>(testReport, paging, 5);
+		when(testReportRepository.findTestReportsBySampleNumberAndSignedOutTypeAndReportConfigurationAndAvailable(
+				"67898", SignedOutType.AUTOMATIC, ReportConfiguration.FST, true, paging)).thenReturn(pages);
+		assertEquals(testReportService.getAllTestReportsBySampleNumber("67898", SignedOutType.AUTOMATIC,
+				ReportConfiguration.FST, true, paging), pages);
+	}
+
+	@Test
+	void testgetAllTestReportsBySignout() {
+		List<TestReport> testReport = new ArrayList<>();
+		testReport.add(DataBuilderOrder.mockTestReport());
+		Pageable paging = PageRequest.of(0, 2);
+		final Page<TestReport> pages = new PageImpl<>(testReport, paging, 5);
+		when(testReportRepository.findTestReportsBySignedOutType(Mockito.anyString(), Mockito.any(), Mockito.any(),
+				Mockito.anyBoolean(), Mockito.any())).thenReturn(pages);
+		assertEquals(testReportService.getAllTestReportsBySignout(Optional.of("f450237e-20a3-4bf1-b64d-9ecaab16be7a"),
+				SignedOutType.AUTOMATIC, 1, IntervalType.HOURS, true, paging), pages);
+	}
+
+	@Test
+	public void testgetAllTestReportsBySignoutException() throws JdxServiceException {
+		Pageable paging = PageRequest.of(0, 2);
+		JdxServiceException e = assertThrows(JdxServiceException.class,
+				() -> testReportService.getAllTestReportsBySignout(Optional.empty(), SignedOutType.AUTOMATIC, 1,
+						IntervalType.HOURS, true, paging));
+		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+	}
+
+	@Test
+	void testfindAllAvailableTestReportsByPatient() {
+		List<TestReport> testReport = new ArrayList<>();
+		testReport.add(DataBuilderOrder.mockTestReport());
+		Pageable paging = PageRequest.of(0, 2);
+		final Page<TestReport> pages = new PageImpl<>(testReport, paging, 5);
+		when(testReportRepository.findTestReportsByPatient_IdAndSignedOut("6L", true, paging)).thenReturn(pages);
+		assertEquals(testReportService.findAllAvailableTestReportsByPatient("6L", paging), pages);
+	}
+
+	@Test
+	public void testfindAllAvailableTestReportsByPatientException() throws JdxServiceException {
+		Pageable paging = PageRequest.of(0, 2);
+		when(testReportRepository.findTestReportsByPatient_IdAndSignedOut("6L", true, paging))
+				.thenThrow(JdxServiceException.class);
+		JdxServiceException e = assertThrows(JdxServiceException.class,
+				() -> testReportService.findAllAvailableTestReportsByPatient("6L", paging));
+		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+	}
+
+	@Test
+	void testsearch() {
+		List<TestReport> testReport = new ArrayList<>();
+		testReport.add(DataBuilderOrder.mockTestReport());
+		Pageable paging = PageRequest.of(0, 2);
+		final Page<TestReport> pages = new PageImpl<>(testReport, paging, 5);
+
+		when(testReportRepository.searchOrderByCompletedAtASC(Mockito.any(), Mockito.anyBoolean(), Mockito.anyString(),
+				Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+				Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(),
+				Mockito.anyBoolean(), Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any()))
+						.thenReturn(pages);
+		assertEquals(testReportService.search(Optional.of("f450237e-20a3-4bf1-b64d-9ecaab16be7a"),
+				Optional.of(SignedOutType.AUTOMATIC), Optional.of(ReportConfiguration.FST),
+				Optional.of(ReportType.STANDARD), Optional.of(true), Optional.of("6L"), Optional.of("Juno_test"),
+				Optional.of("User"), Optional.of("no-email@junodx.com"), Optional.of("67898"), Optional.of("8L"),
+				Optional.of("76c97d43-347f-4132-ba18-ddf3b313c226"), Optional.of("1234"), Optional.of(true),
+				Optional.of(true), Optional.of(true), Optional.of(true), Optional.of(TestReportSortBy.age),
+				Optional.of(SortType.ASC), Optional.of(true), Optional.of(Calendar.getInstance()), paging), pages);
+	}
+
+//	@Test
+//	void testsignOutTestReports() {
+//		Authority auth = new Authority();
+//		auth.setName("ROLE_LAB_DIRECTOR");
+//		List<Authority> authority = new ArrayList<>();
+//		authority.add(auth);
+//		DataBuilderOrder.mockUser().setAuthorities(authority);
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		List<TestRun> runsToSave = new ArrayList<>();
+//		runsToSave.add(DataBuilderOrder.mockTestRunss());
+//		List<Order> ordersToSave = new ArrayList<>();
+//		ordersToSave.add(DataBuilderOrder.mockOrder());
+//		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRunss());
+//		DataBuilderOrder.lineItems.add(DataBuilderOrder.mockOrderLineItem());
+//		DataBuilderOrder.mockOrder().setLineItems(DataBuilderOrder.lineItems);
+//		when(userService.findOne("1L")).thenReturn(Optional.of(DataBuilderOrder.mockUser()));
+//		when(testReportRepository.findAllById(Mockito.anyList())).thenReturn(testReport);
+//
+//		when(testRunService.getTestRunForKitId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRunss()));
+//
+//		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockLaboratoryOrder()));
+//		when(orderRepository.findById(Mockito.anyString())).thenReturn(Optional.of(DataBuilderOrder.mockOrder()));
+//		when(testReportRepository.saveAll(testReport)).thenReturn(testReport);
+//		when(testRunRepository.saveAll(Mockito.anyList())).thenReturn(runsToSave);
+//		when(orderRepository.saveAll(Mockito.anyList())).thenReturn(ordersToSave);
+//		when(mailService.sendEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(),
+//				Mockito.anyBoolean())).thenReturn(true);
+//		testReportService.sendTestReportAvaialbleEmail(DataBuilderOrder.mockOrder());
+//		assertEquals(testReportService.signOutTestReports(testReport, "1L", DataBuilderOrder.userDetailsImpl),
+//				testReport);
+//	}
+
+	@Test
+	void testsignOutReports() {
+		 List<TestReport> reportsToSave = new ArrayList<>();
+         List<Order> ordersToSave = new ArrayList<>();
+         List<TestRun> runsToSave = new ArrayList<>();
+         when(userService.findOne(Mockito.anyString())).thenReturn(Optional.of(DataBuilderOrder.mockUser()));
+         
+         
+         
+         
+         
+         
+         
+	
+	}
+	
+	
+
+//	@Test
+//	public void testsignOutTestReportsUserException() throws JdxServiceException {
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		when(userService.findOne("1L")).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.signOutTestReports(testReport, "1L", DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testsignOutTestReportsTestException() throws JdxServiceException {
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		when(userService.findOne("1L")).thenReturn(Optional.of(DataBuilderOrder.mockUser()));
+//		when(testReportRepository.findAllById(Mockito.anyList())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.signOutTestReports(testReport, "1L", DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testsignOutTestReportsLabException() throws JdxServiceException {
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		when(userService.findOne("1L")).thenReturn(Optional.of(DataBuilderOrder.mockUser()));
+//		when(testReportRepository.findAllById(Mockito.anyList())).thenReturn(testReport);
+//
+//		when(testRunService.getTestRunForKitId(DataBuilderOrder.mockTestReports().getTestRun().getKit().getId()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRun()));
+//
+//		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.signOutTestReports(testReport, "1L", DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testsignOutTestReportsLabTestRunException() throws JdxServiceException {
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		when(userService.findOne("1L")).thenReturn(Optional.of(DataBuilderOrder.mockUser()));
+//		when(testReportRepository.findAllById(Mockito.anyList())).thenReturn(testReport);
+//
+//		when(testRunService.getTestRunForKitId(DataBuilderOrder.mockTestReports().getTestRun().getKit().getId()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRun()));
+//
+//		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockLaboratoryOrder()));
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.signOutTestReports(testReport, "1L", DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testsignOutTestReportsLabReportsException() throws JdxServiceException {
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		DataBuilderOrder.mockLaboratoryOrder().setReportableTestReportId(null);
+//		when(userService.findOne("1L")).thenReturn(Optional.of(DataBuilderOrder.mockUser()));
+//		when(testReportRepository.findAllById(Mockito.anyList())).thenReturn(testReport);
+//		when(testRunService.getTestRunForKitId(DataBuilderOrder.mockTestReports().getTestRun().getKit().getId()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRun()));
+//		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockLaboratoryOrder()));
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.signOutTestReports(testReport, "1L", DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testsendTestReportAvaialbleEmail() {
+//
+//		DataBuilderOrder.lineItems.add(DataBuilderOrder.mockOrderLineItem());
+//		DataBuilderOrder.mockOrder().setLineItems(DataBuilderOrder.lineItems);
+//		when(mailService.sendEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(),
+//				Mockito.anyBoolean())).thenReturn(true);
+//		testReportService.sendTestReportAvaialbleEmail(DataBuilderOrder.mockOrder());
+//	}
+//
+//	@Test
+//	void testrequestReTestForTestReports() {
+//		Authority auth = new Authority();
+//		auth.setName("ROLE_PATIENT");
+//		List<Authority> authority = new ArrayList<>();
+//		authority.add(auth);
+//		DataBuilderOrder.mockUser().setAuthorities(authority);
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		List<TestRun> runsToSave = new ArrayList<>();
+//		runsToSave.add(DataBuilderOrder.mockTestRun());
+//		List<Order> ordersToSave = new ArrayList<>();
+//		ordersToSave.add(DataBuilderOrder.mockOrder());
+//		List<BatchRun> batchesUpdated = new ArrayList<>();
+//		batchesUpdated.add(DataBuilderOrder.mockBatchRun());
+//		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRun());
+//		when(userService.findOne("1L")).thenReturn(Optional.of(DataBuilderOrder.mockUser()));
+//		when(testReportRepository.findAllById(Mockito.anyList())).thenReturn(testReport);
+//		when(testRunService.getTestRunForKitId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRun()));
+//		when(testReportRepository.saveAll(testReport)).thenReturn(testReport);
+//		when(testRunRepository.saveAll(Mockito.anyList())).thenReturn(runsToSave);
+//		// when(orderRepository.saveAll(Mockito.anyList())).thenReturn(ordersToSave);
+//		when(testReportRepository.countOfUnapprovedResultsInBatch(Mockito.anyString())).thenReturn(0L);
+//		when(batchRunService.updateAll(Mockito.any(), Mockito.any())).thenReturn(batchesUpdated);
+//		assertEquals(testReportService.requestReTestForTestReports(testReport, RetestActionType.REFLEX, true, "notes",
+//				"1L", DataBuilderOrder.userDetailsImpl), testReport);
+//	}
+//
+//	@Test
+//	public void testrequestReTestForTestReportsException() throws JdxServiceException {
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		when(userService.findOne("1L")).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.requestReTestForTestReports(testReport, RetestActionType.REFLEX, true, "notes",
+//						"1L", DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testrequestReTestForTestReportsTestException() throws JdxServiceException {
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		when(userService.findOne("1L")).thenReturn(Optional.of(DataBuilderOrder.mockUser()));
+//		when(testReportRepository.findAllById(Mockito.anyList())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.requestReTestForTestReports(testReport, RetestActionType.REFLEX, true, "notes",
+//						"1L", DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	void testapproveTestReports() {
+//		Authority auth = new Authority();
+//		auth.setName("ROLE_PATIENT");
+//		List<Authority> authority = new ArrayList<>();
+//		authority.add(auth);
+//		DataBuilderOrder.mockUser().setAuthorities(authority);
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		List<TestRun> runsToSave = new ArrayList<>();
+//		runsToSave.add(DataBuilderOrder.mockTestRun());
+//		List<Order> ordersToSave = new ArrayList<>();
+//		ordersToSave.add(DataBuilderOrder.mockOrder());
+//		List<BatchRun> batchesUpdated = new ArrayList<>();
+//		batchesUpdated.add(DataBuilderOrder.mockBatchRun());
+//		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRun());
+//		when(userService.findOne("1L")).thenReturn(Optional.of(DataBuilderOrder.mockUser()));
+//		when(testReportRepository.findAllById(Mockito.anyList())).thenReturn(testReport);
+//		when(testRunService.getTestRunForKitId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRun()));
+//		when(testReportRepository.saveAll(testReport)).thenReturn(testReport);
+//		when(testRunRepository.saveAll(Mockito.anyList())).thenReturn(runsToSave);
+//		when(testReportRepository.countOfUnapprovedResultsInBatch(Mockito.anyString())).thenReturn(0L);
+//		when(batchRunService.updateAll(Mockito.any(), Mockito.any())).thenReturn(batchesUpdated);
+//		assertEquals(testReportService.approveTestReports(testReport, "1L", DataBuilderOrder.userDetailsImpl),
+//				testReport);
+//	}
+//
+//	@Test
+//	public void testapproveTestReportsException() throws JdxServiceException {
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		when(userService.findOne("1L")).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.approveTestReports(testReport, "1L", DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testapproveTestReportsTestException() throws JdxServiceException {
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		when(userService.findOne("1L")).thenReturn(Optional.of(DataBuilderOrder.mockUser()));
+//		when(testReportRepository.findAllById(Mockito.anyList())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.approveTestReports(testReport, "1L", DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	void testvalidateResultData() {
+//		testReportService.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReport());
+//		testReportService.validateResultData(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReport());
+//
+//	}
+//
+//	@Test
+//	void testvalidateNIPSReport() {
+//		testReportService.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReport());
+//
+//	}
+
+//	@Test
+//	void testfinalizeAndSaveReports() {
+//		DataBuilderOrder.mockUser().setId("2L");
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		DataBuilderOrder.lineItems.add(DataBuilderOrder.mockOrderLineItems());
+//		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRuns());
+//		List<OrderLineItem> orderLines = new ArrayList<>();
+//		orderLines.add(DataBuilderOrder.mockOrderLineItems());
+//		DataBuilderOrder.mockOrder().setLineItems(orderLines);
+//		testReportService.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReport());
+//		testReportService.validateResultData(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReport());
+//
+//		when(batchRunService.findByPipelineRunId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockBatchRun()));
+//		when(laboratoryService.getDefaultLaboratory()).thenReturn(Optional.of(DataBuilderOrder.mockLaboratory()));
+//		when(kitRepository.findKitBySampleNumber(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockKit()));
+//		when(testRunService.getTestRunForKitId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRuns()));
+//		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockLaboratoryOrder()));
+//
+//		when(orderRepository.findById(Mockito.anyString())).thenReturn(Optional.of(DataBuilderOrder.mockOrder()));
+//
+//		when(testReportRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockTestReports());
+//		DataBuilderOrder.mockOrder().setLineItems(DataBuilderOrder.lineItems);
+//
+//		testReportService.finalizeAndSaveReport(DataBuilderOrder.mockTestReports(), DataBuilderOrder.mockBatchRun(),
+//				DataBuilderOrder.mockTestRuns(), DataBuilderOrder.mockKit(), DataBuilderOrder.mockLaboratory(),
+//				Optional.of(DataBuilderOrder.mockUser()), Optional.of(DataBuilderOrder.mockLaboratoryOrder()),
+//				Optional.of(DataBuilderOrder.mockOrder()), DataBuilderOrder.userDetailsImpl, false, false);
+//
+//		testReportService.saveSingleTestReportWithOrder(DataBuilderOrder.mockBatchRun(),
+//				DataBuilderOrder.mockTestRuns(), DataBuilderOrder.mockKit(), DataBuilderOrder.mockTestReports(),
+//				Optional.of(DataBuilderOrder.mockLaboratoryOrder()), DataBuilderOrder.userDetailsImpl);
+//
+//		testReportService.saveSingleTestReportAsControl(DataBuilderOrder.mockBatchRun(), Optional.empty(),
+//				Optional.empty(), DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl);
+//
+//		testReportService.saveSingleTestReportAsResearch(DataBuilderOrder.mockBatchRun(), Optional.empty(),
+//				Optional.empty(), DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl);
+//
+//		testReportService.createTestReport("12345", DataBuilderOrder.mockTestReports(),
+//				DataBuilderOrder.userDetailsImpl);
+//		assertEquals(testReportService.createTestReports("8L", testReport, DataBuilderOrder.userDetailsImpl),
+//				testReport);
+//
+//	}
+//	@Test
+//	void testfinalizeAndSaveReports() {
+//
+//		DataBuilderOrder.lineItems.add(DataBuilderorderExample.mockOrderLineItemss());
+//		DataBuilderOrder.mockUser().setId("2L");
+//		List<TestReport> testReport = new LinkedList<>();
+//		testReport.add(DataBuilderOrder.mockTestReports());
+//		// DataBuilderOrder.lineItems.add(DataBuilderOrder.mockOrderLineItems());
+//		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRuns());
+//
+//		testReportService.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReport());
+//		testReportService.validateResultData(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReport());
+//
+//		when(batchRunService.findByPipelineRunId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockBatchRun()));
+//		when(laboratoryService.getDefaultLaboratory()).thenReturn(Optional.of(DataBuilderOrder.mockLaboratory()));
+//		when(kitRepository.findKitBySampleNumber(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockKit()));
+//		when(testRunService.getTestRunForKitId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRuns()));
+//		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockLaboratoryOrder()));
+//
+//		when(orderRepository.findById(Mockito.anyString())).thenReturn(Optional.of(DataBuilderOrder.mockOrder()));
+//
+//		when(testReportRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockTestReports());
+//		DataBuilderOrder.mockOrder().setLineItems(DataBuilderOrder.lineItems);
+//
+//		testReportService.finalizeAndSaveReport(DataBuilderOrder.mockTestReports(), DataBuilderOrder.mockBatchRun(),
+//				DataBuilderOrder.mockTestRuns(), DataBuilderOrder.mockKit(), DataBuilderOrder.mockLaboratory(),
+//				Optional.of(DataBuilderOrder.mockUser()), Optional.of(DataBuilderOrder.mockLaboratoryOrder()),
+//				Optional.of(DataBuilderOrder.mockOrder()), DataBuilderOrder.userDetailsImpl, false, false);
+//
+//		testReportService.saveSingleTestReportWithOrder(DataBuilderOrder.mockBatchRun(),
+//				DataBuilderOrder.mockTestRuns(), DataBuilderOrder.mockKit(), DataBuilderOrder.mockTestReports(),
+//				Optional.of(DataBuilderOrder.mockLaboratoryOrder()), DataBuilderOrder.userDetailsImpl);
+//
+//		testReportService.saveSingleTestReportAsControl(DataBuilderOrder.mockBatchRun(), Optional.empty(),
+//				Optional.empty(), DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl);
+//
+//		testReportService.saveSingleTestReportAsResearch(DataBuilderOrder.mockBatchRun(), Optional.empty(),
+//				Optional.empty(), DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl);
+//
+//		testReportService.createTestReport("12345", DataBuilderOrder.mockTestReports(),
+//				DataBuilderOrder.userDetailsImpl);
+//		assertEquals(testReportService.createTestReports("8L", testReport, DataBuilderOrder.userDetailsImpl),
+//				testReport);
+//
+//	}
+
+//	@Test
+//	public void testvalidateResultDataException() throws JdxServiceException {
+//
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.validateResultData(null, DataBuilderOrder.mockReport()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateResultDataReportException() throws JdxServiceException {
+//
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.validateResultData(ReportConfiguration.UCS, DataBuilderOrder.mockReport()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportException() throws JdxServiceException {
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportC13SnrException() throws JdxServiceException {
+//		DataBuilderOrder.mockTestQC().setC13Snr(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetChr13SensException() throws JdxServiceException {
+//		DataBuilderOrder.mockTestQC().setChr13Sens(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetC18SnrException() throws JdxServiceException {
+//		DataBuilderOrder.mockTestQC().setC18Snr(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetChr18SensException() throws JdxServiceException {
+//		DataBuilderOrder.mockTestQC().setChr18Sens(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetC21SnrException() throws JdxServiceException {
+//		DataBuilderOrder.mockTestQC().setC21Snr(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetChr21SensException() throws JdxServiceException {
+//		DataBuilderOrder.mockTestQC().setChr21Sens(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetLowReadsException() throws JdxServiceException {
+//		DataBuilderOrder.mockTestQC().setLowReads(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetRawCountsException() throws JdxServiceException {
+//		DataBuilderOrder.mockTestQC().setRawCounts(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetSnpIdentityException() throws JdxServiceException {
+//		DataBuilderOrder.mockTestQC().setSnpIdentity(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetFetalFractionException() throws JdxServiceException {
+//		DataBuilderOrder.mockNIPSBasicRawData().setFetalFraction(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT13Exception() throws JdxServiceException {
+//		DataBuilderOrder.mockNIPSBasicRawData().setT13(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT13CallException() throws JdxServiceException {
+//		DataBuilderOrder.mockT13Test().setCall(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT13ScoreException() throws JdxServiceException {
+//		DataBuilderOrder.mockT13Test().setzScore(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT13ConfidenceLowerException() throws JdxServiceException {
+//		DataBuilderOrder.mockT13Test().setConfidenceLower(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT21Exception() throws JdxServiceException {
+//		DataBuilderOrder.mockNIPSBasicRawData().setT21(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT21CallException() throws JdxServiceException {
+//		DataBuilderOrder.mockT21Test().setCall(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT21ScoreException() throws JdxServiceException {
+//		DataBuilderOrder.mockT21Test().setzScore(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT21ConfidenceLowerException() throws JdxServiceException {
+//		DataBuilderOrder.mockT21Test().setConfidenceLower(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT18Exception() throws JdxServiceException {
+//		DataBuilderOrder.mockNIPSBasicRawData().setT18(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT18CallException() throws JdxServiceException {
+//		DataBuilderOrder.mockT18Test().setCall(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT18ScoreException() throws JdxServiceException {
+//		DataBuilderOrder.mockT18Test().setzScore(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetT18ConfidenceLowerException() throws JdxServiceException {
+//		DataBuilderOrder.mockT18Test().setConfidenceLower(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetReportConfigurationException() throws JdxServiceException {
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.validateNIPSReport(ReportConfiguration.FST, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetEuploidException() throws JdxServiceException {
+//		DataBuilderOrder.mockNIPSBasicRawData().setEuploid(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetscaException() throws JdxServiceException {
+//		DataBuilderOrder.mockNIPSBasicRawData().setSca(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetscaGenderResultException() throws JdxServiceException {
+//		DataBuilderOrder.mockSCATest().setGenderResult(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetscaScaResultException() throws JdxServiceException {
+//		DataBuilderOrder.mockSCATest().setScaResult(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetGenderConfidenceException() throws JdxServiceException {
+//		DataBuilderOrder.mockSCATest().setGenderConfidence(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetScaConfidenceException() throws JdxServiceException {
+//		DataBuilderOrder.mockSCATest().setScaConfidence(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetxVecException() throws JdxServiceException {
+//		DataBuilderOrder.mockSCATest().setxVec(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetyVecException() throws JdxServiceException {
+//		DataBuilderOrder.mockSCATest().setyVec(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetyVec2Exception() throws JdxServiceException {
+//		DataBuilderOrder.mockSCATest().setyVec2(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testvalidateNIPSReportgetXzScoresException() throws JdxServiceException {
+//		DataBuilderOrder.mockSCATest().setXzScores(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.validateNIPSReport(ReportConfiguration.NIPS_ADVANCED, DataBuilderOrder.mockReportss()));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testfinalizeAndSaveReportException() throws JdxServiceException {
+//
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService.createTestReport(null,
+//				DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testfinalizeAndSaveReportvalidateException() throws JdxServiceException {
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.createTestReport("12345", DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testfinalizeAndSaveReportBatchException() throws JdxServiceException {
+//		when(batchRunService.findByPipelineRunId(Mockito.anyString())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.createTestReport("12345", DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testfinalizeAndSaveReportkitException() throws JdxServiceException {
+//		when(batchRunService.findByPipelineRunId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockBatchRun()));
+//		when(kitRepository.findKitBySampleNumber(Mockito.anyString())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.createTestReport("12345", DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testfinalizeAndSaveReportTestException() throws JdxServiceException {
+//		when(batchRunService.findByPipelineRunId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockBatchRun()));
+//		when(kitRepository.findKitBySampleNumber(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockKit()));
+//		when(testRunService.getTestRunForKitId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRuns()));
+//		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.createTestReport("12345", DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testsaveSingleTestReportWithlabException() throws JdxServiceException {
+//
+////		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.saveSingleTestReportWithOrder(DataBuilderOrder.mockBatchRun(),
+//						DataBuilderOrder.mockTestRuns(), DataBuilderOrder.mockKit(), DataBuilderOrder.mockTestReports(),
+//						Optional.empty(), DataBuilderOrder.userDetailsImpl));
+//		assertEquals("The system experienced an error processing the client's request.", e.getMessage());
+//	}
+//
+//	@Test
+//	public void testsaveSingleTestReportWithOrdersIdException() throws JdxServiceException {
+//		when(orderRepository.findById(Mockito.anyString())).thenThrow(JdxServiceException.class);
+//
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.saveSingleTestReportWithOrder(DataBuilderOrder.mockBatchRun(),
+//						DataBuilderOrder.mockTestRuns(), DataBuilderOrder.mockKit(), DataBuilderOrder.mockTestReports(),
+//						Optional.of(DataBuilderOrder.mockLaboratoryOrder()), DataBuilderOrder.userDetailsImpl));
+//	}
+//
+//	@Test
+//	public void testsaveSingleTestReportWithOrdersException() throws JdxServiceException {
+//		when(orderRepository.findById(Mockito.anyString())).thenReturn(Optional.of(DataBuilderOrder.mockOrder()));
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.saveSingleTestReportWithOrder(DataBuilderOrder.mockBatchRun(),
+//						DataBuilderOrder.mockTestRuns(), DataBuilderOrder.mockKit(), DataBuilderOrder.mockTestReports(),
+//						Optional.of(DataBuilderOrder.mockLaboratoryOrder()), DataBuilderOrder.userDetailsImpl));
+//	}
+//
+//	@Test
+//	void testsaveSingleTestReportWithOrders() {
+//		DataBuilderOrder.lineItems.add(DataBuilderOrder.mockOrderLineItem());
+//		DataBuilderOrder.testRuns.add(DataBuilderOrder.mockTestRuns());
+//		when(kitRepository.findKitBySampleNumber(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockKit()));
+//		when(testRunService.getTestRunForKitId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRuns()));
+//		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockLaboratoryOrder()));
+//		when(orderLineItemRepository.findOrderLineItemByLaboratoryOrderDetails_Id(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockOrderLineItem()));
+//		when(orderRepository.findOrderByLineItems(Mockito.any())).thenReturn(Optional.of(DataBuilderOrder.mockOrder()));
+//		when(testReportRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockTestReports());
+//		assertEquals(testReportService.saveSingleTestReportWithOrder(DataBuilderOrder.mockTestReports(),
+//				DataBuilderOrder.userDetailsImpl), DataBuilderOrder.mockTestReports());
+//	}
+//
+//	@Test
+//	public void testsaveSingleTestReportWithOrdersAnotherIdskitException() throws JdxServiceException {
+//		when(kitRepository.findKitBySampleNumber(Mockito.anyString())).thenThrow(JdxServiceException.class);
+////		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.saveSingleTestReportWithOrder(DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl));
+//	}
+//
+//	@Test
+//	public void testsaveSingleTestReportWithOrdersAnotherTestException() throws JdxServiceException {
+//		when(kitRepository.findKitBySampleNumber(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockKit()));
+//		when(testRunService.getTestRunForKitId(Mockito.anyString())).thenThrow(JdxServiceException.class);
+////		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.saveSingleTestReportWithOrder(DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl));
+//	}
+//
+//	@Test
+//	public void testsaveSingleTestReportWithOrdersAnotherlabException() throws JdxServiceException {
+//		when(kitRepository.findKitBySampleNumber(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockKit()));
+//		when(testRunService.getTestRunForKitId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRuns()));
+//		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any())).thenThrow(JdxServiceException.class);
+////		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.saveSingleTestReportWithOrder(DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl));
+//	}
+//
+//	@Test
+//	public void testsaveSingleTestReportWithOrdersAnotherOrderLineItemsException() throws JdxServiceException {
+//		when(kitRepository.findKitBySampleNumber(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockKit()));
+//		when(testRunService.getTestRunForKitId(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestRuns()));
+//		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockLaboratoryOrder()));
+//		when(orderLineItemRepository.findOrderLineItemByLaboratoryOrderDetails_Id(Mockito.anyString()))
+//				.thenThrow(JdxServiceException.class);
+////		when(laboratoryOrderService.findLaboratoryOrderByTestRun(Mockito.any())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.saveSingleTestReportWithOrder(DataBuilderOrder.mockTestReports(), DataBuilderOrder.userDetailsImpl));
+//	}
+//
+//	@Test
+//	void testdelete() {
+//		verify(testReportRepository, times(0)).deleteById(Mockito.anyString());
+//		testReportService.delete("2L", DataBuilderOrder.userDetailsImpl);
+//	}
+//
+//	@Test
+//	void testvalidateFSTReport() {
+//		testReportService.validateFSTReport(DataBuilderOrder.mockReports());
+//	}
+//
+//	@Test
+//	public void testvalidateFSTReportException() throws JdxServiceException {
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.validateFSTReport(DataBuilderOrder.mockReport()));
+//	}
+//
+//	@Test
+//	public void testvalidateFSTReportEuploidException() throws JdxServiceException {
+//		DataBuilderOrder.mockNIPSBasicRawData().setEuploid(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.validateFSTReport(DataBuilderOrder.mockReport()));
+//	}
+//
+//	@Test
+//	public void testvalidateFSTReportT13Exception() throws JdxServiceException {
+//		DataBuilderOrder.mockNIPSBasicRawData().setT13(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.validateFSTReport(DataBuilderOrder.mockReport()));
+//	}
+//
+//	@Test
+//	public void testvalidateFSTReportT18Exception() throws JdxServiceException {
+//		DataBuilderOrder.mockNIPSBasicRawData().setT18(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.validateFSTReport(DataBuilderOrder.mockReport()));
+//	}
+//
+//	@Test
+//	public void testvalidateFSTReportT21Exception() throws JdxServiceException {
+//		DataBuilderOrder.mockNIPSBasicRawData().setT21(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.validateFSTReport(DataBuilderOrder.mockReport()));
+//	}
+//
+//	@Test
+//	public void testvalidateFSTReportScaException() throws JdxServiceException {
+//		DataBuilderOrder.mockNIPSBasicRawData().setSca(null);
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.validateFSTReport(DataBuilderOrder.mockReport()));
+//	}
+//
+//	@Test
+//	void testgetAllLabReviewStats() {
+//		List<TestReportsReviewResultsDto> resultsDto = new ArrayList<>();
+//		resultsDto.add(DataBuilderOrder.mockTestReportsReviewResultsDto());
+//		assertEquals(testReportService.getAllLabReviewStats("1997-12-15 00:00:00").getClass(), resultsDto.getClass());
+//	}
+//
+//	@Test
+//	void testgetTestReportResults() {
+//		List<TestReportsReviewResultsDto> resultsDto = new ArrayList<>();
+//		resultsDto.add(DataBuilderOrder.mockTestReportsReviewResultsDto());
+//		assertEquals(testReportService.getTestReportResults(Optional.of("lab"), "1997-12-15 00:00:00").getClass(),
+//				resultsDto.getClass());
+//	}
+//
+//	@Test
+//	void testgetAwaitingReports() {
+//		assertEquals(testReportService.getAwaitingReports("f450237e-20a3-4bf1-b64d-9ecaab16be7a", "FST").getClass(),
+//				DataBuilderOrder.mockTestReportsAwaitingReviewDto().getClass());
+//	}
+//
+//	@Test
+//	public void testAwaitingReportsException() throws JdxServiceException {
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.getAwaitingReports(null, "FST"));
+//	}
+//
+//	@Test
+//	void testgetAllAwaitingReports() {
+//		DataBuilderOrder.counts.add(DataBuilderOrder.mockTestReportsAwaitingReviewDto());
+//		// when(laboratoryService.getDefaultLaboratory()).thenReturn(Optional.of(DataBuilderOrder.mockLaboratory()));
+//		assertEquals(testReportService.getAllAwaitingReports("f450237e-20a3-4bf1-b64d-9ecaab16be7a").getClass(),
+//				DataBuilderOrder.mockLaboratoryReviewStatisticsDto().getClass());
+//	}
+//
+//	@Test
+//	void testgetAllAwaitingReportsAnother() {
+//		DataBuilderOrder.counts.add(DataBuilderOrder.mockTestReportsAwaitingReviewDto());
+//		when(laboratoryService.getDefaultLaboratory()).thenReturn(Optional.of(DataBuilderOrder.mockLaboratory()));
+//		assertEquals(testReportService.getAllAwaitingReports().getClass(),
+//				DataBuilderOrder.mockLaboratoryReviewStatisticsDto().getClass());
+//	}
+//
+//	@Test
+//	public void testgetAllAwaitingReportsAnotherException() throws JdxServiceException {
+//		when(laboratoryService.getDefaultLaboratory()).thenReturn(Optional.empty());
+//		JdxServiceException e = assertThrows(JdxServiceException.class,
+//				() -> testReportService.getAllAwaitingReports());
+//	}
+//
+//	@Test
+//	void testcountOfUnapprovedResultsInBatch() {
+//		when(testReportRepository.countOfUnapprovedResultsInBatch(Mockito.anyString())).thenReturn(8L);
+//		assertEquals(testReportService.countOfUnapprovedResultsInBatch("8L"), 8L);
+//	}
+//
+//	@Test
+//	void testupdateTestReportPatientViewedResult() {
+//
+//		List<Product> products = new LinkedList<>();
+//		products.add(DataBuilderOrder.mockProduct());
+//		DataBuilderOrder.orderStatusHistory.add(DataBuilderOrder.mockOrderStatus());
+//		DataBuilderOrder.mockOrderStatus().setStatusType(OrderStatusType.KIT_ASSIGNED);
+//		DataBuilderOrder.mockOrder().setOrderStatusHistory(DataBuilderOrder.orderStatusHistory);
+//		when(testReportRepository.findById(Mockito.anyString()))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestReports()));
+//
+//		orderService.updateOrderWithNewStatus("aa86f0ec-9ea1-487c-a814-b1c6001be7e8",
+//				DataBuilderOrder.mockOrderStatus(), DataBuilderOrder.userDetailsImpl);
+//		when(testReportRepository.save(Mockito.any())).thenReturn(DataBuilderOrder.mockTestReports());
+//
+//		assertEquals(
+//				testReportService.updateTestReportPatientViewedResult("2L", "1L", DataBuilderOrder.userDetailsImpl),
+//				DataBuilderOrder.mockTestReports());
+//	}
+//
+//	@Test
+//	public void testupdateTestReportPatientViewedResultTestException() throws JdxServiceException {
+//		when(testReportRepository.findById(Mockito.anyString())).thenReturn(Optional.empty());
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.updateTestReportPatientViewedResult("2L", "1L", DataBuilderOrder.userDetailsImpl));
+//	}
+//
+//	@Test
+//	public void testupdateTestReportPatientViewedResultException() throws JdxServiceException {
+//		DataBuilderOrder.mockTestReport().setPatient(null);
+//		when(testReportRepository.findById(Mockito.anyString())).thenThrow(JdxServiceException.class);
+//		JdxServiceException e = assertThrows(JdxServiceException.class, () -> testReportService
+//				.updateTestReportPatientViewedResult("2L", "1L", DataBuilderOrder.userDetailsImpl));
+//	}
+
+}

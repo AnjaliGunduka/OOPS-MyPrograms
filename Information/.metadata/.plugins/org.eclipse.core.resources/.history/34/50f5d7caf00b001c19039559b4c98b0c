@@ -1,0 +1,54 @@
+package com.Calci.maths;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+
+
+import junit.framework.TestCase;
+
+public class CalculatorTest extends TestCase {
+
+	Calculator Cal;// global variable
+
+	@BeforeAll
+	static void beforeAllinit()// beforeAll method should be static
+	{
+		System.out.println("this needs to run before aall");
+	}
+
+	@BeforeEach
+	void init() {
+		Cal = new Calculator();
+
+	}
+
+	@AfterEach
+	void cleanup()// when we run any method afterEach will print
+	{
+		System.out.println("cleaning up...");
+	}
+
+	@Test
+	@DisplayName("Testing add method")
+	void testAdd() {
+		
+		int expected = 8;
+//		int actual = Calculator.add(5, 3);
+		int actual = Cal.add(5, 3);
+		assertEquals(expected, actual, "Add method should add two numbers");
+		System.out.println("It Passes the Test");
+		System.out.println("actual value is:-" + actual);
+		
+	}
+
+	private void assertEquals(int expected, int actual, String string) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.junodx.api.models.auth.UserServiceImplTest
+-------------------------------------------------------------------------------
+Tests run: 130, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.392 s - in com.junodx.api.models.auth.UserServiceImplTest

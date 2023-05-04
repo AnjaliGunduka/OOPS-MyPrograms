@@ -1,0 +1,4 @@
+GitRepositoriesView.GitDirectories=D\:\\BMTS\\api-onboarding-service\\.git;D\:\\SpringBoot\\jdx-platform-api\\.git;D\:\\SpringBoot\\api-gateway-service\\.git;D\:\\SpringBoot\\bank-service\\.git;D\:\\SpringBoot\\payment-service\\.git;
+GitRepositoriesView.GitDirectories.relative=D\:\\BMTS\\api-onboarding-service\\.git;jdx-platform-api\\.git;api-gateway-service\\.git;bank-service\\.git;payment-service\\.git;
+core_autoIgnoreDerivedResources=false
+eclipse.preferences.version=1

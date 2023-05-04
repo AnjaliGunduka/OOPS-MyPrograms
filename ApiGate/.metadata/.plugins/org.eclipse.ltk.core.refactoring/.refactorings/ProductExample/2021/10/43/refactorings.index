@@ -1,0 +1,18 @@
+1634794638697	Rename package 'com.example.demo'
+1634794775493	Delete element
+1634794778596	Delete element
+1634794797138	Delete element
+1634794885696	Delete element
+1634795177323	Delete element
+1634795951273	Rename package 'com.tem.cart.model.exception'
+1634795970638	Rename package 'com.product.item.service.exceptions'
+1634795976759	Delete element
+1634795979584	Delete element
+1634797273267	Rename local variable 'products'
+1634798374494	Delete element
+1634798664063	Delete element
+1634798813719	Rename package 'com.javatechie.crud.example'
+1634798833856	Rename type 'ProductRepository'
+1634798904024	Rename type 'ProductService'
+1634799019610	Rename local variable 'product'
+1634799055815	Rename type 'ProductController'

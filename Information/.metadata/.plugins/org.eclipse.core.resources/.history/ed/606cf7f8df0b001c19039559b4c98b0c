@@ -1,0 +1,101 @@
+package com.information.example;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
+import junit.framework.TestCase;
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class CalculatorTest {
+
+	Calculator Cal;// global variable
+
+	@BeforeAll
+	static void beforeAllinit()// beforeAll method should be static
+	{
+		System.out.println("this needs to run before aall");
+	}
+
+	@BeforeEach
+	void init() {
+		Cal = new Calculator();
+
+	}
+
+	@AfterEach
+	void cleanup()// when we run any method afterEach will print
+	{
+		System.out.println("cleaning up...");
+	}
+
+	@Test
+	@DisplayName("Testing add method")
+	void testAdd() {
+		Calculator Cal = new Calculator();
+		int expected = 8;
+		int actual = Calculator.add(5, 3);
+		assertEquals(expected, actual, "Add method should add two numbers");
+		System.out.println("It Passes the Test");
+		System.out.println("actual value is:-" + actual);
+	}
+	
+	@Nested
+	@DisplayName("Add Method")
+	class AddTest
+	{
+		
+	@Test
+	@DisplayName("when adding Positive number")
+	void testAddPositive()
+	{
+		assertEquals(2,Calculator.add(5, 3),"should return sum");
+	}
+	@Test
+	@DisplayName("when adding Positive number")
+	void testAddNegative()
+	{
+		assertEquals(-1,Calculator.add(-1, -1),"should return right sum");
+	}
+	}
+	
+	@Test
+	@DisplayName("Multiply number")
+	void testMultiply()
+	{
+		assertEquals(-1,Calculator.Multi(2, 2),"should return right sum")
+	}
+	
+	
+	
+	@Test
+	void testDivide() {
+//		boolean isServerUp=false;
+//		assumeTrue(isServerUp);
+		assertThrows(ArithmeticException.class, () -> System.out.print(Calculator.div(1, 0) + "divided by zero"));
+		System.out.println("passed");
+	}
+
+
+
+	@Test
+	void testcomputeCircleRadius() {
+		Calculator Cal = new Calculator();
+		assertEquals(314.1592653589793, Calculator.computeCircleRadius(10), "should return area  of a circle");
+	}
+	
+	@Test
+	@Disabled
+	@DisplayName("TOd should not be run")
+	void testDiabled() {
+		fail("This test should be disable");
+	}
+	
+
+}

@@ -1,0 +1,542 @@
+
+x	java:S112¶"FDefine and throw a dedicated exception instead of using a generic one.(Ò‚ÒéüÿÿÿÿHÀ©RMAJORZ
+CODE_SMELL
+š
+java:S1192¢"iDefine a constant instead of duplicating this literal "Cannot process update from lab receipt: " 3 times.(ñ„êÁHÁ©RCRITICALZ
+CODE_SMELL
+°
+java:S1192Ô"zDefine a constant instead of duplicating this literal "Cannot update order from receipt as kitId is not provided" 3 times.(Ó‰¤ØşÿÿÿÿHÅ©RCRITICALZ
+CODE_SMELL
+­
+java:S1192ì"wDefine a constant instead of duplicating this literal "Cannot find any lineitems for order to update from lab" 3 times.(ÿ‹Ï¶üÿÿÿÿHÉ©RCRITICALZ
+CODE_SMELL
+£
+java:S1192è"mDefine a constant instead of duplicating this literal "Cannot find order to update from lab receipt" 3 times.(áıÿğúÿÿÿÿHÍ©RCRITICALZ
+CODE_SMELL
+ 
+java:S1192á"jDefine a constant instead of duplicating this literal "Cannot find lab order associated with kit" 3 times.(çï¬ªşÿÿÿÿHÑ©RCRITICALZ
+CODE_SMELL
+¦
+java:S1192ä"vDefine a constant instead of duplicating this literal "Cannot find order, id or kit information not provided" 3 times.(Ì²¿HÕ©RCRITICALZ
+CODE_SMELL
+Ÿ
+java:S1192İ"iDefine a constant instead of duplicating this literal "Cannot find test run associated with kit" 3 times.(µŞêíüÿÿÿÿHÙ©RCRITICALZ
+CODE_SMELL
+‹	java:S135“"YReduce the total number of break and continue statements in this loop to use at most one.(Ì·Ô‚üÿÿÿÿHİ©RMINORZ
+CODE_SMELL
+‹	java:S135À"YReduce the total number of break and continue statements in this loop to use at most one.(ÚÑÂÚúÿÿÿÿHá©RMINORZ
+CODE_SMELL
+b
+java:S1066Ï"/Merge this if statement with the enclosing one.(“ˆ…ÛüÿÿÿÿHå©RMAJORZ
+CODE_SMELL
+b
+java:S1066"/Merge this if statement with the enclosing one.(µ—ııÿÿÿÿHê©RMAJORZ
+CODE_SMELL
+b
+java:S1066–"/Merge this if statement with the enclosing one.(µ—ııÿÿÿÿHï©RMAJORZ
+CODE_SMELL
+b
+java:S1066ô"/Merge this if statement with the enclosing one.(Àƒ¥­üÿÿÿÿHô©RMAJORZ
+CODE_SMELL
+]
+java:S1066Û"/Merge this if statement with the enclosing one.(ñîØ½Hù©RMAJORZ
+CODE_SMELL
+h
+java:S1141¨"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿHş©RMAJORZ
+CODE_SMELL
+ƒ	java:S117Å"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Åİ–şÿÿÿÿH€ªRMINORZ
+CODE_SMELL
+ƒ	java:S117‰"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ŠÆüüÿÿÿÿHªRMINORZ
+CODE_SMELL
+Š
+java:S2629Ó"\Invoke method(s) only conditionally. Use the built-in formatting to construct this argument.(¶Ü°H‚ªRMAJORZ
+CODE_SMELL
+
+java:S2629Ö"\Invoke method(s) only conditionally. Use the built-in formatting to construct this argument.(¼®ş³üÿÿÿÿHƒªRMAJORZ
+CODE_SMELL
+e
+java:S2629¹"7Use the built-in formatting to construct this argument.(Â†ÿ—H„ªRMAJORZ
+CODE_SMELL
+e
+java:S2629Ñ"7Use the built-in formatting to construct this argument.(ƒšÏ¶H…ªRMAJORZ
+CODE_SMELL
+e
+java:S2629¡"7Use the built-in formatting to construct this argument.(ÕÕëH†ªRMAJORZ
+CODE_SMELL
+e
+java:S2629Ğ"7Use the built-in formatting to construct this argument.(ÕÕëH‡ªRMAJORZ
+CODE_SMELL
+[
+java:S5411"(Use a primitive boolean expression here.(µ—ııÿÿÿÿHˆªRMINORZ
+CODE_SMELL
+[
+java:S5411–"(Use a primitive boolean expression here.(µ—ııÿÿÿÿH‹ªRMINORZ
+CODE_SMELL
+[
+java:S5411†"(Use a primitive boolean expression here.(ú½Ú‹ıÿÿÿÿHªRMINORZ
+CODE_SMELL
+[
+java:S5411¹"(Use a primitive boolean expression here.(¯ÕªùùÿÿÿÿH‘ªRMINORZ
+CODE_SMELL
+[
+java:S5411š"(Use a primitive boolean expression here.(¨‹“–øÿÿÿÿH”ªRMINORZ
+CODE_SMELL
+[
+java:S5411ê"(Use a primitive boolean expression here.(ÕÏüÿÿÿÿH—ªRMINORZ
+CODE_SMELL
+[
+java:S5411î"(Use a primitive boolean expression here.(ÉÀ×ùÿÿÿÿHšªRMINORZ
+CODE_SMELL
+[
+java:S5411†"(Use a primitive boolean expression here.(’†’³ùÿÿÿÿHªRMINORZ
+CODE_SMELL
+Y
+java:S2789¦"2Replace this null literal by an "Optional" object.(áçì±H ªRMAJORZBUG
+Y
+java:S2789Ã"2Replace this null literal by an "Optional" object.(Ò¸¨¹H¡ªRMAJORZBUG
+^
+java:S2789Ì"2Replace this null literal by an "Optional" object.(ú©şÜøÿÿÿÿH¢ªRMAJORZBUG
+š
+java:S3655³"nCall "shippingCarrierOptional.isPresent()" or "!shippingCarrierOptional.isEmpty()" before accessing the value.(€æø¹ùÿÿÿÿH£ªRMAJORZBUG
+Œ
+java:S3655¢"`Call "foundFulfillment.isPresent()" or "!foundFulfillment.isEmpty()" before accessing the value.(¾ş½ºúÿÿÿÿH¤ªRMAJORZBUG
+w
+java:S3655í"PCall "Optional#isPresent()" or "!Optional#isEmpty()" before accessing the value.(ÆÉ—±H¥ªRMAJORZBUG
+j
+java:S2589š"7Remove this expression which always evaluates to "true"(†­ÇıÿÿÿÿH¦ªRMAJORZ
+CODE_SMELL
+j
+java:S2589á"7Remove this expression which always evaluates to "true"(†­ÇıÿÿÿÿHªªRMAJORZ
+CODE_SMELL
+j
+java:S2589¤"7Remove this expression which always evaluates to "true"(†­ÇıÿÿÿÿH®ªRMAJORZ
+CODE_SMELL
+j
+java:S2589€"7Remove this expression which always evaluates to "true"(†­ÇıÿÿÿÿH²ªRMAJORZ
+CODE_SMELL
+j
+java:S2589ï
+"7Remove this expression which always evaluates to "true"(†­ÇıÿÿÿÿH¶ªRMAJORZ
+CODE_SMELL
+f
+java:S2387³"1"mapper" is the name of a field in "ServiceBase".(íÉûÿÿÿÿHºªRBLOCKERZ
+CODE_SMELL
+o	java:S107À"=Method has 24 parameters, which is greater than 7 authorized.(©í¨ÛúÿÿÿÿH»ªRMAJORZ
+CODE_SMELL
+n	java:S125¯"<This block of commented-out lines of code should be removed.(ŞÒ¥øşÿÿÿÿH¼ªRMAJORZ
+CODE_SMELL
+f
+java:S1172¿"9Remove these unused method parameters "includes", "user".(„ÜÒEH½ªRMAJORZ
+CODE_SMELL
+l
+java:S1172Ç"9Remove these unused method parameters "includes", "user".(ŸÌ¼‹úÿÿÿÿHÁªRMAJORZ
+CODE_SMELL
+n	java:S125É"<This block of commented-out lines of code should be removed.(šğñÎıÿÿÿÿHÅªRMAJORZ
+CODE_SMELL
+n	java:S125Ë"<This block of commented-out lines of code should be removed.(Ë¢ÉùşÿÿÿÿHÆªRMAJORZ
+CODE_SMELL
+_
+java:S1135®"2Complete the task associated to this TODO comment.(Øù•­HÈªRINFOZ
+CODE_SMELL
+h	java:S125²"<This block of commented-out lines of code should be removed.(ùï×HÉªRMAJORZ
+CODE_SMELL
+ˆ
+java:S3776À"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(©í¨ÛúÿÿÿÿHÏªRCRITICALZ
+CODE_SMELL
+y
+java:S1854÷"FRemove this useless assignment to local variable "oContainsProductId".(™ÎÑÌÿÿÿÿÿHãªRMAJORZ
+CODE_SMELL
+p
+java:S1854ø"BRemove this useless assignment to local variable "oContainsTests".(ÍÖí£HäªRMAJORZ
+CODE_SMELL
+l
+java:S1854ı"9Remove this useless assignment to local variable "oSort".(Ê¸ØıÿÿÿÿHåªRMAJORZ
+CODE_SMELL
+k
+java:S1854ş"=Remove this useless assignment to local variable "oSortType".(ÛßœïHæªRMAJORZ
+CODE_SMELL
+¨
+java:S1172Ä"uRemove these unused method parameters "status", "firstName", "lastName", "email", "xifinId", "stripeId", "condensed".(à¬şÿÿÿÿHçªRMAJORZ
+CODE_SMELL
+c
+java:S1481Ù"5Remove this unused "oOrderStatusType" local variable.(Õ¡ïØHõªRMINORZ
+CODE_SMELL
+j
+java:S1481à"7Remove this unused "oContainsProductId" local variable.(Íƒ¼úÿÿÿÿH÷ªRMINORZ
+CODE_SMELL
+f
+java:S1481å"3Remove this unused "oContainsTests" local variable.(ÔæïéûÿÿÿÿHøªRMINORZ
+CODE_SMELL
+]
+java:S1481ë"/Remove this unused "oCondensed" local variable.(àÂÉÑHùªRMINORZ
+CODE_SMELL
+W
+java:S1481í"*Remove this unused "oSort" local variable.(­ÑÂHûªRMINORZ
+CODE_SMELL
+a
+java:S1481î".Remove this unused "oSortType" local variable.(±ê‰›üÿÿÿÿHüªRMINORZ
+CODE_SMELL
+i	java:S125†"<This block of commented-out lines of code should be removed.(œ¸¿ùHıªRMAJORZ
+CODE_SMELL
+ˆ
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 88 to the 15 allowed.( ˜ïÑûÿÿÿÿHŠ«RCRITICALZ
+CODE_SMELL
+_
+java:S1135¥"2Complete the task associated to this TODO comment.(æ½ûŠH·«RINFOZ
+CODE_SMELL
+_
+java:S1135±"2Complete the task associated to this TODO comment.(¥¢ÃÛH¸«RINFOZ
+CODE_SMELL
+n	java:S125¸"<This block of commented-out lines of code should be removed.(˜Ãç¡ûÿÿÿÿH¹«RMAJORZ
+CODE_SMELL
+o
+java:S3457¼"AFormat specifiers should be used instead of string concatenation.(Æˆ–°H»«RMAJORZ
+CODE_SMELL
+t
+java:S3457¿"AFormat specifiers should be used instead of string concatenation.(Ñÿ´ÓûÿÿÿÿH¼«RMAJORZ
+CODE_SMELL
+_
+java:S1135Â"2Complete the task associated to this TODO comment.(ÉÇù‹H½«RINFOZ
+CODE_SMELL
+h	java:S125¥"<This block of commented-out lines of code should be removed.(„í‰zH¾«RMAJORZ
+CODE_SMELL
+d
+java:S1135¢"2Complete the task associated to this TODO comment.(¬ÎĞ¯üÿÿÿÿH¿«RINFOZ
+CODE_SMELL
+n	java:S125Ä"<This block of commented-out lines of code should be removed.(ÂÓğ÷ıÿÿÿÿHÀ«RMAJORZ
+CODE_SMELL
+q
+java:S1155á">Use isEmpty() to check whether the collection is empty or not.(£õÎãúÿÿÿÿHÆ«RMINORZ
+CODE_SMELL
+h	java:S125÷"<This block of commented-out lines of code should be removed.(¿Ùå/HÉ«RMAJORZ
+CODE_SMELL
+h	java:S125Ã"<This block of commented-out lines of code should be removed.(ì¹ÍhHÊ«RMAJORZ
+CODE_SMELL
+d
+java:S1135Ï"2Complete the task associated to this TODO comment.(ãÊ¹§ùÿÿÿÿH¬RINFOZ
+CODE_SMELL
+n	java:S125—"<This block of commented-out lines of code should be removed.(¹ÀØ¨ıÿÿÿÿH‚¬RMAJORZ
+CODE_SMELL
+d
+java:S1135•"2Complete the task associated to this TODO comment.(±·÷ÔşÿÿÿÿH„¬RINFOZ
+CODE_SMELL
+‚
+java:S3776±"RRefactor this method to reduce its Cognitive Complexity from 26 to the 15 allowed.(ì­‹DH…¬RCRITICALZ
+CODE_SMELL
+W
+java:S2201º"1The return value of "stripTrailing" must be used.( ªÕfH¬RMAJORZBUG
+d
+java:S1135¿"2Complete the task associated to this TODO comment.(ãÊ¹§ùÿÿÿÿH‘¬RINFOZ
+CODE_SMELL
+X
+java:S2201Á"1The return value of "stripTrailing" must be used.(­à€H’¬RMAJORZBUG
+o
+java:S3457Ğ"AFormat specifiers should be used instead of string concatenation.(‡»³©H“¬RMAJORZ
+CODE_SMELL
+‰
+java:S3776š"SRefactor this method to reduce its Cognitive Complexity from 108 to the 15 allowed.(÷ğ¦ûÿÿÿÿH”¬RCRITICALZ
+CODE_SMELL
+k
+java:S1155É">Use isEmpty() to check whether the collection is empty or not.(ĞèÈvH³¬RMINORZ
+CODE_SMELL
+m
+java:S4034Ï":Replace this negation and "anyMatch()" with "noneMatch()".(“ˆ…ÛüÿÿÿÿH¶¬RMINORZ
+CODE_SMELL
+o
+java:S3457Ó"AFormat specifiers should be used instead of string concatenation.(¶Ü°H·¬RMAJORZ
+CODE_SMELL
+e
+java:S1612Ó"7Replace this lambda with method reference 'Kit::getId'.(¶Ü°H¸¬RMINORZ
+CODE_SMELL
+d
+java:S1612Õ"7Replace this lambda with method reference 'Kit::getId'.(ÜûósHº¬RMINORZ
+CODE_SMELL
+t
+java:S3457Ö"AFormat specifiers should be used instead of string concatenation.(¼®ş³üÿÿÿÿH¼¬RMAJORZ
+CODE_SMELL
+^
+java:S1135ò"2Complete the task associated to this TODO comment.(›‰€OH½¬RINFOZ
+CODE_SMELL
+a
+java:S1172Š".Remove this unused method parameter "updater".(½ğÈÿşÿÿÿÿH¾¬RMAJORZ
+CODE_SMELL
+n	java:S125…"<This block of commented-out lines of code should be removed.(î‚¾´úÿÿÿÿHÀ¬RMAJORZ
+CODE_SMELL
+d
+java:S1135‰"2Complete the task associated to this TODO comment.(Â¦®‚øÿÿÿÿHÃ¬RINFOZ
+CODE_SMELL
+
+java:S1172™"[Remove these unused method parameters "orderId", "orderLineItemid", "limsOrder", "updater".(Ÿ­ËÇûÿÿÿÿHÄ¬RMAJORZ
+CODE_SMELL
+ƒ
+java:S3776¤"RRefactor this method to reduce its Cognitive Complexity from 39 to the 15 allowed.(ÏÕÒHÌ¬RCRITICALZ
+CODE_SMELL
+w
+java:S1854ä"DRemove this useless assignment to local variable "updateCurrentKit".(ç‹³™ùÿÿÿÿHì¬RMAJORZ
+CODE_SMELL
+j
+java:S1854‹	"7Remove this useless assignment to local variable "kit".(ô€ĞöÿÿÿÿÿHí¬RMAJORZ
+CODE_SMELL
+c
+java:S1481¦"5Remove this unused "updateCurrentKit" local variable.(Ğ¯úäHî¬RMINORZ
+CODE_SMELL
+t
+java:S4034é"FReplace this "filter().findAny().isPresent()" chain with "anyMatch()".(‹·¹õHï¬RMINORZ
+CODE_SMELL
+_
+java:S1135’	"2Complete the task associated to this TODO comment.(…ïœ†Hğ¬RINFOZ
+CODE_SMELL
+d
+java:S1135ê	"2Complete the task associated to this TODO comment.(³«èúÿÿÿÿHñ¬RINFOZ
+CODE_SMELL
+l
+java:S1155ó	">Use isEmpty() to check whether the collection is empty or not.(«ÂÑHò¬RMINORZ
+CODE_SMELL
+d
+java:S1135¢
+"2Complete the task associated to this TODO comment.(³«èúÿÿÿÿHô¬RINFOZ
+CODE_SMELL
+l
+java:S1155«
+">Use isEmpty() to check whether the collection is empty or not.(«ÂÑHõ¬RMINORZ
+CODE_SMELL
+n	java:S125¹
+"<This block of commented-out lines of code should be removed.(—‚èœÿÿÿÿÿH÷¬RMAJORZ
+CODE_SMELL
+i	java:S125¼
+"<This block of commented-out lines of code should be removed.(µŸË¡Hø¬RMAJORZ
+CODE_SMELL
+i	java:S125¿
+"<This block of commented-out lines of code should be removed.(ø‚ÿHú¬RMAJORZ
+CODE_SMELL
+h
+java:S4034é
+":Replace this negation and "anyMatch()" with "noneMatch()".(†ĞÌÎHü¬RMINORZ
+CODE_SMELL
+i
+java:S1172ı
+";Remove these unused method parameters "orderId", "updater".(î†ŞïHı¬RMAJORZ
+CODE_SMELL
+n
+java:S1172";Remove these unused method parameters "orderId", "updater".(ªıĞªıÿÿÿÿH­RMAJORZ
+CODE_SMELL
+ˆ
+java:S3776…"RRefactor this method to reduce its Cognitive Complexity from 57 to the 15 allowed.(Óÿ¶ŞÿÿÿÿÿH…­RCRITICALZ
+CODE_SMELL
+Z
+java:S1125"'Remove the unnecessary boolean literal.(µ—ııÿÿÿÿH¡­RMINORZ
+CODE_SMELL
+Z
+java:S1125"'Remove the unnecessary boolean literal.(µ—ııÿÿÿÿH£­RMINORZ
+CODE_SMELL
+d
+java:S1135®"2Complete the task associated to this TODO comment.(ŞÒĞÆÿÿÿÿÿH¥­RINFOZ
+CODE_SMELL
+^
+java:S1135»"2Complete the task associated to this TODO comment.(Ú•º6H¦­RINFOZ
+CODE_SMELL
+„
+java:S1172‹"WRemove these unused method parameters "orderId", "orderLineItemid", "kitId", "updater".(ôƒH§­RMAJORZ
+CODE_SMELL
+ˆ
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.(Ôšä½ùÿÿÿÿH¯­RCRITICALZ
+CODE_SMELL
+Z
+java:S1125–"'Remove the unnecessary boolean literal.(µ—ııÿÿÿÿH½­RMINORZ
+CODE_SMELL
+Z
+java:S1125–"'Remove the unnecessary boolean literal.(µ—ııÿÿÿÿH¿­RMINORZ
+CODE_SMELL
+n	java:S125¡"<This block of commented-out lines of code should be removed.(ÈÒû¤øÿÿÿÿHÁ­RMAJORZ
+CODE_SMELL
+J
+java:S1116­"Remove this empty statement.(›Ï­ğHÉ­RMINORZ
+CODE_SMELL
+n	java:S125¹"<This block of commented-out lines of code should be removed.(ö¥Û„øÿÿÿÿHË­RMAJORZ
+CODE_SMELL
+_
+java:S1135Æ"2Complete the task associated to this TODO comment.(ˆéÉ„HÑ­RINFOZ
+CODE_SMELL
+ˆ
+java:S3776Ñ"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(ŠŠ•êıÿÿÿÿHÒ­RCRITICALZ
+CODE_SMELL
+q
+java:S1155ë">Use isEmpty() to check whether the collection is empty or not.(­‡Ä úÿÿÿÿHá­RMINORZ
+CODE_SMELL
+s
+java:S4034î"FReplace this "filter().findAny().isPresent()" chain with "anyMatch()".(ˆÅ²fHã­RMINORZ
+CODE_SMELL
+t
+java:S4034ü"FReplace this "filter().findAny().isPresent()" chain with "anyMatch()".(§¥áÁHä­RMINORZ
+CODE_SMELL
+h	java:S125‹"<This block of commented-out lines of code should be removed.( ‹?Hå­RMAJORZ
+CODE_SMELL
+n	java:S125­"<This block of commented-out lines of code should be removed.(Ë¾¸×ıÿÿÿÿHí­RMAJORZ
+CODE_SMELL
+q
+java:S1155Â">Use isEmpty() to check whether the collection is empty or not.(­‡Ä úÿÿÿÿHğ­RMINORZ
+CODE_SMELL
+s
+java:S4034Å"FReplace this "filter().findAny().isPresent()" chain with "anyMatch()".(¯™¯qHò­RMINORZ
+CODE_SMELL
+n	java:S125Ò"<This block of commented-out lines of code should be removed.(ŠÓèÚşÿÿÿÿHó­RMAJORZ
+CODE_SMELL
+q
+java:S1155…">Use isEmpty() to check whether the collection is empty or not.(­‡Ä úÿÿÿÿHû­RMINORZ
+CODE_SMELL
+s
+java:S4034ˆ"FReplace this "filter().findAny().isPresent()" chain with "anyMatch()".(¯™¯qHı­RMINORZ
+CODE_SMELL
+n	java:S125•"<This block of commented-out lines of code should be removed.(õ¼ú×ûÿÿÿÿHş­RMAJORZ
+CODE_SMELL
+ˆ
+java:S3776¯"RRefactor this method to reduce its Cognitive Complexity from 40 to the 15 allowed.(Û±Í¥ıÿÿÿÿH†®RCRITICALZ
+CODE_SMELL
+n	java:S125†"<This block of commented-out lines of code should be removed.(º½ë÷øÿÿÿÿH£®RMAJORZ
+CODE_SMELL
+_
+java:S1135"2Complete the task associated to this TODO comment.(©ÎŒHª®RINFOZ
+CODE_SMELL
+k
+java:S1155±">Use isEmpty() to check whether the collection is empty or not.(ÙÅÂH«®RMINORZ
+CODE_SMELL
+s
+java:S4034±"FReplace this "filter().findAny().isPresent()" chain with "anyMatch()".(ÙÅÂH­®RMINORZ
+CODE_SMELL
+o
+java:S3457¹"AFormat specifiers should be used instead of string concatenation.(Â†ÿ—H®®RMAJORZ
+CODE_SMELL
+d
+java:S1135Â"2Complete the task associated to this TODO comment.(„µ‘øÿÿÿÿH¯®RINFOZ
+CODE_SMELL
+t
+java:S3457Ê"AFormat specifiers should be used instead of string concatenation.(çË´ßşÿÿÿÿH°®RMAJORZ
+CODE_SMELL
+o
+java:S3457Ñ"AFormat specifiers should be used instead of string concatenation.(ƒšÏ¶H±®RMAJORZ
+CODE_SMELL
+ƒ
+java:S3776Ø"RRefactor this method to reduce its Cognitive Complexity from 35 to the 15 allowed.(°”ã¼H²®RCRITICALZ
+CODE_SMELL
+j
+java:S1854˜"<Remove this useless assignment to local variable "labOrder".(û’«‡HÌ®RMAJORZ
+CODE_SMELL
+O
+java:S1116„"Remove this empty statement.(ƒÀƒÑúÿÿÿÿHÍ®RMINORZ
+CODE_SMELL
+n	java:S125¬"<This block of commented-out lines of code should be removed.(‹¨ÙøÿÿÿÿHÏ®RMAJORZ
+CODE_SMELL
+i	java:S125´"<This block of commented-out lines of code should be removed.(Şê¼òHÒ®RMAJORZ
+CODE_SMELL
+n	java:S125Ï"<This block of commented-out lines of code should be removed.(†¶ÃøÿÿÿÿHÕ®RMAJORZ
+CODE_SMELL
+„
+java:S3776à"SRefactor this method to reduce its Cognitive Complexity from 103 to the 15 allowed.(Ö‰Ğ‰HØ®RCRITICALZ
+CODE_SMELL
+n
+java:S1854…"@Remove this useless assignment to local variable "activatedKit".(âÅáHó®RMAJORZ
+CODE_SMELL
+i	java:S125ê"<This block of commented-out lines of code should be removed.(ˆ©ÆáHô®RMAJORZ
+CODE_SMELL
+d
+java:S1135é"2Complete the task associated to this TODO comment.(³ìä†úÿÿÿÿHõ®RINFOZ
+CODE_SMELL
+l
+java:S1155ì">Use isEmpty() to check whether the collection is empty or not.( ±ËHö®RMINORZ
+CODE_SMELL
+o
+java:S3457ı"AFormat specifiers should be used instead of string concatenation.(•¸–óHø®RMAJORZ
+CODE_SMELL
+t
+java:S4034œ"FReplace this "filter().findAny().isPresent()" chain with "anyMatch()".(ïŠŸİHù®RMINORZ
+CODE_SMELL
+i	java:S125®"<This block of commented-out lines of code should be removed.(¿ÌÛHú®RMAJORZ
+CODE_SMELL
+q
+java:S1155á">Use isEmpty() to check whether the collection is empty or not.(»–³ÔıÿÿÿÿH‚¯RMINORZ
+CODE_SMELL
+€	java:S100é"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Î£Â²ıÿÿÿÿH…¯RMINORZ
+CODE_SMELL
+q
+java:S1155÷">Use isEmpty() to check whether the collection is empty or not.(»–³ÔıÿÿÿÿH†¯RMINORZ
+CODE_SMELL
+q
+java:S1155€">Use isEmpty() to check whether the collection is empty or not.(»–³ÔıÿÿÿÿH‰¯RMINORZ
+CODE_SMELL
+q
+java:S1155‰">Use isEmpty() to check whether the collection is empty or not.(»–³ÔıÿÿÿÿHŒ¯RMINORZ
+CODE_SMELL
+„
+java:S3776‘"SRefactor this method to reduce its Cognitive Complexity from 189 to the 15 allowed.(­¬¸ÓH¯RCRITICALZ
+CODE_SMELL
+c
+java:S1172‘"5Remove this unused method parameter "recordsChanged".(­¬¸ÓHì¯RMAJORZ
+CODE_SMELL
+^
+java:S1481’"0Remove this unused "orderUpdate" local variable.(ÌÊÆ´Hî¯RMINORZ
+CODE_SMELL
+Z
+java:S1125š"'Remove the unnecessary boolean literal.(Ë¸÷‚ıÿÿÿÿHï¯RMINORZ
+CODE_SMELL
+o
+java:S3457¡"AFormat specifiers should be used instead of string concatenation.(ÕÕëHò¯RMAJORZ
+CODE_SMELL
+o
+java:S3457¢"AFormat specifiers should be used instead of string concatenation.(öÌÎÏHó¯RMAJORZ
+CODE_SMELL
+n	java:S125æ"<This block of commented-out lines of code should be removed.(ÕÇ„ëûÿÿÿÿHô¯RMAJORZ
+CODE_SMELL
+‚
+java:S2159ô"VRemove this call to "equals"; comparisons between unrelated types always return false.(×ºáğıÿÿÿÿH°RMAJORZBUG
+i	java:S125ø"<This block of commented-out lines of code should be removed.(»ÓäêH‚°RMAJORZ
+CODE_SMELL
+n	java:S125¡"<This block of commented-out lines of code should be removed.(¸Ü“‹ùÿÿÿÿHŠ°RMAJORZ
+CODE_SMELL
+‚
+java:S2159±"VRemove this call to "equals"; comparisons between unrelated types always return false.(¿ƒ¹øùÿÿÿÿH°RMAJORZBUG
+Q	java:S131×""Add a default case to this switch.(åÓH°RCRITICALZ
+CODE_SMELL
+}
+java:S2159‰"VRemove this call to "equals"; comparisons between unrelated types always return false.(½Šš™H‘°RMAJORZBUG
+T
+java:S2175Ÿ"-A "List<Vital>" cannot contain a "VitalType".(›‡ñH’°RMAJORZBUG
+n	java:S125¹"<This block of commented-out lines of code should be removed.(ÿÄ¿˜üÿÿÿÿH“°RMAJORZ
+CODE_SMELL
+‚
+java:S3776¿"RRefactor this method to reduce its Cognitive Complexity from 47 to the 15 allowed.(¶£H”°RCRITICALZ
+CODE_SMELL
+r
+java:S1854è"?Remove this useless assignment to local variable "createdById".(óöæËÿÿÿÿÿH³°RMAJORZ
+CODE_SMELL
+v
+java:S1854ç"CRemove this useless assignment to local variable "consentApproval".(éÕûÛúÿÿÿÿH´°RMAJORZ
+CODE_SMELL
+Z
+java:S1125É"'Remove the unnecessary boolean literal.(Ë¸÷‚ıÿÿÿÿHµ°RMINORZ
+CODE_SMELL
+o
+java:S3457Ğ"AFormat specifiers should be used instead of string concatenation.(ÕÕëH¸°RMAJORZ
+CODE_SMELL
+o
+java:S3457Ñ"AFormat specifiers should be used instead of string concatenation.(öÌÎÏH¹°RMAJORZ
+CODE_SMELL
+n	java:S125â"<This block of commented-out lines of code should be removed.(äœêùÿÿÿÿHº°RMAJORZ
+CODE_SMELL
+g
+java:S1481ç"4Remove this unused "consentApproval" local variable.(éÕûÛúÿÿÿÿH¿°RMINORZ
+CODE_SMELL
+c
+java:S1481è"0Remove this unused "createdById" local variable.(óöæËÿÿÿÿÿHÁ°RMINORZ
+CODE_SMELL
+x
+java:S1128"FRemove this unused import 'com.amazonaws.services.rds.model.Timezone'.(–ç¥ªúÿÿÿÿHÃ°RMINORZ
+CODE_SMELL
+Œ
+java:S1128"ZRemove this unused import 'com.junodx.api.connectors.lims.elements.client.ElementsClient'.(ÓœµâûÿÿÿÿHÅ°RMINORZ
+CODE_SMELL
+n
+java:S1068µ";Remove this unused "commerceMapStructMapper" private field.(¡ûúøÿÿÿÿHÇ°RMAJORZ
+CODE_SMELL
+e
+java:S1068·"7Remove this unused "userMapStructMapper" private field.(‡‹±ÁHÊ°RMAJORZ
+CODE_SMELL

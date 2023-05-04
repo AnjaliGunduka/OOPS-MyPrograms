@@ -1,0 +1,17 @@
+package Classes;
+
+public class StaticMethod {
+	 String name;
+	int id;
+	static void a()
+	{
+	
+		
+	}
+	
+	
+	
+public static void main(String[] args) {
+	
+}
+}

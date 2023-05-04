@@ -1,0 +1,13 @@
+
+w	java:S1129"FDefine and throw a dedicated exception instead of using a generic one.(êÆÖËùÿÿÿÿHÅÿRMAJORZ
+CODE_SMELL
+r	java:S112;"FDefine and throw a dedicated exception instead of using a generic one.(ÈçïÕHÆÿRMAJORZ
+CODE_SMELL
+r	java:S1125"FDefine and throw a dedicated exception instead of using a generic one.(Â††‘HÇÿRMAJORZ
+CODE_SMELL
+[
+java:S1452."&Remove usage of generic wildcard type.(¤÷ÁØøÿÿÿÿHÈÿRCRITICALZ
+CODE_SMELL
+|
+java:S4488-"JReplace "@RequestMapping(method = RequestMethod.POST)" with "@PostMapping"(£ÀÂûýÿÿÿÿHÉÿRMINORZ
+CODE_SMELL

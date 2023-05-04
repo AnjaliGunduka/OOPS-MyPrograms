@@ -1,0 +1,681 @@
+package com.junodx.api.controllers.lab;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.junodx.api.controllers.ControllerUtils;
+import com.junodx.api.controllers.SortType;
+import com.junodx.api.controllers.exceptions.JunoErrorCodes;
+import com.junodx.api.controllers.exceptions.JunoErrorResponse;
+import com.junodx.api.controllers.lab.actions.TestReportUpdateActions;
+import com.junodx.api.controllers.lab.types.TestReportSortBy;
+import com.junodx.api.controllers.payloads.MessageResponse;
+import com.junodx.api.controllers.payloads.TestReportUpdateRequest;
+import com.junodx.api.dto.mappers.LaboratoryMapStructMapper;
+import com.junodx.api.dto.models.laboratory.reports.TestReportBatchDto;
+import com.junodx.api.logging.LogCode;
+import com.junodx.api.models.core.types.IntervalType;
+import com.junodx.api.models.laboratory.LaboratoryOrder;
+import com.junodx.api.models.laboratory.TestReport;
+import com.junodx.api.models.laboratory.reports.*;
+import com.junodx.api.models.laboratory.reports.types.SignedOutType;
+import com.junodx.api.models.laboratory.tests.TestQC;
+import com.junodx.api.models.laboratory.types.ReportConfiguration;
+import com.junodx.api.models.laboratory.types.ReportType;
+import com.junodx.api.models.providers.Provider;
+import com.junodx.api.models.strings.TargetPortal;
+import com.junodx.api.security.ResourceOwnerValidation;
+import com.junodx.api.services.auth.UserDetailsImpl;
+import com.junodx.api.services.auth.UserNotInClientException;
+import com.junodx.api.services.auth.UserNotOwnerException;
+import com.junodx.api.services.exceptions.JdxServiceException;
+import com.junodx.api.services.lab.TestReportService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import javax.swing.text.html.Option;
+import java.lang.reflect.Array;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("api/labs/reports")
+public class TestReportController {
+    @Value("${jdx.controllers.maxPageSize}")
+    private int maxPageSize;
+
+    @Value("${jdx.controllers.testreports.maxTestReportPostSize}")
+    private int maxTestReportPostSize;
+
+    @Autowired
+    private TestReportService testReportService;
+
+    private ObjectMapper mapper;
+
+    private static final Logger logger = LoggerFactory.getLogger(KitController.class);
+
+    @Autowired
+    private LaboratoryMapStructMapper laboratoryMapStructMapper;
+
+    public TestReportController(){
+        this.mapper = new ObjectMapper();
+    }
+
+    @GetMapping("/{reportId}")
+    @PreAuthorize("hasRole('ROLE_LAB_DIRECTOR')" + "|| hasRole('ROLE_ADMIN')" + "|| hasRole('ROLE_PATIENT')" + "|| hasRole('ROLE_PROVIDER')")
+    public ResponseEntity<?> getTestReport(@PathVariable("reportId") String reportId, @RequestParam("target") Optional<TargetPortal> portal, @RequestParam("withstrings") Optional<Boolean> withStrings) {
+        //Grab the userId from the security context (access token) and use that Role is patient
+        Authentication authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userContext = (UserDetailsImpl) authentication.getPrincipal();
+
+        boolean inStringsBundle = false;
+        if(withStrings.isPresent())
+            inStringsBundle = withStrings.get();
+
+        if(reportId != null) {
+            Optional<TestReport> resp = testReportService.getTestReport(reportId, portal, inStringsBundle, userContext);
+            if(resp.isPresent())
+                return ResponseEntity.ok().body(resp.get());
+
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/order/{orderId}/{orderLineItemId}")
+    @PreAuthorize("hasRole('ROLE_PATIENT')" + "|| hasRole('ROLE_ADMIN')" + "|| hasRole('ROLE_PROVIDER')")
+    public ResponseEntity<?> getReportableTestReportForOrderLineItem(@PathVariable("orderId") String orderId, @PathVariable("orderLineItemId") String orderLineItemId, @RequestParam("target") Optional<TargetPortal> portal, @RequestParam("withstrings") Optional<Boolean> withStrings) {
+        //Grab the userId from the security context (access token) and use that Role is patient
+        Authentication authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userContext = (UserDetailsImpl) authentication.getPrincipal();
+
+        boolean inStringsBundle = false;
+        if(withStrings.isPresent())
+            inStringsBundle = withStrings.get();
+
+
+        try {
+            Optional<TestReport> resp = testReportService.getTestReportForOrderLineItem(orderId, orderLineItemId, portal, inStringsBundle, userContext);
+            if (resp.isPresent()) {
+                if (ResourceOwnerValidation.resourceRequiresRestrictedScope(userContext)) {
+                    if (!ResourceOwnerValidation.validateOwnership(userContext, resp.get().getOwnerId(), resp.get().getOwningClientId()))
+                        return ResponseEntity.badRequest().body("Cannot allow access to resource, requesting user is not owner or have sufficient privileges to this data ");
+                }
+                return ResponseEntity.ok().body(resp.get());
+            }
+        } catch (UserNotOwnerException | UserNotInClientException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot allow access to resource, requesting user is not owner or have sufficient privileges to this data " + e.getMessage());
+        } catch (JdxServiceException e){
+            e.printStackTrace();
+            throw e;
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/patient/{userId}")
+    @PreAuthorize("hasRole('ROLE_LAB_DIRECTOR')" + "|| hasRole('ROLE_ADMIN')" + "|| hasRole('ROLE_ADMIN')" + "|| hasRole('ROLE_PATIENT')" + "|| hasRole('ROLE_PROVIDER')")
+    public ResponseEntity<?> getTestReportsForPatient(@PathVariable("userId") String userId,
+                                                      @RequestParam("page") Optional<Integer> pg,
+                                                      @RequestParam("size") Optional<Integer> ps) {
+        //Grab the userId from the security context (access token) and use that Role is patient
+        Authentication authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userContext = (UserDetailsImpl) authentication.getPrincipal();
+
+        int page = 0;
+        int pageSize = maxPageSize;
+
+        if(pg.isPresent())
+            page = pg.get().intValue();
+        if(ps.isPresent())
+            pageSize = ps.get().intValue();
+
+        //Limit the pageSize
+        if(pageSize > maxPageSize)
+            pageSize = maxPageSize;
+
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<TestReport> resp = null;
+
+        resp = testReportService.findAllAvailableTestReportsByPatient(userId, pageable);
+
+        //TODO add patient ownership check here
+        if(resp != null) {
+            List<TestReport> transitionReports = resp.getContent();
+            return ResponseEntity.ok()
+                    .header("link", ControllerUtils.buildLinkHeader(ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString(), page, pageSize, resp.getTotalPages()))
+                    .header("X-Jdx-Total-Results", ControllerUtils.buildQueryResultsDataHeader(resp.getTotalElements()))
+                    .header("X-Jdx-Max-Page-Size", ControllerUtils.buildMaxPageSizeDataheader(maxPageSize))
+                    .header("X-Jdx-Current-Page", ControllerUtils.buildMaxPageSizeDataheader(resp.getPageable().getPageNumber()))
+                    .body(transitionReports);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+
+    /**
+     * Implements a paginated scroll through the Kit database
+     * @param
+     * @param
+     * @return
+     */
+    @GetMapping()
+    @PreAuthorize("hasRole('ROLE_LAB_DIRECTOR')" + "|| hasRole('ROLE_ADMIN')"  + "|| hasRole('ROLE_PROVIDER')")
+    public ResponseEntity<?> find(@RequestParam("page") Optional<Integer> pg,
+                                  @RequestParam("size") Optional<Integer> ps,
+                                  @RequestParam("labid") Optional<String> labId,
+                                  @RequestParam("interval") Optional<Integer> interval,
+                                  @RequestParam("units") Optional<IntervalType> units,
+                                  @RequestParam("bytype") Optional<SignedOutType> type,
+                                  @RequestParam("byreport") Optional<ReportConfiguration> report,
+                                  @RequestParam("byreporttype") Optional<ReportType> reportType,
+                                  @RequestParam("bysignedout") Optional<Boolean> signedOut,
+                                  @RequestParam("byapproved") Optional<Boolean> approved,
+                                  @RequestParam("byunreportedsecondaryresult") Optional<Boolean> unreportedSecondaryResult,
+                                  @RequestParam("bypatient") Optional<String> patientId,
+                                  @RequestParam("byfirstname") Optional<String> firstName,
+                                  @RequestParam("bylastname") Optional<String> lastName,
+                                  @RequestParam("byemail") Optional<String> email,
+                                  @RequestParam("bysamplenumber") Optional<String> sampleNumber,
+                                  @RequestParam("bybatchrunid") Optional<String> batchRunId,
+                                  @RequestParam("bylaborder") Optional<String> labOrderId,
+                                  @RequestParam("byordernumber") Optional<String> orderNumber,
+                                  @RequestParam("isavailable") Optional<Boolean> isAvailable,
+                                  @RequestParam("upcomingonly") Optional<Boolean> upcomingOnly,
+                                  @RequestParam("isretest") Optional<Boolean> retest,
+                                  @RequestParam("isredraw") Optional<Boolean> redraw,
+                                  @RequestParam("sortby") Optional<TestReportSortBy> sortBy,
+                                  @RequestParam("sorttype") Optional<SortType> sortDirection,
+                                  @RequestParam("condensed") Optional<Boolean> condensed,
+                                  @RequestParam("bynotreportable") Optional<Boolean> notReportable) {
+        //Grab the userId from the security context (access token) and use that Role is patient
+        Authentication authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userContext = (UserDetailsImpl) authentication.getPrincipal();
+
+        int page = 0;
+        int pageSize = maxPageSize;
+
+        if(pg.isPresent())
+            page = pg.get().intValue();
+        if(ps.isPresent())
+            pageSize = ps.get().intValue();
+
+        //Limit the pageSize
+        if(pageSize > maxPageSize)
+            pageSize = maxPageSize;
+
+        Pageable pageable = PageRequest.of(page, pageSize);
+
+        Calendar after = null;
+        Optional<Calendar> cal = null;
+        if(interval.isPresent() && units.isPresent()){
+            after = Calendar.getInstance();
+            switch (units.get()) {
+                case SECONDS: after.set(Calendar.SECOND, -interval.get());
+                    break;
+                case MINUTES: after.set(Calendar.MINUTE, -interval.get());
+                    break;
+                case HOURS: after.set(Calendar.HOUR, -interval.get());
+                    break;
+                case DAYS: after.set(Calendar.DATE, -interval.get());
+                    break;
+                case WEEKS: after.set(Calendar.DATE, -interval.get()*7);
+                    break;
+                default:
+                    after.set(Calendar.DATE, -interval.get());
+                    break;
+            }
+        }
+        if(after == null)
+            cal = Optional.empty();
+        else
+            cal = Optional.of(after);
+
+        Page<TestReport> resp = null;
+
+        Optional<Boolean> reportable = null;
+
+        if(notReportable.isPresent())
+            reportable = Optional.of(!notReportable.get().booleanValue());
+        else
+            reportable = Optional.empty();
+
+        //If no query params presented then return all
+        /*if(interval.isEmpty() && labId.isEmpty()
+                && type.isEmpty() && report.isEmpty()
+                && signedOut.isEmpty() && approved.isEmpty()
+                && patientId.isEmpty() && sampleNumber.isEmpty()
+                && batchRunId.isEmpty() && labOrderId.isEmpty()
+                && isAvailable.isEmpty() && upcomingOnly.isEmpty()
+                && orderNumber.isEmpty() && firstName.isEmpty()
+                && lastName.isEmpty() && email.isEmpty()
+                && reportType.isEmpty())
+            resp = testReportService.getAllTestReports(pageable);
+        else*/
+
+        //Needed here for when client browsers encode the + symbol to a space, we need to encode it back to a +
+        String emailReencoded = null;
+        if(email.isPresent())
+            emailReencoded = email.get().replaceAll(" ", "+");
+
+            resp = testReportService.search(labId,
+                    type,
+                    report,
+                    reportType,
+                    signedOut,
+                    unreportedSecondaryResult,
+                    patientId,
+                    firstName,
+                    lastName,
+                    emailReencoded != null ? Optional.of(emailReencoded) : Optional.empty(),
+                    sampleNumber,
+                    batchRunId,
+                    labOrderId,
+                    orderNumber,
+                    isAvailable,
+                    upcomingOnly,
+                    approved,
+                    reportable,
+                    retest,
+                    redraw,
+                    sortBy, sortDirection, condensed, cal, pageable);
+
+        if (resp != null) {
+            if (condensed.isPresent()) {
+                if (!condensed.get().booleanValue()) {
+                    List<TestReport> transitionReports = resp.getContent();
+                    return ResponseEntity.ok()
+                            .header("link", ControllerUtils.buildLinkHeader(ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString(), page, pageSize, resp.getTotalPages()))
+                            .header("X-Jdx-Total-Results", ControllerUtils.buildQueryResultsDataHeader(resp.getTotalElements()))
+                            .header("X-Jdx-Max-Page-Size", ControllerUtils.buildMaxPageSizeDataheader(maxPageSize))
+                            .header("X-Jdx-Current-Page", ControllerUtils.buildMaxPageSizeDataheader(resp.getPageable().getPageNumber()))
+                            .body(transitionReports);
+                } else {
+                    List<TestReportBatchDto> transitionReports = laboratoryMapStructMapper.testReportToTestReportBatchDtos(resp.getContent());
+                    return ResponseEntity.ok()
+                            .header("link", ControllerUtils.buildLinkHeader(ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString(), page, pageSize, resp.getTotalPages()))
+                            .header("X-Jdx-Total-Results", ControllerUtils.buildQueryResultsDataHeader(resp.getTotalElements()))
+                            .header("X-Jdx-Max-Page-Size", ControllerUtils.buildMaxPageSizeDataheader(maxPageSize))
+                            .header("X-Jdx-Current-Page", ControllerUtils.buildMaxPageSizeDataheader(resp.getPageable().getPageNumber()))
+                            .body(transitionReports);
+                }
+            } else {
+                List<TestReportBatchDto> transitionReports = laboratoryMapStructMapper.testReportToTestReportBatchDtos(resp.getContent());
+                return ResponseEntity.ok()
+                        .header("link", ControllerUtils.buildLinkHeader(ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString(), page, pageSize, resp.getTotalPages()))
+                        .header("X-Jdx-Total-Results", ControllerUtils.buildQueryResultsDataHeader(resp.getTotalElements()))
+                        .header("X-Jdx-Max-Page-Size", ControllerUtils.buildMaxPageSizeDataheader(maxPageSize))
+                        .header("X-Jdx-Current-Page", ControllerUtils.buildMaxPageSizeDataheader(resp.getPageable().getPageNumber()))
+                        .body(transitionReports);
+            }
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+
+    @PostMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //public ResponseEntity<?> testReportActions(@RequestBody TestReportUpdateRequest request) {
+    public ResponseEntity<?> testReportActions(@RequestBody String requestString) {
+        //Grab the userId from the security context (access token) and use that Role is patient
+        Authentication authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userContext = (UserDetailsImpl) authentication.getPrincipal();
+
+        TestReportUpdateRequest request = new TestReportUpdateRequest();
+        try {
+            JsonNode root = mapper.readTree(requestString);
+            request.setAction(TestReportUpdateActions.valueOf(root.get("action").asText()));
+            if(root.has("pipelineRunId"))
+                request.setPipelineRunId(root.get("pipelineRunId").textValue());
+            if(root.has("sequencingRunId"))
+                request.setSequencingRunId(root.get("sequencingRunId").textValue());
+            if(root.has("userId"))
+                request.setUserId(root.get("userId").textValue());
+            if(root.has("name"))
+                request.setName(root.get("name").textValue());
+
+            JsonNode reportsNode = root.get("reports");
+            List<TestReport> reports = new ArrayList<>();
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            if(reportsNode.isArray()){
+                for(JsonNode node : reportsNode) {
+                    reports.add(TestReportService.customJsonParserFroTestReportFromNode(node));
+                }
+            }
+
+            request.setReports(reports);
+
+            if(request != null) {
+                if(request == null || request.getAction() == null)
+                    return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to update Test Report(s), action not defined"));
+
+                if(request.getReports() == null || request.getReports().size() == 0)
+                    return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to update Test Report(s), reports not provided"));
+
+               // if(request.getUserId() == null || request.getUserId() == null)
+               //     return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to update Test Report(s), authorizing user not provided"));
+
+                //TODO need to improve this, what is the actual upper bound?
+                //TODO need to decide whether the signatory userId is from the context or the request.userId - right now is the userContext
+                if(request.getReports().size() > maxTestReportPostSize)
+                    return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Cannot update more than 20 Test Reports in one call"));
+
+                switch(request.getAction()) {
+                    case APPROVE:
+                        if(request.getReports() != null) {
+                            List<TestReport> resp = testReportService.approveTestReports(request.getReports(), userContext.getUserId(), userContext);
+                            if (resp != null)
+                                return ResponseEntity.ok().body(resp);
+                        } else {
+                            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must provide one or more reports to create"));
+                        }
+                        break;
+                    case SIGNOUT:
+                        if(request.getReports() != null) {
+                            List<TestReport> resp = testReportService.signOutTestReports(request.getReports(), userContext.getUserId(), userContext);
+                            if (resp != null)
+                                return ResponseEntity.ok().body(resp);
+                        } else {
+                            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must provide one or more reports to create"));
+                        }
+                        break;
+                    case SET_NOT_REPORTABLE:
+                        if(request.getReports() != null) {
+                            if(request.getReports().size() != 1)
+                                throw new JdxServiceException("Can only process one report at a time for setting as non-reportable");
+
+                            TestReport resp = testReportService.setTestReportToNotReportable(request.getReports().get(0), userContext.getUserId(), userContext);
+                            if (resp != null)
+                                return ResponseEntity.ok().body(resp);
+                        } else {
+                            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must provide one or more reports to set to not reportable"));
+                        }
+                        break;
+                    case CREATE:
+                        if(request.getReports() != null) {
+                            if(request.getPipelineRunId() != null) {
+                                List<TestReport> resp = testReportService.createTestReports(request.getPipelineRunId(), request.getReports(), userContext);
+                                if (resp != null)
+                                    return ResponseEntity.ok().body(resp);
+                            } else {
+                                return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must provide the pipelineRunId to post a test report"));
+                            }
+                        } else {
+                            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must provide one or more reports to create"));
+                        }
+                        break;
+                    case RETEST:
+                        if(request.getReTestType() == null)
+                            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must specify a retest type in order to create a retest ticket."));
+                        List<TestReport> resp = testReportService.requestReTestForTestReports(request.getReports(), request.getReTestType(), request.isNoResult(), request.getNotes(), userContext.getUserId(), userContext);
+                        if (resp != null)
+                            return ResponseEntity.ok().body(resp);
+                    default:
+                        break;
+                }
+            }
+        } catch (JdxServiceException e) {
+            throw e;
+        }
+        catch (Exception e){
+            logger.info("Exception occurred creating a report:" + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_CREATE_ERROR.label, LogCode.RESOURCE_CREATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to create a Test Report for Id. " + e.getMessage()));
+        }
+
+        return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_CREATE_ERROR.label, LogCode.RESOURCE_CREATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to create a Test Report for Id"));
+    }
+
+
+    /*
+    @PostMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> testReportActions(@RequestBody TestReportUpdateRequest request) {
+        //Grab the userId from the security context (access token) and use that Role is patient
+        Authentication authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userContext = (UserDetailsImpl) authentication.getPrincipal();
+
+        try {
+            if(request != null) {
+                if(request == null || request.getAction() == null)
+                    return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to update Test Report(s), action not defined"));
+
+                if(request.getReports() == null || request.getReports().size() == 0)
+                    return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to update Test Report(s), reports not provided"));
+
+                // if(request.getUserId() == null || request.getUserId() == null)
+                //     return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to update Test Report(s), authorizing user not provided"));
+
+                //TODO need to improve this, what is the actual upper bound?
+                //TODO need to decide whether the signatory userId is from the context or the request.userId - right now is the userContext
+                if(request.getReports().size() > maxTestReportPostSize)
+                    return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Cannot update more than 20 Test Reports in one call"));
+                logger.info("Input test report data: " + mapper.writeValueAsString(request.getReports()));
+
+
+                switch(request.getAction()) {
+                    case APPROVE:
+                        if(request.getReports() != null) {
+                            List<TestReport> resp = testReportService.approveTestReports(request.getReports(), userContext.getUserId(), userContext);
+                            if (resp != null)
+                                return ResponseEntity.ok().body(resp);
+                        } else {
+                            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must provide one or more reports to create"));
+                        }
+                        break;
+                    case SIGNOUT:
+                        if(request.getReports() != null) {
+                            List<TestReport> resp = testReportService.signOutTestReports(request.getReports(), userContext.getUserId(), userContext);
+                            if (resp != null)
+                                return ResponseEntity.ok().body(resp);
+                        } else {
+                            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must provide one or more reports to create"));
+                        }
+                        break;
+                    case CREATE:
+                        if(request.getReports() != null) {
+                            if(request.getPipelineRunId() != null) {
+                                List<TestReport> resp = testReportService.createTestReports(request.getPipelineRunId(), request.getReports(), userContext);
+                                if (resp != null)
+                                    return ResponseEntity.ok().body(resp);
+                            } else {
+                                return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must provide the pipelineRunId to post a test report"));
+                            }
+                        } else {
+                            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must provide one or more reports to create"));
+                        }
+                        break;
+                    case RETEST:
+                        if(request.getReTestType() == null)
+                            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must specify a retest type in order to create a retest ticket."));
+                        List<TestReport> resp = testReportService.requestReTestForTestReports(request.getReports(), request.getReTestType(), request.isNoResult(), request.getNotes(), userContext.getUserId(), userContext);
+                        if (resp != null)
+                            return ResponseEntity.ok().body(resp);
+                    default:
+                        break;
+                }
+
+
+
+
+            }
+        } catch (Exception e){
+            logger.info("Exception occurred creating a report:" + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_CREATE_ERROR.label, LogCode.RESOURCE_CREATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to create a Test Report for Id. " + e.getMessage()));
+        }
+
+        return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_CREATE_ERROR.label, LogCode.RESOURCE_CREATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to create a Test Report for Id"));
+    }
+    */
+
+    //deprecated
+    @PatchMapping("")
+    @PreAuthorize("hasRole('ROLE_LAB_DIRECTOR')" + "|| hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> update(@RequestBody TestReportUpdateRequest reportUpdateRequest) {
+        //Grab the userId from the security context (access token) and use that Role is patient
+        Authentication authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userContext = (UserDetailsImpl) authentication.getPrincipal();
+
+        if(reportUpdateRequest == null || reportUpdateRequest.getAction() == null)
+            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to update Test Report(s), action not defined"));
+
+        if(reportUpdateRequest.getReports() == null || reportUpdateRequest.getReports().size() == 0)
+            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to update Test Report(s), reports not provided"));
+
+        if(reportUpdateRequest.getUserId() == null || reportUpdateRequest.getUserId() == null)
+            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to update Test Report(s), authorizing user not provided"));
+
+        //TODO need to improve this, what is the actual upper bound?
+        if(reportUpdateRequest.getReports().size() > maxTestReportPostSize)
+            return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Cannot update more than 20 Test Reports in one call"));
+
+        List<TestReport> resp = null;
+
+        switch(reportUpdateRequest.getAction()) {
+            case APPROVE:
+                resp = testReportService.approveTestReports(reportUpdateRequest.getReports(), userContext.getUserId(), userContext);
+                break;
+            case SIGNOUT:
+                resp = testReportService.signOutTestReports(reportUpdateRequest.getReports(), userContext.getUserId(), userContext);
+                break;
+            case RETEST:
+                if(reportUpdateRequest.getReTestType() == null)
+                    return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Must specify a retest type in order to create a retest ticket."));
+                resp = testReportService.requestReTestForTestReports(reportUpdateRequest.getReports(), reportUpdateRequest.getReTestType(), reportUpdateRequest.isNoResult(), reportUpdateRequest.getNotes(), userContext.getUserId(), userContext);
+                break;
+        }
+
+        if(resp != null)
+            return ResponseEntity.ok().body(resp);
+
+        return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_UPDATE_ERROR.label, LogCode.RESOURCE_UPDATE_ERROR.code, Calendar.getInstance().getTime(), "Unable to sign out " + reportUpdateRequest.getReports().size() + " Test Reports"));
+    }
+
+    @GetMapping("/results")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getTestReportResults(@RequestParam(value = "labId", required = false) String labId,
+            @RequestParam(name = "afterDate", required = false) String afterDate) {
+        if(labId != null)
+            return ResponseEntity.ok().body(testReportService.getTestReportResults(Optional.of(labId), afterDate));
+        else
+            return ResponseEntity.ok().body(testReportService.getTestReportResults(Optional.empty(), afterDate));
+    }
+
+    @GetMapping("/results/awaiting")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getAwaitingReports(@RequestParam(value = "labId", required = false) String lab,
+            @RequestParam(name = "reportType", required = false) String reportType) {
+
+        if(lab == null && reportType == null)
+            return ResponseEntity.ok().body(testReportService.getAllAwaitingReports());
+        else if (lab == null && reportType != null)
+            return ResponseEntity.ok().body(testReportService.getAwaitingReports(null, reportType));
+        else
+            return ResponseEntity.ok().body(testReportService.getAwaitingReports(lab, reportType));
+    }
+
+    @DeleteMapping("/{reportId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> delete(@PathVariable("reportId") String reportId) {
+        //Grab the userId from the security context (access token) and use that Role is patient
+        Authentication authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userContext = (UserDetailsImpl) authentication.getPrincipal();
+        try {
+            testReportService.delete(reportId, userContext);
+            return ResponseEntity.ok().body(new MessageResponse("Deleted Test Report " + reportId,
+                        LogCode.RESOURCE_DELETE.code,
+                        Calendar.getInstance().getTime(),
+                        "Deletion of Test Report was successful"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.badRequest().body(new MessageResponse(LogCode.RESOURCE_DELETE_ERROR.label, LogCode.RESOURCE_DELETE_ERROR.code, Calendar.getInstance().getTime(), "Encountered an error trying to delete the Test Report at Id " + reportId));
+    }
+
+    @PostMapping("/{reportId}/viewed")
+    @PreAuthorize("hasRole('ROLE_ADMIN')" + "|| hasRole('ROLE_PATIENT')")
+    public ResponseEntity<?> updateViewed(@PathVariable("reportId") String reportId, @RequestParam("patientId") String patientId) {
+        //Grab the userId from the security context (access token) and use that Role is patient
+        Authentication authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userContext = (UserDetailsImpl) authentication.getPrincipal();
+
+        try {
+            return ResponseEntity.ok().body(testReportService.updateTestReportPatientViewedResult(reportId, patientId, userContext));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Cannot update viewed status for patient: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/pdf/{reportId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')" + "|| hasRole('ROLE_PATIENT')" + "|| hasRole('ROLE_PROVIDER')")
+    public ResponseEntity<?> getResultsPdfUrl(@PathVariable("reportId") String reportId)  {
+        Authentication authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userContext = (UserDetailsImpl) authentication.getPrincipal();
+
+        try {
+            if (reportId != null) {
+                URI uri = testReportService.getResultsPdfUrl(reportId, userContext);
+                if (uri != null)
+                    return ResponseEntity.ok().body(uri);
+            }
+            throw new JdxServiceException(JunoErrorCodes.RESOURCE_NOT_FOUND.code,
+                    JunoErrorCodes.RESOURCE_NOT_FOUND.statusCode,
+                    JunoErrorCodes.RESOURCE_NOT_FOUND.message,
+                    "Cannot find document url associated with request");
+
+        } catch (JdxServiceException e){
+            throw e;
+        }
+    }
+
+    @GetMapping("/pdf/generate/{reportId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> generatePdfDocument(@PathVariable("reportId") String reportId, @RequestParam("withsignature") Optional<Boolean> withSignature)  {
+        Authentication authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userContext = (UserDetailsImpl) authentication.getPrincipal();
+
+        try {
+            if (reportId != null) {
+                String keyName = testReportService.generatePdfDocument(reportId, withSignature, userContext);
+                if(keyName != null)
+                    return ResponseEntity.ok().body(keyName);
+            }
+            throw new JdxServiceException(JunoErrorCodes.RESOURCE_NOT_FOUND.code,
+                    JunoErrorCodes.RESOURCE_NOT_FOUND.statusCode,
+                    JunoErrorCodes.RESOURCE_NOT_FOUND.message,
+                    "Cannot find document url associated with request");
+
+        } catch (JdxServiceException e){
+            throw e;
+        }
+    }
+}

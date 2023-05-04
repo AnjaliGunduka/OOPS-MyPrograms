@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="javax.persistence.Entity"/>
+    <fullyQualifiedTypeName name="com.example.demo.repository.CartRepository"/>
+    <fullyQualifiedTypeName name="com.example.demo.service.CartService"/>
+    <fullyQualifiedTypeName name="com.example.demo.entity.Cart"/>
+    <fullyQualifiedTypeName name="com.example.demo.service.ItemService"/>
+    <fullyQualifiedTypeName name="com.example.demo.repository.ItemRepository"/>
+    <fullyQualifiedTypeName name="com.example.demo.entity.Item"/>
+    <fullyQualifiedTypeName name="com.example.demo.exceptions.ItemIsAlreadyAssignedException"/>
+    <fullyQualifiedTypeName name="com.example.demo.exceptions.CartNotFoundException"/>
+    <fullyQualifiedTypeName name="com.example.demo.exceptions.ItemNotFoundException"/>
+    <fullyQualifiedTypeName name="com.tem.cart.client.CustomerClient"/>
+    <fullyQualifiedTypeName name="com.tem.cart.entity.Customer"/>
+    <fullyQualifiedTypeName name="com.tem.cart.repo.CustomerRepository"/>
+    <fullyQualifiedTypeName name="com.tem.cart.repository.ItemRepository"/>
+    <fullyQualifiedTypeName name="com.tem.cart.model.dto.PlainCartDto"/>
+    <fullyQualifiedTypeName name="com.tem.cart.service.PlainCartService"/>
+    <fullyQualifiedTypeName name="com.tem.cart.repository.CartRepository"/>
+    <fullyQualifiedTypeName name="com.tem.cart.model.Item"/>
+    <fullyQualifiedTypeName name="com.tem.cart.model.dto.CartDto"/>
+    <fullyQualifiedTypeName name="com.tem.cart.model.Cart"/>
+    <fullyQualifiedTypeName name="com.tem.cart.model.dto.ItemDto"/>
+</qualifiedTypeNameHistroy>

@@ -1,0 +1,53 @@
+package com.library.service.book.service;
+
+import java.util.List;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.library.service.book.entity.RequestBook;
+import com.library.service.book.exception.Constants;
+import com.library.service.book.exception.NotFoundException;
+import com.library.service.book.repository.RequestRepository;
+
+@Service
+public class RequestBookService {
+
+	@Autowired
+	RequestRepository requestRepository;
+
+	/**
+	 * This method is used to search RequestBooks based on Cardno
+	 * 
+	 * @param cardNo
+	 * @param requestId
+	 * @return
+	 */
+
+	public RequestBook getRequestBook(String cardNo) {
+		return requestRepository.findBycardNo(cardNo)
+				.orElseThrow(() -> new NotFoundException(Constants.REQUESTBOOK_NOT_FOUND + cardNo));
+	}
+
+	/**
+	 * This method is used to search RequestBooks based on id
+	 * 
+	 * @param requestId
+	 * @return
+	 */
+	public RequestBook getRequestBook(Long requestBookId) {
+		return requestRepository.findById(requestBookId)
+				.orElseThrow(() -> new NotFoundException(Constants.REQUESTBOOK_NOT_FOUND + requestBookId));
+	}
+
+	/**
+	 * This method is used to get all RequestBooks
+	 * 
+	 * @return List
+	 */
+
+	public List<RequestBook> getAllRequestedBooks() {
+		return requestRepository.findAll();
+	}
+
+}

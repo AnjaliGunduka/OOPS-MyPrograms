@@ -1,0 +1,11 @@
+package com.bookstore.service.prices.mappers;
+
+import org.mapstruct.Mapper;
+
+import com.bookstore.service.prices.dto.PriceDto;
+import com.bookstore.service.prices.entities.Price;
+
+public interface PriceMapper {
+
+    PriceDto toPriceDto(Price price);
+}

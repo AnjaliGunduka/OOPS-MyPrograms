@@ -1,0 +1,17 @@
+
+l
+java:S1117":Rename "client" which hides the field declared at line 24.(þë¹šúÿÿÿÿHÓ°RMAJORZ
+CODE_SMELL
+j
+java:S6242"8Set the credentials provider explicitly on this builder.(þë¹šúÿÿÿÿHÔ°RMAJORZ
+CODE_SMELL
+x
+java:S1128"KRemove this unused import 'org.springframework.context.ApplicationContext'.(»Ô»¿HÕ°RMINORZ
+CODE_SMELL
+u
+java:S1128	"HRemove this unused import 'org.springframework.context.annotation.Bean'.(‚î‰ÞH×°RMINORZ
+CODE_SMELL
+w
+java:S1128
+"ERemove this unused import 'org.springframework.stereotype.Component'.(Þ÷Ñ¸ÿÿÿÿÿHÙ°RMINORZ
+CODE_SMELL

@@ -1,0 +1,11 @@
+package Classes;
+
+public class StaticVariable {
+
+	int rollno;// instance variable
+	static String name;// static variable
+
+	public static void main(String[] args) {
+
+	}
+}

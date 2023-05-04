@@ -1,0 +1,5 @@
+1635135992511	Rename package 'nl.amis.demo.services.books_service'
+1635136270156	Rename package 'com.books_service.application'
+1635136286075	Rename package 'com.books_service.presentation'
+1635136297232	Rename package 'com.books_service.domain'
+1635136312933	Rename package 'com.books_service.infrastructure.persistence'

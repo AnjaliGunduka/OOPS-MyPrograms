@@ -1,0 +1,21 @@
+
+r
+java:S34579"AFormat specifiers should be used instead of string concatenation.(å‰ÅµýÿÿÿÿH¢JRMAJORZ
+CODE_SMELL
+g	java:S1252"<This block of commented-out lines of code should be removed.(µ¦¾ŒHŸJRMAJORZ
+CODE_SMELL
+m
+java:S3457="AFormat specifiers should be used instead of string concatenation.(ö§ÁH£JRMAJORZ
+CODE_SMELL
+r
+java:S3457-"AFormat specifiers should be used instead of string concatenation.(ÎËÊðþÿÿÿÿHžJRMAJORZ
+CODE_SMELL
+m
+java:S3457&"AFormat specifiers should be used instead of string concatenation.(¹ç°ºHJRMAJORZ
+CODE_SMELL
+m
+java:S3457 "AFormat specifiers should be used instead of string concatenation.(Ì©ŸŸHœJRMAJORZ
+CODE_SMELL
+h
+java:S2629-"7Use the built-in formatting to construct this argument.(ÎËÊðþÿÿÿÿH›JRMAJORZ
+CODE_SMELL

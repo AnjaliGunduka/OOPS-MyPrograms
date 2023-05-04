@@ -1,0 +1,7 @@
+package com.bookstore.service.prices.mappers;
+
+
+public interface PriceMapper {
+
+    PriceDto toPriceDto(Price price);
+}

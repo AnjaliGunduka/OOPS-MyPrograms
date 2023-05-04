@@ -1,0 +1,17 @@
+
+¯
+java:S1845P"€Rename field "CHANGE_User_PASSWORD_FILE_NAME" to prevent any misunderstanding/clash with field "CHANGE_USER_PASSWORD_FILE_NAME".(¼ø¤HÅWRBLOCKERZ
+CODE_SMELL
+k
+java:S1118":Add a private constructor to hide the implicit public one.(“³±ûÿÿÿÿHÇWRMAJORZ
+CODE_SMELL
+ˆ	java:S115P"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(¼ø¤HÂWRCRITICALZ
+CODE_SMELL
+	java:S115O"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(œ×ÜùÿÿÿÿHÁWRCRITICALZ
+CODE_SMELL
+¸
+java:S1845O"„Rename field "SHARE_User_CREDENTIALS_FILE_NAME" to prevent any misunderstanding/clash with field "SHARE_USER_CREDENTIALS_FILE_NAME".(œ×ÜùÿÿÿÿHÃWRBLOCKERZ
+CODE_SMELL
+r
+java:S1075^"ARefactor your code to get this URI from a customizable parameter.(• İúıÿÿÿÿHÈWRMINORZ
+CODE_SMELL

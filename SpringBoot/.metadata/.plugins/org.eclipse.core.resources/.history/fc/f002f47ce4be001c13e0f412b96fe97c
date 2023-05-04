@@ -1,0 +1,29 @@
+package KieRule;
+import com.library.service.book.entity.Book;
+import com.library.service.book.entity.Student;
+import com.library.service.book.enums.RequestStatus;
+global com.library.service.book.entity.RequestBook;
+dialect "mvel"
+rule "REQUESTED"
+
+when
+requestBook : RequestBook(status=="REQUESTED" && noOfBooks>0);
+then
+requestBook .setStatus(10);
+end;
+
+rule "APPROVED"
+
+when
+orderObject : Order(cardType=="ICICI" && price>15000);
+then
+orderObject.setDiscount(8);
+end;
+
+rule "REJECTED"
+
+when
+orderObject : Order(cardType=="DBS" && price>15000);
+then
+orderObject.setDiscount(15);
+end;

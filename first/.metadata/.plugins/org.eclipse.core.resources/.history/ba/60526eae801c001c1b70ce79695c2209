@@ -1,0 +1,9 @@
+package com.hiber.Service;
+
+public interface ProductService {
+	 List  getAllProducts();
+	 
+	 boolean addProduct(Product product);
+ 
+	  boolean deleteProduct(int productId);
+}

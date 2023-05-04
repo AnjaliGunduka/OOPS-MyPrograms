@@ -1,0 +1,13 @@
+package com.information.example;
+
+public class Calculator {
+
+	public static int add(int a,int b)
+	{
+		return a+b;
+	}
+	public static double computeCircleRadius(double radius)
+	{
+		return Math.PI * radius * radius;
+	}
+}

@@ -1,0 +1,5 @@
+package com.javatechie.redis.respository;
+
+public interface ProductDaos {
+
+}

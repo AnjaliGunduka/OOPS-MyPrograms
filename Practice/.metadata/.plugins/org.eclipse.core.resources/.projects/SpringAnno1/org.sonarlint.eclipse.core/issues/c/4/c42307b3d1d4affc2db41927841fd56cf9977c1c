@@ -1,0 +1,8 @@
+
+i	java:S106"9Replace this use of System.out or System.err by a logger.(çØêÞûÿÿÿÿHƒJRMAJORZ
+CODE_SMELL
+d	java:S106"9Replace this use of System.out or System.err by a logger.(°ÌüÚH„JRMAJORZ
+CODE_SMELL
+w
+java:S1128"KRemove this unused import 'org.springframework.context.annotation.Primary'.(“ð›ßH…JRMINORZ
+CODE_SMELL

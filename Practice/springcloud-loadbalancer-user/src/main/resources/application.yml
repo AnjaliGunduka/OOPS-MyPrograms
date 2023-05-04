@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: springcloud-loadbalancer-user
+server:
+  port: 8091

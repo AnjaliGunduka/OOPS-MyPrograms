@@ -1,0 +1,7 @@
+
+б
+java:S1128"iRemove this unused import 'org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest'.(Й┬гу¤    8Щ╫│┤ъ0HБwRMINORZ
+CODE_SMELL
+Э
+java:S1128"jRemove this unused import 'org.springframework.security.oauth2.client.web.AuthorizationRequestRepository'.(цлым8Щ╫│┤ъ0H vRMINORZ
+CODE_SMELL

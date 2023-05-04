@@ -1,0 +1,24 @@
+package com.Calci.maths;
+
+import java.security.Timestamp;
+import java.util.logging.Logger;
+
+public class Logging {
+	final static Logger logger = Logger.getLogger(Calculator.class);
+	public static void main(String[] args) {
+		logger.debug("DEBUG Message");
+		logger.warning("WARN Message");
+		logger.fatal("FATAL Message");
+		logger.error("ERROR Message");
+		logger.trace("TRACE Message");
+
+		
+		
+		
+		
+		
+	}
+}
+	
+	
+

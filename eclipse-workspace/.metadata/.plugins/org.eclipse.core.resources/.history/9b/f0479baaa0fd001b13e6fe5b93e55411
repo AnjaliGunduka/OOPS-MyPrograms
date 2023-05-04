@@ -1,0 +1,23 @@
+package Classes;
+
+public class AcceesSpecifierMethod {
+	public static void main(String[] args) 
+	
+	{
+		int a=8;
+		int b=8;
+		int c=add(a,b);
+		System.out.println(c);
+		
+		
+		
+	}
+	public static int add(int i,int j)
+	{
+		int s;
+		s=i+j;
+		return s;
+	}
+	
+	
+}

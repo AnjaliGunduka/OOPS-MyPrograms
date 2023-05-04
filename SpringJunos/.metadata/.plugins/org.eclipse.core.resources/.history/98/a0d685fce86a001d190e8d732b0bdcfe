@@ -1,0 +1,56 @@
+package com.junodx.api.models.commerce;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import com.junodx.api.models.laboratory.TestReport;
+import com.junodx.api.models.laboratory.reports.types.SignedOutType;
+import com.junodx.api.models.laboratory.types.ReportConfiguration;
+import com.junodx.api.models.laboratory.types.ReportType;
+
+public class DataBuilderOrder {
+	public static TestReport mockTestReport() {
+		TestReport report = new TestReport();
+		report.setId("2L");
+		report.setAvailable(true);
+		report.setReportConfiguration(ReportConfiguration.NIPS_PLUS);
+		report.setEstimatedToBeAvailableAt(Calendar.getInstance());
+		report.setFirstAvailableAt(Calendar.getInstance());
+		report.setApproved(true);
+		report.setSignedOut(true);
+	//	report.setSignoutDetails(mockSignoutDetails());
+		report.setResultsUrl("url");
+		report.setOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8");
+		report.setOrderNumber("1234");
+		report.setLabId("f450237e-20a3-4bf1-b64d-9ecaab16be7a");
+	//	report.setPatient(mockUser());
+		report.setLaboratoryOrderId("76c97d43-347f-4132-ba18-ddf3b313c226");
+		report.setNoOrder(true);
+		report.setControl(false);
+		report.setResearchSample(false);
+		report.setReportType(ReportType.STANDARD);
+		report.setResearchProjectName("researchProjectName");
+		report.setBatchRunId("8L");
+		report.setPipelineRunId("12345");
+		report.setCompletedAt(Calendar.getInstance());
+		report.setSignedOutType(SignedOutType.MANUAL);
+	//	report.setResultData(mockReport());
+		report.setSampleNumber("123455");
+		report.setDeliveredToProvider(true);
+		report.setDeliveredToPatient(true);
+		report.setDeliveredToPatientAt(Calendar.getInstance());
+		report.setViewedByPatient(true);
+		report.setViewedByPatientAt(Calendar.getInstance());
+		report.setRetestRequested(true);
+		report.setRetestRequestDate(Calendar.getInstance());
+		report.setRetestRequester("request");
+		report.setReportable(true);
+		// report.setTestRun(mockTestRun());
+	//	report.setMeta(DataBuilder.getMockMeta());
+		return report;
+	}
+	
+	public static List<TestReport> testReports = new ArrayList<>();
+	public static List<TestReport> testReportss = new ArrayList<>();
+}

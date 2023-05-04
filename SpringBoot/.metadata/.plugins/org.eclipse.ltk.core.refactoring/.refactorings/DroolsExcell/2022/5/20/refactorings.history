@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;DroolConfig.java&apos; to &apos;admin-service/src/main/java/com.library.service.book.config&apos;&#x0D;&#x0A;- Original project: &apos;ExcelDrolls&apos;&#x0D;&#x0A;- Destination element: &apos;admin-service/src/main/java/com.library.service.book.config&apos;&#x0D;&#x0A;- Original element: &apos;com.spring.demo.DroolConfig.java&apos;" description="Copy compilation unit" destination="=admin-service/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.library.service.book.config" element1="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.spring.demo{DroolConfig.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1652078376134" units="1" version="1.0"/>
+</session>

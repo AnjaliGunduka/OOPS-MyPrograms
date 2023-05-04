@@ -1,0 +1,56 @@
+package com.payment.streams.controllertest;
+
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.payment.streams.controller.UserController;
+import com.payment.streams.model.User;
+import com.payment.streams.service.UserService;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@ExtendWith(SpringExtension.class)
+@WebMvcTest(controllers = UserController.class)
+@ActiveProfiles("test")
+public class UserControllerTest {
+	@Autowired
+	MockMvc mockMvc;
+	@MockBean
+	UserService userService;
+
+    @Test
+    public void getCar_Details() throws Exception{
+        given(userService.findById(Mockito.anyLong())).willReturn(new User(1L, "anju", "g", "anjali@"));
+
+        mockMvc.perform(
+                    get("/cars/Scala")
+                    .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("name").value("Scala"))
+                .andExpect(jsonPath("type").value("Sadan"));
+    }
+
+
+}

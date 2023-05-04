@@ -1,0 +1,19 @@
+
+a
+java:S1874!"0Remove this use of "signWith"; it is deprecated.(¿ĞçæûÿÿÿÿHœwRMINORZ
+CODE_SMELL
+Z
+java:S1874&".Remove this use of "parser"; it is deprecated.(¤‹ıàHwRMINORZ
+CODE_SMELL
+f
+java:S1874'"5Remove this use of "setSigningKey"; it is deprecated.(±®ß™üÿÿÿÿHwRMINORZ
+CODE_SMELL
+Z
+java:S18740".Remove this use of "parser"; it is deprecated.(øˆ½¤HŸwRMINORZ
+CODE_SMELL
+a
+java:S18740"5Remove this use of "setSigningKey"; it is deprecated.(øˆ½¤H wRMINORZ
+CODE_SMELL
+f
+java:S18742":Remove this use of "SignatureException"; it is deprecated.(° µÿH¡wRMINORZ
+CODE_SMELL

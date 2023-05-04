@@ -1,0 +1,19 @@
+server:
+    port: 6668
+spring:
+    application:
+        name: apigateway
+zuul:
+    routes:
+        Citizen-service:
+            path: /Citizenservice/**
+            url: http://localhost:8012/
+            stripPrefix: false
+        Vaccination-Center:
+            path: /VaccinationCenter/**
+            url: http://localhost:9986/
+            stripPrefix: false
+    sensitiveHeaders: Cookie,Set-Cookie
+    host:
+        connect-timeout-millis: 10000
+        socket-timeout-millis: 1000000

@@ -1,0 +1,12 @@
+package com.jdbc.spring.hiber.config;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+@Configuration
+@ComponentScan("com.jdbc.spring.hiber")
+@EnableTransactionManagement
+public class ApplicationContextConfig {
+
+}

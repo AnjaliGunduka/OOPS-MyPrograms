@@ -1,0 +1,14 @@
+
+[
+java:S1125>"'Remove the unnecessary boolean literal.(ωΑΨ8¨Β©ες0HΫRMINORZ
+CODE_SMELL
+
+java:S3655]"XCall "userOptional.isPresent()" or "!userOptional.isEmpty()" before accessing the value.(“¦¥ήϊÿÿÿÿ8¨Β©ες0HήRMAJORZBUG
+s
+java:S2259w"FA "NullPointerException" could be thrown; "fileName" is nullable here.(ςΖλτ8¨Β©ες0HίRMAJORZBUG
+
+java:S3655G"ZCall "eventOptional.isPresent()" or "!eventOptional.isEmpty()" before accessing the value.(ίθτιόÿÿÿÿ8¨Β©ες0HγRMAJORZBUG
+‡
+java:S3655f"ZCall "adminOptional.isPresent()" or "!adminOptional.isEmpty()" before accessing the value.(ƒψρ8¨Β©ες0HδRMAJORZBUG
+
+java:S3655T"XCall "userOptional.isPresent()" or "!userOptional.isEmpty()" before accessing the value.(“¦¥ήϊÿÿÿÿ8¨Β©ες0HεRMAJORZBUG

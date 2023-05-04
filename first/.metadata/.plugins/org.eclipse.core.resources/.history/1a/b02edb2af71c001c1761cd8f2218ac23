@@ -1,0 +1,11 @@
+package com.jdbc.spring.hiber.config;
+
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+@Configuration
+@EnableWebMvc
+@ComponentScan(basePackages = {
+    " com.jdbc.spring.hiber.controller"
+})
+public class WebMvcConfig implements WebMvcConfigurer {
+
+}

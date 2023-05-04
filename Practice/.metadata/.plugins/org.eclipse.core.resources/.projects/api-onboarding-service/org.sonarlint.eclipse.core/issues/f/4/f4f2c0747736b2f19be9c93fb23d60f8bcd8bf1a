@@ -1,0 +1,13 @@
+
+	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(·ˆñäûÿÿÿÿH”XRCRITICALZ
+CODE_SMELL
+
+java:S1149H"_Replace the synchronized class "StringBuffer" by an unsynchronized one such as "StringBuilder".(ì­ŠÜúÿÿÿÿH•XRMAJORZ
+CODE_SMELL
+K
+java:S5542)"Use a secure cipher mode.(­ĞÉìH–XRCRITICALZVULNERABILITY
+K
+java:S55426"Use a secure cipher mode.(­ĞÉìH—XRCRITICALZVULNERABILITY
+v
+java:S1858J"E"toHexString" returns a string, there's no need to call "toString()".(¨ÁÅ™ùÿÿÿÿH˜XRMINORZ
+CODE_SMELL

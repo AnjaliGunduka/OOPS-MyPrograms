@@ -1,0 +1,27 @@
+INDEX VERSION 1.131
+D:\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3460846204.index
+\StructsLoginPage\src\main\java
+D:\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2080939791.index
+\LoginStructs\src\main\java
+D:\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\941055789.index
+\MvcAritecture\src\main\java
+D:\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2506856699.index
+\RegistrationFormJsp\src\main\java
+C:\Users\anjalig\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2512274334.index
+\CurrentDateShow\src\main\java
+C:\Users\anjalig\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3460846204.index
+\StructsLoginPage\src\main\java
+C:\Users\anjalig\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2506856699.index
+\RegistrationFormJsp\src\main\java
+C:\Users\anjalig\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2080939791.index
+\LoginStructs\src\main\java
+D:\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\870131943.index
+\Registration-UsingJspServletMysqlconnector\src\main\java
+D:\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2512274334.index
+\CurrentDateShow\src\main\java
+C:\Users\anjalig\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\870131943.index
+\Registration-UsingJspServletMysqlconnector\src\main\java
+C:\Users\anjalig\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\941055789.index
+\MvcAritecture\src\main\java
+C:\Users\anjalig\eclipse-workspace\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3153838803.index
+\StructsExample\src\main\java

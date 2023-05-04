@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="com.wavelabs.library.demo.entity.Book"/>
+    <fullyQualifiedTypeName name="com.library.service.demo.Repository.BookRepository"/>
+    <fullyQualifiedTypeName name="com.library.service.demo.Exceptions.NotFoundException"/>
+    <fullyQualifiedTypeName name="com.library.service.demo.service.BookService"/>
+    <fullyQualifiedTypeName name="com.library.service.demo.Request.BookRequest"/>
+    <fullyQualifiedTypeName name="com.library.service.demo.entity.Book"/>
+</qualifiedTypeNameHistroy>

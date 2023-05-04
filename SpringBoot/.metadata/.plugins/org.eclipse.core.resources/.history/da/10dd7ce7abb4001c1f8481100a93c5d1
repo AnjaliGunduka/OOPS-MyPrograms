@@ -1,0 +1,5 @@
+package com.spring.demo.repo;
+
+public interface EmployeeRepository {
+
+}

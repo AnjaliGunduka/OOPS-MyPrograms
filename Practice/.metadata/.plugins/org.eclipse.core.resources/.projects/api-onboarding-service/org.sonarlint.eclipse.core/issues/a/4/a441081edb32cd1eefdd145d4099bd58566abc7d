@@ -1,0 +1,22 @@
+
+p
+java:S1128&"CRemove this unused import 'com.bmt.onboarding.entity.EventPricing'.(¹Á›ÆHæšRMINORZ
+CODE_SMELL
+o
+java:S1128)"BRemove this unused import 'com.bmt.onboarding.mapper.EventMapper'.(¦‚ØÆHèšRMINORZ
+CODE_SMELL
+r
+java:S1128#"@Remove this unused import 'com.bmt.onboarding.common.Constants'.(éäóùÿÿÿÿHêšRMINORZ
+CODE_SMELL
+o
+java:S1128%"BRemove this unused import 'com.bmt.onboarding.entity.EventOffers'.(ĞŸÒ¬HìšRMINORZ
+CODE_SMELL
+]
+java:S1128"+Remove this unused import 'java.util.List'.(Õë±ÄøÿÿÿÿHîšRMINORZ
+CODE_SMELL
+u
+java:S1128<"HRemove this unused import 'com.bmt.onboarding.response.SuccessResponse'.(àëéçHğšRMINORZ
+CODE_SMELL
+o
+java:S1128$"BRemove this unused import 'com.bmt.onboarding.entity.EventArtist'.(œ¾´ÎHòšRMINORZ
+CODE_SMELL

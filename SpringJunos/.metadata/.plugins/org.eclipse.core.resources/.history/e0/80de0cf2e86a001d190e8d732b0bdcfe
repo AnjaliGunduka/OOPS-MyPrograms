@@ -1,0 +1,4263 @@
+package com.junodx.api.models.commerce;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Currency;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.junodx.api.connectors.aws.sns.SnsMessageResponse;
+import com.junodx.api.connectors.messaging.payloads.EntityPayload;
+import com.junodx.api.connectors.messaging.payloads.EventType;
+import com.junodx.api.controllers.commerce.payloads.PurchaseWithTokenPayload;
+import com.junodx.api.controllers.payloads.ClientCredentialsPayload;
+import com.junodx.api.controllers.payloads.IDTokenObject;
+import com.junodx.api.controllers.payloads.JwtResponse;
+import com.junodx.api.controllers.payloads.OrderLineItemInfo;
+import com.junodx.api.controllers.payloads.SFBillingAddress;
+import com.junodx.api.controllers.payloads.SalesforceAttributes;
+import com.junodx.api.controllers.payloads.SalesforceChangedDataMap;
+import com.junodx.api.controllers.payloads.SalesforceChartUpdateInfo;
+import com.junodx.api.controllers.payloads.SalesforceOrderUpdateAccountInfo;
+import com.junodx.api.controllers.payloads.SalesforcePracticeAccountInfo;
+import com.junodx.api.controllers.payloads.SalesforcePracticeChangedDataMap;
+import com.junodx.api.controllers.payloads.SalesforcePracticePayload;
+import com.junodx.api.controllers.payloads.SalesforcePracticeRecordChanged;
+import com.junodx.api.controllers.payloads.SalesforceRecordChanged;
+import com.junodx.api.controllers.payloads.SalesforceUserUpdateAccountInfo;
+import com.junodx.api.controllers.payloads.SalesforceUserUpdatePayload;
+import com.junodx.api.controllers.payloads.SalesforceWhoRecord;
+import com.junodx.api.controllers.providers.payloads.ProviderRemoveLicensesPayload;
+import com.junodx.api.controllers.providers.payloads.ProviderRemoveSpecialtiesPayload;
+import com.junodx.api.controllers.payloads.SalesforceChartUpdateInfo.TestResult;
+import com.junodx.api.controllers.payloads.SalesforceLineItemUpdateInfo;
+import com.junodx.api.controllers.payloads.SalesforceLocationData;
+import com.junodx.api.controllers.users.payloads.ChangePasswordPayload;
+import com.junodx.api.controllers.users.payloads.ChartEntryPayload;
+import com.junodx.api.controllers.users.payloads.EmailChangePayload;
+import com.junodx.api.controllers.users.payloads.PostRegistrationPayload;
+import com.junodx.api.controllers.users.payloads.RegisterUserPayload;
+import com.junodx.api.controllers.users.payloads.UserCredentialsPayload;
+import com.junodx.api.controllers.users.payloads.UserForgotPasswordPayload;
+import com.junodx.api.controllers.users.payloads.UserUpdatePasswordPayload;
+import com.junodx.api.controllers.users.payloads.UserVerificationPayload;
+import com.junodx.api.controllers.users.payloads.VerificationCodeResponsePayload;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdateFetalSexResultsPreferences;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdateInsurancePayload;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdateMedicalDetails;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdatePatientDetailsPayload;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdatePayload;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdatePreferencesPayload;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpsertProviderPayload;
+import com.junodx.api.controllers.xifin.payloads.MessageHeader;
+import com.junodx.api.controllers.xifin.payloads.accession.AccessionPayload;
+import com.junodx.api.controllers.xifin.payloads.accession.CreateAccession;
+import com.junodx.api.controllers.xifin.payloads.accession.CreateAccessionPayload;
+import com.junodx.api.dto.models.auth.SalesforceAddressDto;
+import com.junodx.api.dto.models.auth.SalesforceUserDto;
+import com.junodx.api.dto.models.auth.UserBatchDto;
+import com.junodx.api.dto.models.commerce.OrderTruncatedDto;
+import com.junodx.api.dto.models.laboratory.KitTruncatedDto;
+import com.junodx.api.dto.models.laboratory.TestReportTruncatedDto;
+import com.junodx.api.dto.models.laboratory.TestRunTruncatedDto;
+import com.junodx.api.dto.models.patient.PatientChartEntryDto;
+import com.junodx.api.models.auth.AccessToken;
+import com.junodx.api.models.auth.Authority;
+import com.junodx.api.models.auth.EmailChange;
+import com.junodx.api.models.auth.FetalSexResultsPreferences;
+import com.junodx.api.models.auth.ForgotPasswordCode;
+import com.junodx.api.models.auth.OAuthClient;
+import com.junodx.api.models.auth.Preferences;
+import com.junodx.api.models.auth.RefreshToken;
+import com.junodx.api.models.auth.User;
+import com.junodx.api.models.auth.VerificationCode;
+import com.junodx.api.models.auth.types.GenderTerms;
+import com.junodx.api.models.auth.types.UserStatus;
+import com.junodx.api.models.auth.types.UserType;
+import com.junodx.api.models.commerce.DataBuilderOrder;
+import com.junodx.api.models.commerce.Discount;
+import com.junodx.api.models.commerce.Order;
+import com.junodx.api.models.commerce.OrderLineItem;
+import com.junodx.api.models.commerce.OrderStatus;
+import com.junodx.api.models.commerce.ProviderApproval;
+import com.junodx.api.models.commerce.Tax;
+import com.junodx.api.models.commerce.types.DiscountMode;
+import com.junodx.api.models.commerce.types.DiscountType;
+import com.junodx.api.models.commerce.types.OrderType;
+import com.junodx.api.models.commerce.types.ProductType;
+import com.junodx.api.models.commerce.types.TaxType;
+import com.junodx.api.models.configuration.TokenApiClientConfiguration;
+import com.junodx.api.models.configuration.WebhookServerConfiguration;
+import com.junodx.api.models.configuration.lims.ElementsDataSources;
+import com.junodx.api.models.configuration.lims.LIMSConfigurationEntity;
+import com.junodx.api.models.configuration.lims.ReportTypes;
+import com.junodx.api.models.configuration.storage.DocumentStorageConfiguration;
+import com.junodx.api.models.core.Address;
+import com.junodx.api.models.core.Meta;
+import com.junodx.api.models.core.Phone;
+import com.junodx.api.models.core.types.ACTIVITY;
+import com.junodx.api.models.core.types.ADD_REMOVE;
+import com.junodx.api.models.core.types.DataType;
+import com.junodx.api.models.core.types.IntervalType;
+import com.junodx.api.models.core.types.PASS_FAIL;
+import com.junodx.api.models.core.types.PhoneType;
+import com.junodx.api.models.core.types.State;
+import com.junodx.api.models.fulfillment.Fulfillment;
+import com.junodx.api.models.fulfillment.FulfillmentProvider;
+import com.junodx.api.models.fulfillment.ShippingCarrier;
+import com.junodx.api.models.fulfillment.ShippingDetails;
+import com.junodx.api.models.fulfillment.ShippingMethod;
+import com.junodx.api.models.fulfillment.ShippingStatus;
+import com.junodx.api.models.fulfillment.ShippingTarget;
+import com.junodx.api.models.fulfillment.ShippingTransaction;
+import com.junodx.api.models.fulfillment.types.ShippingDeliveryType;
+import com.junodx.api.models.laboratory.BatchRun;
+import com.junodx.api.models.laboratory.Kit;
+import com.junodx.api.models.laboratory.Laboratory;
+import com.junodx.api.models.laboratory.LaboratoryOrder;
+import com.junodx.api.models.laboratory.LaboratoryStatistics;
+import com.junodx.api.models.laboratory.LaboratoryStatus;
+import com.junodx.api.models.laboratory.Signout;
+import com.junodx.api.models.laboratory.TestReport;
+import com.junodx.api.models.laboratory.TestRun;
+import com.junodx.api.models.laboratory.reports.FSTRawData;
+import com.junodx.api.models.laboratory.reports.NIPSBasicRawData;
+import com.junodx.api.models.laboratory.reports.Report;
+import com.junodx.api.models.laboratory.reports.types.SignedOutType;
+import com.junodx.api.models.laboratory.tests.EuploidTest;
+import com.junodx.api.models.laboratory.tests.FetalSexTest;
+import com.junodx.api.models.laboratory.tests.LabConstants;
+import com.junodx.api.models.laboratory.tests.SCATest;
+import com.junodx.api.models.laboratory.tests.T13Test;
+import com.junodx.api.models.laboratory.tests.T18Test;
+import com.junodx.api.models.laboratory.tests.T21Test;
+import com.junodx.api.models.laboratory.tests.TestQC;
+import com.junodx.api.models.laboratory.tests.types.GenderResultType;
+import com.junodx.api.models.laboratory.tests.types.POSITIVE_NEGATIVE;
+import com.junodx.api.models.laboratory.tests.types.QCType;
+import com.junodx.api.models.laboratory.tests.types.SCAResultType;
+import com.junodx.api.models.laboratory.tests.types.SnpIdentityType;
+import com.junodx.api.models.laboratory.types.KitType;
+import com.junodx.api.models.laboratory.types.ReportConfiguration;
+import com.junodx.api.models.laboratory.types.ReportConfigurationCounts;
+import com.junodx.api.models.laboratory.types.ReportType;
+import com.junodx.api.models.laboratory.types.TestRunType;
+import com.junodx.api.models.patient.Consent;
+import com.junodx.api.models.patient.MedicalDetails;
+import com.junodx.api.models.patient.Medication;
+import com.junodx.api.models.patient.PatientChart;
+import com.junodx.api.models.patient.PatientChartEntry;
+import com.junodx.api.models.patient.PatientDetails;
+import com.junodx.api.models.patient.Vital;
+import com.junodx.api.models.patient.types.ChartType;
+import com.junodx.api.models.patient.types.ConsentType;
+import com.junodx.api.models.patient.types.ConsultType;
+import com.junodx.api.models.patient.types.MedicationType;
+import com.junodx.api.models.patient.types.VitalType;
+import com.junodx.api.models.payment.insurance.InsuranceCarrier;
+import com.junodx.api.models.payment.insurance.InsurancePolicy;
+import com.junodx.api.models.payment.insurance.types.PatientRelationship;
+import com.junodx.api.models.providers.types.SpecialtyType;
+import com.junodx.api.models.strings.Copy;
+import com.junodx.api.models.strings.CopyCategory;
+import com.junodx.api.models.strings.TargetPortal;
+import com.junodx.api.security.JwtConfiguration;
+import com.junodx.api.security.types.OAuthGrantType;
+import com.junodx.api.services.auth.UserDetailsImpl;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
+
+import software.amazon.awssdk.services.sns.model.PublishResponse;
+import software.amazon.awssdk.services.sns.model.PublishResponse.Builder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.junodx.api.connectors.aws.sns.SnsMessageResponse;
+import com.junodx.api.connectors.messaging.payloads.EntityPayload;
+import com.junodx.api.connectors.messaging.payloads.EventType;
+import com.junodx.api.controllers.commerce.payloads.PurchaseWithTokenPayload;
+import com.junodx.api.controllers.payloads.ClientCredentialsPayload;
+import com.junodx.api.controllers.payloads.IDTokenObject;
+import com.junodx.api.controllers.payloads.JwtResponse;
+import com.junodx.api.controllers.payloads.OrderLineItemInfo;
+import com.junodx.api.controllers.payloads.SFBillingAddress;
+import com.junodx.api.controllers.payloads.SalesforceAttributes;
+import com.junodx.api.controllers.payloads.SalesforceChangedDataMap;
+import com.junodx.api.controllers.payloads.SalesforceChartUpdateInfo;
+import com.junodx.api.controllers.payloads.SalesforceChartUpdateInfo.TestResult;
+import com.junodx.api.controllers.payloads.SalesforceLineItemUpdateInfo;
+import com.junodx.api.controllers.payloads.SalesforceLocationData;
+import com.junodx.api.controllers.payloads.SalesforceOrderUpdateAccountInfo;
+import com.junodx.api.controllers.payloads.SalesforcePracticeAccountInfo;
+import com.junodx.api.controllers.payloads.SalesforcePracticeChangedDataMap;
+import com.junodx.api.controllers.payloads.SalesforcePracticePayload;
+import com.junodx.api.controllers.payloads.SalesforcePracticeRecordChanged;
+import com.junodx.api.controllers.payloads.SalesforceRecordChanged;
+import com.junodx.api.controllers.payloads.SalesforceUserUpdateAccountInfo;
+import com.junodx.api.controllers.payloads.SalesforceUserUpdatePayload;
+import com.junodx.api.controllers.payloads.SalesforceWhoRecord;
+import com.junodx.api.controllers.providers.payloads.ProviderRemoveLicensesPayload;
+import com.junodx.api.controllers.providers.payloads.ProviderRemoveSpecialtiesPayload;
+import com.junodx.api.controllers.users.payloads.ChangePasswordPayload;
+import com.junodx.api.controllers.users.payloads.ChartEntryPayload;
+import com.junodx.api.controllers.users.payloads.EmailChangePayload;
+import com.junodx.api.controllers.users.payloads.PostRegistrationPayload;
+import com.junodx.api.controllers.users.payloads.RegisterUserPayload;
+import com.junodx.api.controllers.users.payloads.UserCredentialsPayload;
+import com.junodx.api.controllers.users.payloads.UserForgotPasswordPayload;
+import com.junodx.api.controllers.users.payloads.UserUpdatePasswordPayload;
+import com.junodx.api.controllers.users.payloads.UserVerificationPayload;
+import com.junodx.api.controllers.users.payloads.VerificationCodeResponsePayload;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdateFetalSexResultsPreferences;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdateInsurancePayload;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdateMedicalDetails;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdatePatientDetailsPayload;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdatePayload;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpdatePreferencesPayload;
+import com.junodx.api.controllers.users.payloads.UserUpdate.UserUpsertProviderPayload;
+import com.junodx.api.controllers.xifin.payloads.MessageHeader;
+import com.junodx.api.controllers.xifin.payloads.accession.AccessionPayload;
+import com.junodx.api.controllers.xifin.payloads.accession.CreateAccession;
+import com.junodx.api.controllers.xifin.payloads.accession.CreateAccessionPayload;
+import com.junodx.api.dto.models.auth.SalesforceAddressDto;
+import com.junodx.api.dto.models.auth.SalesforceUserDto;
+import com.junodx.api.dto.models.auth.UserBatchDto;
+import com.junodx.api.dto.models.commerce.OrderTruncatedDto;
+import com.junodx.api.dto.models.laboratory.KitTruncatedDto;
+import com.junodx.api.dto.models.laboratory.TestReportTruncatedDto;
+import com.junodx.api.dto.models.laboratory.TestRunTruncatedDto;
+import com.junodx.api.dto.models.patient.PatientChartEntryDto;
+import com.junodx.api.models.auth.AccessToken;
+import com.junodx.api.models.auth.EmailChange;
+import com.junodx.api.models.auth.FetalSexResultsPreferences;
+import com.junodx.api.models.auth.ForgotPasswordCode;
+import com.junodx.api.models.auth.OAuthClient;
+import com.junodx.api.models.auth.Preferences;
+import com.junodx.api.models.auth.RefreshToken;
+import com.junodx.api.models.auth.User;
+import com.junodx.api.models.auth.VerificationCode;
+import com.junodx.api.models.auth.types.GenderTerms;
+import com.junodx.api.models.auth.types.UserStatus;
+import com.junodx.api.models.auth.types.UserType;
+import com.junodx.api.models.commerce.types.DiscountMode;
+import com.junodx.api.models.commerce.types.DiscountType;
+import com.junodx.api.models.commerce.types.OrderType;
+import com.junodx.api.models.commerce.types.ProductType;
+import com.junodx.api.models.commerce.types.TaxType;
+import com.junodx.api.models.configuration.TokenApiClientConfiguration;
+import com.junodx.api.models.configuration.WebhookServerConfiguration;
+import com.junodx.api.models.configuration.lims.ElementsDataSources;
+import com.junodx.api.models.configuration.lims.LIMSConfigurationEntity;
+import com.junodx.api.models.configuration.lims.ReportTypes;
+import com.junodx.api.models.configuration.storage.DocumentStorageConfiguration;
+import com.junodx.api.models.core.Address;
+import com.junodx.api.models.core.Meta;
+import com.junodx.api.models.core.Phone;
+import com.junodx.api.models.core.types.ACTIVITY;
+import com.junodx.api.models.core.types.ADD_REMOVE;
+import com.junodx.api.models.core.types.DataType;
+import com.junodx.api.models.core.types.IntervalType;
+import com.junodx.api.models.core.types.PASS_FAIL;
+import com.junodx.api.models.core.types.PhoneType;
+import com.junodx.api.models.core.types.State;
+import com.junodx.api.models.fulfillment.Fulfillment;
+import com.junodx.api.models.fulfillment.FulfillmentProvider;
+import com.junodx.api.models.fulfillment.ShippingCarrier;
+import com.junodx.api.models.fulfillment.ShippingDetails;
+import com.junodx.api.models.fulfillment.ShippingMethod;
+import com.junodx.api.models.fulfillment.ShippingStatus;
+import com.junodx.api.models.fulfillment.ShippingTarget;
+import com.junodx.api.models.fulfillment.ShippingTransaction;
+import com.junodx.api.models.fulfillment.types.ShippingDeliveryType;
+import com.junodx.api.models.laboratory.BatchRun;
+import com.junodx.api.models.laboratory.Kit;
+import com.junodx.api.models.laboratory.Laboratory;
+import com.junodx.api.models.laboratory.LaboratoryOrder;
+import com.junodx.api.models.laboratory.LaboratoryStatistics;
+import com.junodx.api.models.laboratory.LaboratoryStatus;
+import com.junodx.api.models.laboratory.Signout;
+import com.junodx.api.models.laboratory.TestReport;
+import com.junodx.api.models.laboratory.TestRun;
+import com.junodx.api.models.laboratory.reports.FSTRawData;
+import com.junodx.api.models.laboratory.reports.NIPSBasicRawData;
+import com.junodx.api.models.laboratory.reports.Report;
+import com.junodx.api.models.laboratory.reports.types.SignedOutType;
+import com.junodx.api.models.laboratory.tests.EuploidTest;
+import com.junodx.api.models.laboratory.tests.FetalSexTest;
+import com.junodx.api.models.laboratory.tests.LabConstants;
+import com.junodx.api.models.laboratory.tests.SCATest;
+import com.junodx.api.models.laboratory.tests.T13Test;
+import com.junodx.api.models.laboratory.tests.T18Test;
+import com.junodx.api.models.laboratory.tests.T21Test;
+import com.junodx.api.models.laboratory.tests.TestQC;
+import com.junodx.api.models.laboratory.tests.types.GenderResultType;
+import com.junodx.api.models.laboratory.tests.types.POSITIVE_NEGATIVE;
+import com.junodx.api.models.laboratory.tests.types.QCType;
+import com.junodx.api.models.laboratory.tests.types.SCAResultType;
+import com.junodx.api.models.laboratory.tests.types.SnpIdentityType;
+import com.junodx.api.models.laboratory.types.KitType;
+import com.junodx.api.models.laboratory.types.ReportConfiguration;
+import com.junodx.api.models.laboratory.types.ReportConfigurationCounts;
+import com.junodx.api.models.laboratory.types.ReportType;
+import com.junodx.api.models.laboratory.types.TestRunType;
+import com.junodx.api.models.patient.Consent;
+import com.junodx.api.models.patient.MedicalDetails;
+import com.junodx.api.models.patient.Medication;
+import com.junodx.api.models.patient.PatientChart;
+import com.junodx.api.models.patient.PatientChartEntry;
+import com.junodx.api.models.patient.PatientDetails;
+import com.junodx.api.models.patient.Vital;
+import com.junodx.api.models.patient.types.ChartType;
+import com.junodx.api.models.patient.types.ConsentType;
+import com.junodx.api.models.patient.types.ConsultType;
+import com.junodx.api.models.patient.types.MedicationType;
+import com.junodx.api.models.patient.types.VitalType;
+import com.junodx.api.models.payment.insurance.InsuranceCarrier;
+import com.junodx.api.models.payment.insurance.InsurancePolicy;
+import com.junodx.api.models.payment.insurance.types.PatientRelationship;
+import com.junodx.api.models.providers.MedicalLicense;
+import com.junodx.api.models.providers.Practice;
+import com.junodx.api.models.providers.Specialty;
+import com.junodx.api.models.providers.types.SpecialtyType;
+import com.junodx.api.models.strings.Copy;
+import com.junodx.api.models.strings.CopyCategory;
+import com.junodx.api.models.strings.TargetPortal;
+import com.junodx.api.security.types.OAuthGrantType;
+import com.junodx.api.services.auth.UserDetailsImpl;
+import com.stripe.exception.StripeException;
+
+import software.amazon.awssdk.services.sns.model.PublishResponse;
+
+public class DataBuilder {
+
+	public static User mockUser() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_test");
+		u.setLastName("User");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-15");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("12345");
+		u.setXifinPatientId("1234");
+		u.setStripeCustomerId("34677676");
+		u.setActivated(true);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static User mockUserUserStatus() throws StripeException {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_test");
+		u.setLastName("User");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-15");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("12345");
+//		Map<String, Object> paramsC = new HashMap<>();
+//		Customer customers = Customer.create(paramsC);
+		u.setStripeCustomerId("1234");
+		u.setXifinPatientId("1234");
+		u.setStripeCustomerId("34677676");
+		u.setActivated(false);
+		u.setStatus(UserStatus.NEW);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static User mockUserEmpty() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_test");
+		u.setLastName("User");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-15");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("12345");
+		u.setXifinPatientId("1234");
+		u.setStripeCustomerId("34677676");
+		u.setActivated(false);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static EntityPayload mockEntityPayload() throws StripeException  {
+		EntityPayload msg = new EntityPayload();
+		msg.setEntity(mockUserUserStatus());
+		msg.setEvent(EventType.CREATE);
+		msg.setEventTs(Calendar.getInstance());
+		msg.setStatus("NEW");
+		return msg;
+	}
+
+	public static SnsMessageResponse mockSnsMessageResponse() {
+		SnsMessageResponse snsMessageResponse = new SnsMessageResponse();
+		snsMessageResponse.setResponse(PublishResponse.builder().build());
+		PublishResponse.builder().build().sequenceNumber();
+		return snsMessageResponse;
+
+	}
+
+	public static Copy mockCopy() {
+		Copy copy = new Copy();
+		copy.setCategory(CopyCategory.PRODUCT);
+		copy.setCopy("copy");
+		copy.setId(8L);
+		copy.setLocale(Locale.ITALY);
+		copy.setKey("keys");
+		copy.setMeta(getMockMeta());
+		copy.setPortal(TargetPortal.PROVIDER);
+		return copy;
+	}
+
+	public static Copy mockCopys() {
+		Copy copy = new Copy();
+		copy.setCategory(CopyCategory.ORDERS);
+		copy.setCopy("copys");
+		copy.setId(8L);
+		copy.setLocale(Locale.ITALY);
+		copy.setKey("keys");
+		copy.setMeta(getMockMeta());
+		copy.setPortal(TargetPortal.PATIENT);
+		return copy;
+	}
+
+	public static Copy mockCopyIdEmpty() {
+		Copy copy = new Copy();
+		copy.setCategory(CopyCategory.PRODUCT);
+		copy.setCopy("copy");
+		copy.setId(null);
+		copy.setLocale(Locale.ITALY);
+		copy.setKey("keys");
+		copy.setMeta(getMockMeta());
+		copy.setPortal(TargetPortal.PROVIDER);
+		return copy;
+	}
+
+	public static User mockUserPreferences() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_test");
+		u.setLastName("User");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-15");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("12345");
+		u.setXifinPatientId("1234");
+		u.setStripeCustomerId("34677676");
+		u.setActivated(true);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferencePreferenceDetails());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static User mockUserFirst() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName(null);
+		u.setLastName(null);
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-15");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("12345");
+		u.setXifinPatientId("1234");
+		u.setStripeCustomerId("34677676");
+		u.setActivated(false);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static User mockUserForUpdate() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_tests");
+		u.setLastName("Users");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-16");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("9348-8892-9342-01");
+		u.setXifinPatientId("12345");
+		u.setStripeCustomerId("346776766");
+		u.setActivated(false);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static User mockUserForUpdatePatientPortal() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_tests");
+		u.setLastName("Users");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-16");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("9348-8892-9342-01");
+		u.setXifinPatientId("12345");
+		u.setStripeCustomerId("346776766");
+		u.setActivated(false);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static User mockUserForUpdatePatientPortalException() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_tests");
+		u.setLastName("Users");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-16");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("9348");
+		u.setXifinPatientId("12345");
+		u.setStripeCustomerId("346776766");
+		u.setActivated(false);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static User mockUserForUpdateExceptions() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_tests");
+		u.setLastName("Users");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-16");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("12345");
+		u.setXifinPatientId("12345");
+		u.setStripeCustomerId("346776766");
+		u.setActivated(false);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static User mockUserForUpdateLabPortal() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_tests");
+		u.setLastName("Users");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-16");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("9358-4292-7682-02");
+		u.setXifinPatientId("12345");
+		u.setStripeCustomerId("346776766");
+		u.setActivated(false);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static User mockUserForUpdateproviderPortal() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_tests");
+		u.setLastName("Users");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-16");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("0352-8232-9622-03");
+		u.setXifinPatientId("12345");
+		u.setStripeCustomerId("346776766");
+		u.setActivated(false);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static User mockUserForUpdates() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_tests");
+		u.setLastName("Users");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-16");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("12345");
+		u.setXifinPatientId("12345");
+		u.setStripeCustomerId("346776766");
+		u.setActivated(true);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static User mockUsers() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_test");
+		u.setLastName("User");
+		u.setEmail("jon+41@junodx.com");
+		u.setUserType(UserType.TEST);
+		u.setDateOfBirth("1997-12-15");
+		u.setClientId("9348-8892-9342-01");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setActivated(true);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static Location getMockLocations() {
+		Location location = new Location();
+		location.setId("1");
+		location.setName("Juno Headquarters");
+		location.setPhone(getMockPhone());
+		location.setAddress(getMockAddress());
+		location.setPractice(getMockPractices());
+		return location;
+	}
+
+	public static Location getMockLocationsave() {
+		Location location = new Location();
+		location.setId("1");
+		location.setName("Juno Headquarters");
+		location.setPhone(getMockPhone());
+		location.setAddress(getMockAddress());
+		location.setPractice(getMockPracticesave());
+		return location;
+	}
+
+	public static List<Provider> providesave = new ArrayList<Provider>();
+
+	public static Practice getMockPracticesave() {
+		Practice practice = new Practice();
+		practice.setActive(true);
+		practice.setBillingEmail("billing@junodx.com");
+		practice.setContactAddress(getMockAddress());
+		practice.setDefaultPractice(true);
+		practice.setId("2L");
+		practice.setLimsId("78788");
+		practice.setXifinId("56768");
+		practice.setSalesforceId("43L");
+		// List<Location> locations = new ArrayList<Location>();
+		// locations.add(getMockLocation());
+		// practice.setLocations(locations);
+//		practice.setMeta(getMockMeta());
+		practice.setName("Juno Diagnostics Medical");
+		practice.setPatientEmail("support@junodx.com");
+		practice.setPrimaryEmail("support@junodx.com");
+		// practice.setPrimaryPhone(getMockPhone());
+
+//		provide.add(getMockProvider());
+		practice.setProviders(providesave);
+//		practice.setSalesforceId(null);
+//		practice.setXifinId(null);
+		return practice;
+	}
+
+	public static List<Provider> provide = new ArrayList<Provider>();
+
+	public static Practice getMockPractices() {
+		Practice practice = new Practice();
+		practice.setActive(true);
+		practice.setBillingEmail("billing@junodx.com");
+		practice.setContactAddress(getMockAddress());
+		practice.setDefaultPractice(true);
+		practice.setId("2L");
+		practice.setLimsId("78788");
+		practice.setXifinId("56768");
+		practice.setSalesforceId("43L");
+		// List<Location> locations = new ArrayList<Location>();
+		// locations.add(getMockLocation());
+		// practice.setLocations(locations);
+//		practice.setMeta(getMockMeta());
+		practice.setName("Juno Diagnostics Medical");
+		practice.setPatientEmail("support@junodx.com");
+		practice.setPrimaryEmail("support@junodx.com");
+		// practice.setPrimaryPhone(getMockPhone());
+
+//		provide.add(getMockProvider());
+		practice.setProviders(provide);
+//		practice.setSalesforceId(null);
+//		practice.setXifinId(null);
+		return practice;
+	}
+
+	public static Location getMockLocation() {
+		Location location = new Location();
+		location.setId("1");
+		location.setName("Juno Headquarters");
+		location.setPhone(getMockPhone());
+		location.setAddress(getMockAddress());
+		// location.setPractice(getMockPractice());
+		return location;
+	}
+
+	public static Phone getMockPhone() {
+		Phone phone = new Phone();
+		phone.setAreaCode("93023");
+		phone.setCountry("United States");
+		phone.setCountryCode("93023");
+		phone.setDigits(0);
+		phone.setPhoneNumber("8586472374");
+		phone.setPhoneType(PhoneType.MOBILE);
+		phone.setPrimaryPhone(false);
+		return phone;
+	}
+
+	public static Practice getMockPractice() {
+		Practice practice = new Practice();
+		practice.setActive(true);
+		practice.setBillingEmail("billing@junodx.com");
+		practice.setContactAddress(getMockAddress());
+		practice.setDefaultPractice(true);
+		practice.setId("2L");
+		practice.setLimsId("78788");
+		// List<Location> locations = new ArrayList<Location>();
+		// locations.add(getMockLocation());
+		// practice.setLocations(locations);
+//		practice.setMeta(getMockMeta());
+		practice.setName("Juno Diagnostics Medical");
+		practice.setPatientEmail("support@junodx.com");
+		practice.setPrimaryEmail("support@junodx.com");
+		// practice.setPrimaryPhone(getMockPhone());
+//		List<Provider> provide = new ArrayList<Provider>();
+//		provide.add(getMockProvider());
+//		practice.setProviders(provide);
+//		practice.setSalesforceId(null);
+//		practice.setXifinId(null);
+		return practice;
+	}
+
+	public static Practice getMockPracticeLims() {
+		Practice practice = new Practice();
+		practice.setActive(true);
+		practice.setBillingEmail("billing@junodx.com");
+		practice.setContactAddress(getMockAddress());
+		practice.setDefaultPractice(true);
+		practice.setId("2L");
+		practice.setLimsId(null);
+		// List<Location> locations = new ArrayList<Location>();
+		// locations.add(getMockLocation());
+		// practice.setLocations(locations);
+//		practice.setMeta(getMockMeta());
+		practice.setName("Juno Diagnostics Medical");
+		practice.setPatientEmail("support@junodx.com");
+		practice.setPrimaryEmail("support@junodx.com");
+		// practice.setPrimaryPhone(getMockPhone());
+//		List<Provider> provide = new ArrayList<Provider>();
+//		provide.add(getMockProvider());
+//		practice.setProviders(provide);
+//		practice.setSalesforceId(null);
+//		practice.setXifinId(null);
+		return practice;
+	}
+
+	public static Meta getMockMeta() {
+		Meta meta = new Meta();
+		meta.setCreatedAt(Calendar.getInstance());
+		meta.setCreatedBy(userDetailsImpl.getEmail());
+		meta.setCreatedById(userDetailsImpl.getUserId());
+		meta.setLastModifiedAt(Calendar.getInstance());
+		meta.setLastModifiedBy(userDetailsImpl.getEmail());
+		meta.setLastModifiedById(userDetailsImpl.getUserId());
+		return meta;
+	}
+
+	public static Address getMockAddress() {
+		Address address = new Address();
+		address.setCity("San Diego");
+		address.setCountry("United States");
+		address.setName("Juno Headquarters");
+		address.setPostalCode("98077");
+		address.setPrimaryAddress(true);
+		address.setState("CA");
+		address.setStreet("11511 Sorrento Valley Rd");
+		address.setPrimaryMailingAddress(true);
+		return address;
+	}
+
+	public static User user = User.createDummyUser();
+
+	public static VerificationCode getVerificationCode() {
+		VerificationCode verificationCode = new VerificationCode();
+		verificationCode.setCode(verificationCode.generateCode());
+		verificationCode.setCreatedAt(Calendar.getInstance());
+		verificationCode.setUser(mockUserForUpdatePatientPortal());
+		verificationCode.setId(1L);
+		verificationCode.setExpiresAt(Calendar.getInstance());
+		Calendar expiresAt = Calendar.getInstance();
+		expiresAt = Calendar.getInstance();
+		return verificationCode;
+	}
+
+	public static VerificationCode getVerificationCodeAuthorityEmpty() {
+		VerificationCode verificationCode = new VerificationCode();
+		verificationCode.setCode(verificationCode.generateCode());
+		verificationCode.setCreatedAt(Calendar.getInstance());
+		verificationCode.setUser(mockUserForUpdatePatientPortalAuthorityEmpty());
+		verificationCode.setId(1L);
+		verificationCode.setExpiresAt(Calendar.getInstance());
+		Calendar expiresAt = Calendar.getInstance();
+		expiresAt = Calendar.getInstance();
+		return verificationCode;
+	}
+
+	public static User mockUserForUpdatePatientPortalAuthorityEmpty() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_tests");
+		u.setLastName("Users");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-16");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("9348-8892-9342-01");
+		u.setXifinPatientId("12345");
+		u.setStripeCustomerId("346776766");
+		u.setActivated(false);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static VerificationCode getVerificationCodes() {
+		VerificationCode verificationCode = new VerificationCode();
+		// verificationCode.setCode(verificationCode.generateCode());
+		// verificationCode.setCreatedAt(Calendar.getInstance());
+		// verificationCode.setUser(user);
+		verificationCode.setId(1L);
+		verificationCode.setExpiresAt(Calendar.getInstance());
+		Calendar expiresAt = Calendar.getInstance();
+		expiresAt = Calendar.getInstance();
+		return verificationCode;
+	}
+
+	public static UserUpdateMedicalDetails mockUserUpdateMedicalDetails() {
+		UserUpdateMedicalDetails userUpdateMedicalDetails = new UserUpdateMedicalDetails();
+		userUpdateMedicalDetails.setConceptionDate(Calendar.getInstance());
+		// userUpdateMedicalDetails.setLmpDate(Calendar.getInstance());
+		userUpdateMedicalDetails.setPregnant(true);
+		userUpdateMedicalDetails.setGestationalAge(30.00f);
+		userUpdateMedicalDetails.setNumberOfFetuses(1);
+		userUpdateMedicalDetails.setThreeOrMoreFetuses(true);
+		userUpdateMedicalDetails.setNoBloodTransfusion(true);
+		userUpdateMedicalDetails.setLmpDate(Calendar.getInstance());
+		userUpdateMedicalDetails.setNoOrganTransplant(true);
+		userUpdateMedicalDetails.setVitals(vitals);
+		return userUpdateMedicalDetails;
+
+	}
+
+	public static UserUpdatePatientDetailsPayload mockUserUpdatePatientDetailsPayloads() {
+		UserUpdatePatientDetailsPayload userUpdatePatientDetailsPayload = new UserUpdatePatientDetailsPayload();
+		userUpdatePatientDetailsPayload.setMedicalDetails(mockUserUpdateMedicalDetailss());
+		return userUpdatePatientDetailsPayload;
+
+	}
+
+	public static List<Vital> vitalss = new ArrayList<>();
+
+	public static UserUpdateMedicalDetails mockUserUpdateMedicalDetailss() {
+		UserUpdateMedicalDetails userUpdateMedicalDetails = new UserUpdateMedicalDetails();
+		userUpdateMedicalDetails.setPregnant(true);
+		userUpdateMedicalDetails.setGestationalAge(30.00f);
+		userUpdateMedicalDetails.setNumberOfFetuses(1);
+		userUpdateMedicalDetails.setThreeOrMoreFetuses(true);
+		userUpdateMedicalDetails.setNoBloodTransfusion(true);
+		userUpdateMedicalDetails.setNoOrganTransplant(true);
+		userUpdateMedicalDetails.setVitals(vitalss);
+		return userUpdateMedicalDetails;
+
+	}
+
+	public static UserUpdatePatientDetailsPayload mockUserUpdatePatientDetailsPayload() {
+		UserUpdatePatientDetailsPayload userUpdatePatientDetailsPayload = new UserUpdatePatientDetailsPayload();
+		userUpdatePatientDetailsPayload.setMedicalDetails(mockUserUpdateMedicalDetails());
+		userUpdatePatientDetailsPayload.setMedications(medications);
+		return userUpdatePatientDetailsPayload;
+
+	}
+
+	public static PostRegistrationPayload mockPostRegistrationPayload() {
+		PostRegistrationPayload response = new PostRegistrationPayload();
+		response.setAlreadyRegistered(false);
+		response.setCreatedAt(getVerificationCode().getCreatedAt());
+		response.setEmail("no-email@junodx.com");
+		response.setExpiration(getVerificationCode().getExpiresAt());
+		response.setIdToken("passwordneww");
+		response.setRequiresVerification(true);
+		response.setVerificationCodeSent(true);
+		return response;
+
+	}
+
+	public static PostRegistrationPayload mockPostRegistrationPayloads() {
+		PostRegistrationPayload response = new PostRegistrationPayload();
+		response.setAlreadyRegistered(false);
+		response.setCreatedAt(getVerificationCode().getCreatedAt());
+		response.setEmail("no-email@junodx.com");
+		response.setExpiration(getVerificationCode().getExpiresAt());
+		response.setIdToken("passwordneww");
+		response.setRequiresVerification(false);
+		response.setVerificationCodeSent(false);
+		return response;
+
+	}
+//	UserBatchDto userBatchDto = new UserBatchDto("1L", "Juno_test", "User", "no-email@junodx.com",
+//			"General_test_user", true, DataBuilder.getMockAddress(), UserType.STANDARD, 5, Calendar.getInstance(),
+//			UserStatus.ACTIVATED);
+
+	public static UserBatchDto mockUserBatchDto() {
+		UserBatchDto userBatchDto = new UserBatchDto();
+//		userBatchDto.setActivated(true);
+		userBatchDto.setAge(5);
+		userBatchDto.setFirstName("Juno_test");
+		userBatchDto.setEmail("no-email@junodx.com");
+		userBatchDto.setLastName("User");
+		userBatchDto.setId("1L");
+		userBatchDto.setLastOrderedAt(Calendar.getInstance());
+		userBatchDto.setPrimaryAddress(getMockAddress());
+//		userBatchDto.setStatus(UserStatus.ACTIVATED);
+//		userBatchDto.setUsername("General_test_user");
+		userBatchDto.setUserType(UserType.STANDARD);
+		return userBatchDto;
+
+	}
+
+	public static ForgotPasswordCode mockForgotPasswordCode() {
+		ForgotPasswordCode forgotPasswordCode = new ForgotPasswordCode();
+		forgotPasswordCode.setClientId("9348-8892-9342-01");
+		forgotPasswordCode.setCode(
+				"am9uKzQxQGp1bm9keC5jb206OTM0OC04ODkyLTkzNDItMDE6OWEzOTA4MDktMGY5My00MmY2LTljMjAtMzEwOWZhYWU4Zjk1");
+		forgotPasswordCode.setCreatedAt(Calendar.getInstance());
+		forgotPasswordCode.setExpiresAt(Calendar.getInstance());
+		forgotPasswordCode.setUser(mockUsers());
+		// forgotPasswordCode.setId(5L);
+		return forgotPasswordCode;
+
+	}
+
+	public static ForgotPasswordCode mockForgotPassword() {
+		ForgotPasswordCode forgotPasswordCode = new ForgotPasswordCode();
+		forgotPasswordCode.setClientId("9348-8892-9342-01");
+		forgotPasswordCode.setCode(
+				"am9uKzQxQGp1bm9keC5jb206OTM0OC04ODkyLTkzNDItMDE6OWEzOTA4MDktMGY5My00MmY2LTljMjAtMzEwOWZhYWU4Zjk1");
+		forgotPasswordCode.setCreatedAt(Calendar.getInstance());
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.YEAR, 2022);
+		cal.add(Calendar.MONTH, 8);
+		cal.add(Calendar.DAY_OF_MONTH, 8);
+		cal.add(Calendar.HOUR, 8);
+		cal.add(Calendar.MINUTE, 8);
+		forgotPasswordCode.setExpiresAt(cal);
+		forgotPasswordCode.setUser(mockUsers());
+		// forgotPasswordCode.setId(5L);
+		return forgotPasswordCode;
+
+	}
+
+	public static ForgotPasswordCode mockForgotPasswordCodes() {
+		ForgotPasswordCode forgotPasswordCode = new ForgotPasswordCode();
+		forgotPasswordCode.setClientId("9348-8892-9342-01");
+		forgotPasswordCode.setCode("toke");
+		forgotPasswordCode.setCreatedAt(Calendar.getInstance());
+		Calendar expiresAt = Calendar.getInstance();
+		expiresAt.before(Calendar.getInstance());
+		forgotPasswordCode.setExpiresAt(expiresAt);
+		forgotPasswordCode.setUser(mockUsers());
+		// forgotPasswordCode.setId(5L);
+		return forgotPasswordCode;
+
+	}
+
+	public static ChangePasswordPayload mockChangePasswordPayload() {
+		ChangePasswordPayload changePasswordPayload = new ChangePasswordPayload();
+		changePasswordPayload.setExistingPassword("Password&123");
+		changePasswordPayload.setNewPassword("Password&123");
+		changePasswordPayload.setUserId("1L");
+		return changePasswordPayload;
+
+	}
+
+	public static UserUpsertProviderPayload mockUserUpsertProviderPayload() {
+		UserUpsertProviderPayload userUpsertProviderPayload = new UserUpsertProviderPayload();
+		userUpsertProviderPayload.setAction(ADD_REMOVE.ADD);
+		userUpsertProviderPayload.setClientId("12345");
+		userUpsertProviderPayload.setProvider(getMockProvider());
+		return userUpsertProviderPayload;
+	}
+
+	public static UserUpsertProviderPayload mockUserUpsertProviderPayloadss() {
+		UserUpsertProviderPayload userUpsertProviderPayload = new UserUpsertProviderPayload();
+		userUpsertProviderPayload.setAction(ADD_REMOVE.REMOVE);
+		userUpsertProviderPayload.setClientId("123456");
+		userUpsertProviderPayload.setProvider(getMockProvider());
+		return userUpsertProviderPayload;
+	}
+
+	public static UserUpsertProviderPayload mockUserUpsertProviderPayloads() {
+		UserUpsertProviderPayload userUpsertProviderPayload = new UserUpsertProviderPayload();
+		userUpsertProviderPayload.setAction(ADD_REMOVE.ADD);
+		userUpsertProviderPayload.setClientId("");
+		userUpsertProviderPayload.setProvider(getMockProvider());
+		return userUpsertProviderPayload;
+	}
+
+	public static ChangePasswordPayload mockChangePasswordPayloads() {
+		ChangePasswordPayload changePasswordPayload = new ChangePasswordPayload();
+		// changePasswordPayload.setExistingPassword("Password&123");
+		// changePasswordPayload.setNewPassword("Password&123");
+		// changePasswordPayload.setUserId("12345");
+		return changePasswordPayload;
+
+	}
+
+	public static ChangePasswordPayload mockChangePasswordPayloadPassword() {
+		ChangePasswordPayload changePasswordPayload = new ChangePasswordPayload();
+		changePasswordPayload.setExistingPassword("Password&343");
+		changePasswordPayload.setNewPassword("Password&123");
+		changePasswordPayload.setUserId("12345");
+		return changePasswordPayload;
+
+	}
+
+	public static EmailChangePayload getMockEmailChangePayload() {
+		EmailChangePayload response = new EmailChangePayload();
+		response.setExistingEmail("no-email@junodx.com");
+		response.setChangeToEmail("anjus@gmail.com");
+		response.setUserId("1L");
+		response.setVerificationCodeExpiresAt(getVerificationCode().getExpiresAt());
+		response.setVerificationCodeSent(true);
+		return response;
+	}
+
+	public static EmailChange getMockEmailChange() {
+		EmailChange emailChange = new EmailChange();
+		emailChange.setExistingEmail("no-email@junodx.com");
+		emailChange.setNewEmail("anjus@gmail.com");
+		emailChange.setUserId(DataBuilder.getVerificationCode().getUser().getId());
+		emailChange.setCreatedAt(Calendar.getInstance());
+		Calendar expires = Calendar.getInstance();
+		int verificationCodeExpirationDuration = 60 * 60;
+		expires.add(Calendar.HOUR_OF_DAY, verificationCodeExpirationDuration);
+		emailChange.setExpiresAt(expires);
+		return emailChange;
+	}
+
+	public static EmailChange getMockEmailChanges() {
+		EmailChange emailChange = new EmailChange();
+		emailChange.setExistingEmail("no-email@junodx.com");
+		emailChange.setNewEmail("anjus@gmail.com");
+		emailChange.setUserId(DataBuilder.getVerificationCode().getUser().getId());
+		emailChange.setCreatedAt(Calendar.getInstance());
+		Calendar expires = Calendar.getInstance();
+//		int verificationCodeExpirationDuration = 60 * 60;
+//		expires.add(Calendar.HOUR_OF_DAY, verificationCodeExpirationDuration);
+		emailChange.setExpiresAt(expires);
+		return emailChange;
+	}
+
+	public static EmailChange getMockEmailChangeEmail() {
+		EmailChange emailChange = new EmailChange();
+		emailChange.setExistingEmail("email@junodx.com");
+		emailChange.setNewEmail("anjus@gmail.com");
+		emailChange.setUserId(DataBuilder.getVerificationCode().getUser().getId());
+		emailChange.setCreatedAt(Calendar.getInstance());
+		Calendar expires = Calendar.getInstance();
+		int verificationCodeExpirationDuration = 60 * 60;
+		expires.add(Calendar.HOUR_OF_DAY, verificationCodeExpirationDuration);
+		emailChange.setExpiresAt(expires);
+		return emailChange;
+	}
+
+	public static EmailChange getMockEmailChangeEmails() {
+		EmailChange emailChange = new EmailChange();
+		emailChange.setExistingEmail("no-email@junodx.com");
+		emailChange.setNewEmail("junos@gmail.com");
+		emailChange.setUserId(DataBuilder.getVerificationCode().getUser().getId());
+		emailChange.setCreatedAt(Calendar.getInstance());
+		Calendar expires = Calendar.getInstance();
+		int verificationCodeExpirationDuration = 60 * 60;
+		expires.add(Calendar.HOUR_OF_DAY, verificationCodeExpirationDuration);
+		emailChange.setExpiresAt(expires);
+		return emailChange;
+	}
+
+	public static VerificationCodeResponsePayload mockVerificationCodeResponsePayload() {
+		VerificationCodeResponsePayload verificationCodeResponsePayload = new VerificationCodeResponsePayload();
+		verificationCodeResponsePayload.setEmail("no-email@junodx.com");
+		verificationCodeResponsePayload.setSuccess(true);
+		verificationCodeResponsePayload.setUserId("1L");
+		return verificationCodeResponsePayload;
+	}
+
+	public static RegisterUserPayload mockRegisterUserPayload() {
+		RegisterUserPayload registerUserPayload = new RegisterUserPayload();
+		registerUserPayload.setClientId("9348-8892-9342-01");
+		registerUserPayload.setEmail("no-email@junodx.com");
+		registerUserPayload.setFirstName("Juno_test");
+		registerUserPayload.setLastName("User");
+		registerUserPayload.setPassword("Password&123");
+		registerUserPayload.setDob("15-12-1997");
+		registerUserPayload.setIdToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		registerUserPayload.setInsurancePolicy(mockInsurancePolicy());
+		registerUserPayload.setPatientDetails(mockPatientDetails());
+		registerUserPayload.setPhone(getMockPhone());
+		registerUserPayload.setPreferences(getMockPreferences());
+		registerUserPayload.setUserType(UserType.STANDARD);
+		return registerUserPayload;
+
+	}
+
+	public static RegisterUserPayload mockRegisterUserPayloadLmpDate() {
+		RegisterUserPayload registerUserPayload = new RegisterUserPayload();
+		registerUserPayload.setClientId("9348-8892-9342-01");
+		registerUserPayload.setEmail("no-email@junodx.com");
+		registerUserPayload.setFirstName("Juno_test");
+		registerUserPayload.setIdToken("12345");
+		registerUserPayload.setLastName("User");
+		registerUserPayload.setPassword("Password&123");
+		registerUserPayload.setDob("15-12-1997");
+		registerUserPayload.setIdToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		registerUserPayload.setInsurancePolicy(mockInsurancePolicy());
+		registerUserPayload.setPatientDetails(mockPatientDetailLmpDate());
+		registerUserPayload.setPhone(getMockPhone());
+		registerUserPayload.setPreferences(getMockPreferences());
+		registerUserPayload.setUserType(UserType.STANDARD);
+		return registerUserPayload;
+
+	}
+
+	public static RegisterUserPayload mockRegisterUserPayloadLmpDateNotEmpty() {
+		RegisterUserPayload registerUserPayload = new RegisterUserPayload();
+		registerUserPayload.setClientId("9348-8892-9342-01");
+		registerUserPayload.setEmail("no-email@junodx.com");
+		registerUserPayload.setFirstName("Juno_test");
+		registerUserPayload.setIdToken("12345");
+		registerUserPayload.setLastName("User");
+		registerUserPayload.setPassword("Password&123");
+		registerUserPayload.setDob("15-12-1997");
+		registerUserPayload.setIdToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		registerUserPayload.setInsurancePolicy(mockInsurancePolicy());
+		registerUserPayload.setPatientDetails(mockPatientDetailLmpDateNotEmpty());
+		registerUserPayload.setPhone(getMockPhone());
+		registerUserPayload.setPreferences(getMockPreferences());
+		registerUserPayload.setUserType(UserType.STANDARD);
+		return registerUserPayload;
+
+	}
+
+	public static PatientDetails mockPatientDetailLmpDateNotEmpty() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetailsLmpDateNotEmpty());
+		patientDetails.setMedications(medications);
+		patientDetails.setProviders(providers);
+		patientDetails.setUser(user);
+		return patientDetails;
+	}
+
+	public static MedicalDetails mockMedicalDetailsLmpDateNotEmpty() {
+		MedicalDetails medicalDetails = new MedicalDetails();
+		medicalDetails.setConceptionDate(Calendar.getInstance());
+		// medicalDetails.setLmpDate(Calendar.getInstance());
+		medicalDetails.setGestationalAge(8f);
+		medicalDetails.setId(8L);
+		medicalDetails.setLastUpdatedAt(Calendar.getInstance());
+		medicalDetails.setNoBloodTransfusion(false);
+		medicalDetails.setNoOrganTransplant(false);
+		medicalDetails.setNumberOfFetuses(5);
+		// medicalDetails.setPatientDetails(mockPatientDetails());
+		medicalDetails.setPregnant(false);
+		medicalDetails.setThreeOrMoreFetuses(false);
+		medicalDetails.setVitals(vitals);
+		return medicalDetails;
+
+	}
+
+	public static RegisterUserPayload mockRegisterUserPayloadInsuranceEmpty() {
+		RegisterUserPayload registerUserPayload = new RegisterUserPayload();
+		registerUserPayload.setClientId("9348-8892-9342-01");
+		registerUserPayload.setEmail("no-email@junodx.com");
+		registerUserPayload.setFirstName("Juno_test");
+		registerUserPayload.setIdToken("12345");
+		registerUserPayload.setLastName("User");
+		registerUserPayload.setPassword("Password&123");
+		registerUserPayload.setDob("15-12-1997");
+		registerUserPayload.setIdToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		registerUserPayload.setInsurancePolicy(mockInsurancePolicy());
+		registerUserPayload.setPatientDetails(mockPatientDetails());
+		registerUserPayload.setPhone(getMockPhone());
+		registerUserPayload.setPreferences(getMockPreferences());
+		registerUserPayload.setUserType(UserType.STANDARD);
+		return registerUserPayload;
+
+	}
+
+	public static RegisterUserPayload mockRegisterUserPayloadEmails() {
+		RegisterUserPayload registerUserPayload = new RegisterUserPayload();
+		registerUserPayload.setClientId("9348-8892-9342-01");
+		registerUserPayload.setEmail("junodx.com");
+		registerUserPayload.setFirstName("Juno_test");
+		registerUserPayload.setIdToken("12345");
+		registerUserPayload.setLastName("User");
+		registerUserPayload.setPassword("Password&123");
+		registerUserPayload.setUserType(UserType.STANDARD);
+		return registerUserPayload;
+
+	}
+
+	public static RegisterUserPayload mockRegisterUserPayloadEmailPassword() {
+		RegisterUserPayload registerUserPayload = new RegisterUserPayload();
+		registerUserPayload.setClientId("9348-8892-9342-01");
+		registerUserPayload.setEmail("junodx.com");
+		registerUserPayload.setFirstName("Juno_test");
+		registerUserPayload.setIdToken("12345");
+		registerUserPayload.setLastName("User");
+		registerUserPayload.setPassword("Passwords");
+		registerUserPayload.setUserType(UserType.STANDARD);
+		return registerUserPayload;
+
+	}
+
+	public static RegisterUserPayload mockRegisterUserPayloadFirst() {
+		RegisterUserPayload registerUserPayload = new RegisterUserPayload();
+		registerUserPayload.setClientId("12345");
+		registerUserPayload.setEmail("no-email@junodx.com");
+		registerUserPayload.setFirstName(null);
+		registerUserPayload.setIdToken("12345");
+		registerUserPayload.setLastName("User");
+		registerUserPayload.setPassword("Password&123");
+		registerUserPayload.setUserType(UserType.STANDARD);
+		return registerUserPayload;
+
+	}
+
+	public static RegisterUserPayload mockRegisterUserPayloads() {
+		RegisterUserPayload registerUserPayload = new RegisterUserPayload();
+		registerUserPayload.setClientId("12345");
+		registerUserPayload.setEmail("no-email@junodx.com");
+		registerUserPayload.setFirstName("Juno_test");
+		registerUserPayload.setIdToken("12345");
+		registerUserPayload.setLastName("User");
+		registerUserPayload.setPassword("passwr");
+		registerUserPayload.setUserType(UserType.STANDARD);
+		return registerUserPayload;
+	}
+
+	public static RegisterUserPayload mockRegisterUserPayloadEmail() {
+		RegisterUserPayload registerUserPayload = new RegisterUserPayload();
+		registerUserPayload.setClientId("12345");
+		registerUserPayload.setEmail(null);
+		registerUserPayload.setFirstName("Juno_test");
+		registerUserPayload.setIdToken("12345");
+		registerUserPayload.setLastName("User");
+		registerUserPayload.setPassword("passwr");
+		registerUserPayload.setUserType(UserType.STANDARD);
+		return registerUserPayload;
+	}
+
+	public static UserVerificationPayload payload() {
+		UserVerificationPayload payload = new UserVerificationPayload();
+		payload.setClientId("12345");
+		payload.setCode(getVerificationCode().generateCode());
+		payload.setEmail("no-email@junodx.com");
+		return payload;
+	}
+
+	public static UserVerificationPayload payloadexc() {
+
+		UserVerificationPayload payload = new UserVerificationPayload();
+		// payload.setClientId("12345");
+		// payload.setCode(getVerificationCode().generateCode());
+		// payload.setEmail("no-email@junodx.com");
+		return payload;
+
+	}
+
+	public static UserVerificationPayload payloadDifferent() {
+		UserVerificationPayload payload = new UserVerificationPayload();
+		payload.setClientId("34343");
+		payload.setCode(getVerificationCode().generateCode());
+		payload.setEmail("no-email@junodx.com");
+		return payload;
+
+	}
+
+	public static UserVerificationPayload payloads() {
+		UserVerificationPayload payload = new UserVerificationPayload();
+		payload.setClientId("12345");
+		// payload.setCode(getVerificationCode().generateCode());
+		// payload.setEmail("no-email@junodx.com");
+		return payload;
+
+	}
+
+	public static UserVerificationPayload payloadClient() {
+		UserVerificationPayload payload = new UserVerificationPayload();
+		// payload.setClientId("12345");
+		payload.setCode(getVerificationCode().generateCode());
+		payload.setEmail("no-email@junodx.com");
+		return payload;
+
+	}
+
+	public static UserVerificationPayload payloadss() {
+		UserVerificationPayload payload = new UserVerificationPayload();
+		payload.setClientId("12345");
+		payload.setCode(getVerificationCode().generateCode());
+		payload.setEmail("juno@junodx.com");
+		return payload;
+
+	}
+
+	public static Provider getMockProvider() {
+		Provider provider = new Provider();
+		provider.setContactAddress(getMockAddress());
+		provider.setContactPhone(getMockPhone());
+		provider.setDefaultProvider(false);
+		provider.setEmail("no-email@junodx.com");
+		provider.setFirstName("Juno_test");
+		// UUID productId = UUID.fromString("ac358df7-4a38-4ad0-b070-59adcd57dde0");
+		provider.setId("12345");
+		provider.setLastName("User");
+//		List<MedicalLicense> license=new ArrayList<MedicalLicense>();
+//		license.add(getMockMedicalLicense() );
+		// provider.setLicenses(license);
+		provider.setLimsId("1234");
+		// provider.setMeta(getMockMeta());
+		provider.setNpi("1224");
+		// provider.setPractice(getMockPractice());
+		provider.setXifinId("1234");
+		return provider;
+	}
+
+	public static List<MedicalLicense> licenses = new ArrayList<>();
+
+	public static ProviderRemoveLicensesPayload getProviderRemoveLicensesPayload() {
+		ProviderRemoveLicensesPayload providerRemoveLicensesPayload = new ProviderRemoveLicensesPayload();
+		providerRemoveLicensesPayload.setLicenses(licenses);
+		providerRemoveLicensesPayload.setProviderId("12345");
+		return providerRemoveLicensesPayload;
+
+	}
+
+	public static List<Specialty> specialties = new ArrayList<>();
+
+	public static ProviderRemoveSpecialtiesPayload getProviderRemoveSpecialtiesPayload() {
+		ProviderRemoveSpecialtiesPayload providerRemoveSpecialtiesPayload = new ProviderRemoveSpecialtiesPayload();
+		providerRemoveSpecialtiesPayload.setProviderId("12345");
+		providerRemoveSpecialtiesPayload.setSpecialties(specialties);
+		return providerRemoveSpecialtiesPayload;
+	}
+
+	public static Specialty getSpecialty() {
+		Specialty specialty = new Specialty();
+		specialty.setId(8L);
+		specialty.setProvider(getMockProvider());
+		specialty.setType(SpecialtyType.GYNECOLOGY);
+		return specialty;
+	}
+
+	public static Specialty getSpecialtys() {
+		Specialty specialty = new Specialty();
+		specialty.setId(8L);
+		specialty.setProvider(getMockProvider());
+		specialty.setType(SpecialtyType.INTERNAL_MEDICINE);
+		return specialty;
+	}
+
+	public static Provider getMockProviders() {
+		Provider provider = new Provider();
+		provider.setContactAddress(getMockAddress());
+		provider.setContactPhone(getMockPhone());
+		provider.setDefaultProvider(false);
+		provider.setEmail("no-email@junodx.com");
+		provider.setFirstName("Juno_test");
+		// UUID productId = UUID.fromString("ac358df7-4a38-4ad0-b070-59adcd57dde0");
+		provider.setId("12345");
+		provider.setLastName("User");
+//		List<MedicalLicense> license=new ArrayList<MedicalLicense>();
+//		license.add(getMockMedicalLicense() );
+		// provider.setLicenses(license);
+		provider.setLimsId("1234");
+		// provider.setMeta(getMockMeta());
+		provider.setNpi("1224");
+		provider.setPractice(getMockPractice());
+		provider.setXifinId("1234");
+		return provider;
+	}
+//	public static UserUpdatePayload mockuserUpdatePayload = new UserUpdatePayload("1L", "Juno_test", "User",
+//			"no-email@junodx.com", getMockPhone(), "15-12-1997", getMockAddress(), getMockAddress(), "123456657",
+//			"34677676", UserType.STANDARD);
+
+	public static UserUpdatePayload mockuserUpdatePayloadss() {
+		UserUpdatePayload userUpdatePayload = new UserUpdatePayload();
+		userUpdatePayload.setBillingAddress(getMockAddress());
+		userUpdatePayload.setDateOfBirth("15-12-1997");
+		userUpdatePayload.setEmail("no-email@junodx.com");
+		userUpdatePayload.setFirstName("Juno_test");
+		userUpdatePayload.setId("1L");
+		userUpdatePayload.setLastName("User");
+		userUpdatePayload.setLimsContactId("123456657");
+		// userUpdatePayload.setPatientDetails(mockUserUpdatePatientDetailsPayload());
+		// userUpdatePayload.setPreferences(userUpdatePreferencesPayload);
+		userUpdatePayload.setPrimaryAddress(getMockAddress());
+		userUpdatePayload.setPrimaryPhone(getMockPhone());
+		userUpdatePayload.setStripeCustomerId("34677676");
+		userUpdatePayload.setUserType(UserType.STANDARD);
+		return userUpdatePayload;
+
+	}
+
+	public static UserUpdatePayload mockuserUpdatePayloadId() {
+		UserUpdatePayload userUpdatePayload = new UserUpdatePayload();
+		userUpdatePayload.setBillingAddress(getMockAddress());
+		userUpdatePayload.setDateOfBirth("15-12-1997");
+		userUpdatePayload.setEmail("no-email@junodx.com");
+		userUpdatePayload.setFirstName("Juno_test");
+		// userUpdatePayload.setId("8L");
+		userUpdatePayload.setLastName("User");
+		userUpdatePayload.setLimsContactId("123456657");
+		// userUpdatePayload.setPatientDetails(mockUserUpdatePatientDetailsPayload());
+		// userUpdatePayload.setPreferences(userUpdatePreferencesPayload);
+		userUpdatePayload.setPrimaryAddress(getMockAddress());
+		userUpdatePayload.setPrimaryPhone(getMockPhone());
+		userUpdatePayload.setStripeCustomerId("34677676");
+		userUpdatePayload.setUserType(UserType.STANDARD);
+		return userUpdatePayload;
+
+	}
+
+	public static UserUpdatePayload mockuserUpdatePayloadAdress() {
+		UserUpdatePayload userUpdatePayload = new UserUpdatePayload();
+		userUpdatePayload.setBillingAddress(getMockAddress());
+		userUpdatePayload.setDateOfBirth("15-12-1997");
+		userUpdatePayload.setEmail("no-email@junodx.com");
+		userUpdatePayload.setFirstName("Juno_tests");
+		userUpdatePayload.setId("1L");
+		userUpdatePayload.setLastName("Users");
+		userUpdatePayload.setLimsContactId("123456657");
+		userUpdatePayload.setPatientDetails(mockUserUpdatePatientDetailsPayload());
+		userUpdatePayload.setPreferences(mockUserUpdatePreferencesPayload());
+		userUpdatePayload.setPrimaryAddress(getMockAddress());
+		userUpdatePayload.setPrimaryPhone(getMockPhone());
+		userUpdatePayload.setStripeCustomerId("3467767688");
+		userUpdatePayload.setUserType(UserType.STANDARD);
+		// userUpdatePayload.setInsurancePolicy(mockInsurancePolicy());
+		return userUpdatePayload;
+	}
+
+	public static SalesforceUserDto mockSalesforceUserDto() throws StripeException {
+		SalesforceUserDto salesforceUserDto = new SalesforceUserDto();
+		salesforceUserDto.setActivated(false);
+		salesforceUserDto.setActivationTs(Calendar.getInstance());
+		salesforceUserDto.setAge(1);
+		salesforceUserDto.setBillingAddress(mockSalesforceAddressDto());
+		salesforceUserDto.setClientId("12345");
+		salesforceUserDto.setDateOfBirth("15-12-1997");
+		salesforceUserDto.setEmail("no-email@junodx.com");
+		salesforceUserDto.setFirstName("Juno_test");
+		salesforceUserDto.setLastLoggedIn(Calendar.getInstance());
+		salesforceUserDto.setId("1L");
+		salesforceUserDto.setLimsContactId("1234");
+		salesforceUserDto.setMeta(getMockMeta());
+		salesforceUserDto.setPatientDetails(mockPatientDetails());
+		salesforceUserDto.setPreferences(getMockPreferences());
+		salesforceUserDto.setPrimaryAddress(mockSalesforceAddressDto());
+		salesforceUserDto.setPrimaryPhone(getMockPhone());
+		salesforceUserDto.setStatus(UserStatus.NEW);
+//		Map<String, Object> paramsC = new HashMap<>();
+//		Customer customers = Customer.create(paramsC);
+		// Stripe stripe = new Stripe(stripe.apiKey);
+		salesforceUserDto.setStripeCustomerId(UUID.randomUUID().toString());
+		salesforceUserDto.setXifinPatientId("1234");
+		return salesforceUserDto;
+	}
+
+	public static SalesforceAddressDto mockSalesforceAddressDto() {
+		SalesforceAddressDto salesforceAddressDto = new SalesforceAddressDto();
+		salesforceAddressDto.setCity("San Diego");
+		salesforceAddressDto.setCountry("United States");
+		salesforceAddressDto.setName("Juno Headquarters");
+		salesforceAddressDto.setPostalCode("98077");
+		salesforceAddressDto.setPrimaryAddress(true);
+		salesforceAddressDto.setPrimaryMailingAddress(true);
+		salesforceAddressDto.setResidential(false);
+		salesforceAddressDto.setStreet("11511 Sorrento Valley Rd");
+
+		return salesforceAddressDto;
+	}
+
+	public static UserUpdatePayload mockuserUpdatePayloadAddresss() {
+		UserUpdatePayload userUpdatePayload = new UserUpdatePayload();
+		userUpdatePayload.setBillingAddress(getMockAddress());
+		userUpdatePayload.setDateOfBirth("15-12-1997");
+		userUpdatePayload.setEmail("no-email@junodx.com");
+		userUpdatePayload.setFirstName("Juno_test");
+		userUpdatePayload.setId("1L");
+		userUpdatePayload.setLastName("User");
+		userUpdatePayload.setLimsContactId("123456657");
+		userUpdatePayload.setPatientDetails(mockUserUpdatePatientDetailsPayload());
+		userUpdatePayload.setPreferences(mockUserUpdatePreferencesPayload());
+		userUpdatePayload.setPrimaryAddress(getMockAddress());
+		userUpdatePayload.setPrimaryPhone(getMockPhone());
+		userUpdatePayload.setStripeCustomerId("3467767688");
+		userUpdatePayload.setUserType(UserType.STANDARD);
+		userUpdatePayload.setInsurancePolicy(mockInsurancePolicy());
+		return userUpdatePayload;
+
+	}
+
+	public static UserUpdatePayload mockuserUpdatePayloadAddresEmail() {
+		UserUpdatePayload userUpdatePayload = new UserUpdatePayload();
+		userUpdatePayload.setBillingAddress(getMockAddress());
+		userUpdatePayload.setDateOfBirth("15-12-1997");
+		userUpdatePayload.setEmail("email@junodx.com");
+		userUpdatePayload.setFirstName("Juno_test");
+		userUpdatePayload.setId("1L");
+		userUpdatePayload.setLastName("User");
+		userUpdatePayload.setLimsContactId("123456657");
+		userUpdatePayload.setPatientDetails(mockUserUpdatePatientDetailsPayload());
+		userUpdatePayload.setPreferences(mockUserUpdatePreferencesPayload());
+		userUpdatePayload.setPrimaryAddress(getMockAddress());
+		userUpdatePayload.setPrimaryPhone(getMockPhone());
+		userUpdatePayload.setStripeCustomerId("3467767688");
+		userUpdatePayload.setUserType(UserType.STANDARD);
+		userUpdatePayload.setInsurancePolicy(mockInsurancePolicy());
+		return userUpdatePayload;
+
+	}
+
+	public static UserUpdatePayload mockuserUpdatePayloadAddresEmailEmpty() {
+		UserUpdatePayload userUpdatePayload = new UserUpdatePayload();
+		userUpdatePayload.setBillingAddress(getMockAddress());
+		userUpdatePayload.setDateOfBirth("15-12-1997");
+		userUpdatePayload.setEmail("email@junodx.com");
+		userUpdatePayload.setFirstName("Juno_test");
+		userUpdatePayload.setId("1L");
+		userUpdatePayload.setLastName("User");
+		userUpdatePayload.setLimsContactId("123456657");
+		userUpdatePayload.setPatientDetails(mockUserUpdatePatientDetailsPayload());
+		userUpdatePayload.setPreferences(mockUserUpdatePreferencesPayload());
+		userUpdatePayload.setPrimaryAddress(getMockAddress());
+		userUpdatePayload.setPrimaryPhone(getMockPhone());
+		userUpdatePayload.setStripeCustomerId("3467767688");
+		userUpdatePayload.setUserType(UserType.STANDARD);
+		userUpdatePayload.setInsurancePolicy(mockInsurancePolicy());
+		return userUpdatePayload;
+
+	}
+
+	public static UserUpdatePayload mockuserUpdatePayloadAddress() {
+		UserUpdatePayload userUpdatePayload = new UserUpdatePayload();
+		userUpdatePayload.setBillingAddress(getMockAddress());
+		userUpdatePayload.setDateOfBirth("15-12-1997");
+		userUpdatePayload.setEmail("juno@junodx.com");
+		userUpdatePayload.setFirstName("Juno_test");
+		userUpdatePayload.setId("12345");
+		userUpdatePayload.setLastName("User");
+		userUpdatePayload.setLimsContactId("123456657");
+		userUpdatePayload.setPatientDetails(mockUserUpdatePatientDetailsPayload());
+		userUpdatePayload.setPreferences(mockUserUpdatePreferencesPayload());
+		userUpdatePayload.setPrimaryAddress(getMockAddress());
+		userUpdatePayload.setPrimaryPhone(getMockPhone());
+		userUpdatePayload.setStripeCustomerId("34677676");
+		userUpdatePayload.setUserType(UserType.STANDARD);
+		return userUpdatePayload;
+
+	}
+
+	public static UserUpdatePayload mockuserUpdatePayloadAddresselse() {
+		UserUpdatePayload userUpdatePayload = new UserUpdatePayload();
+		userUpdatePayload.setBillingAddress(getMockAddress());
+		userUpdatePayload.setDateOfBirth("15-12-1997");
+		userUpdatePayload.setEmail("juno@junodx.com");
+		userUpdatePayload.setFirstName("Juno_test");
+		userUpdatePayload.setId("12345");
+		userUpdatePayload.setLastName("User");
+		userUpdatePayload.setLimsContactId("123456657");
+		userUpdatePayload.setPatientDetails(mockUserUpdatePatientDetailsPayloads());
+		userUpdatePayload.setPreferences(mockUserUpdatePreferencesPayload());
+		userUpdatePayload.setPrimaryAddress(getMockAddress());
+		userUpdatePayload.setPrimaryPhone(getMockPhone());
+		userUpdatePayload.setStripeCustomerId("34677676");
+		userUpdatePayload.setUserType(UserType.STANDARD);
+		return userUpdatePayload;
+
+	}
+
+	public static UserUpdatePayload mockuserUpdatePayloads() {
+		UserUpdatePayload userUpdatePayload = new UserUpdatePayload();
+		userUpdatePayload.setBillingAddress(getMockAddress());
+		userUpdatePayload.setDateOfBirth("15-12-1997");
+		userUpdatePayload.setEmail("juno@junodx.com");
+		userUpdatePayload.setFirstName("Juno_test");
+		userUpdatePayload.setId("12345");
+		userUpdatePayload.setLastName("User");
+		userUpdatePayload.setLimsContactId("123456657");
+		userUpdatePayload.setPatientDetails(mockUserUpdatePatientDetailsPayload());
+		userUpdatePayload.setPreferences(mockUserUpdatePreferencesPayload());
+		userUpdatePayload.setPrimaryAddress(getMockAddress());
+		userUpdatePayload.setPrimaryPhone(getMockPhone());
+		userUpdatePayload.setStripeCustomerId("34677676");
+		userUpdatePayload.setUserType(UserType.STANDARD);
+		return userUpdatePayload;
+
+	}
+
+	public static List<GrantedAuthority> authorities = user.getAuthorities().stream()
+			.map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+	public static UserDetailsImpl userDetailsImpls = (UserDetailsImpl) new UserDetailsImpl(null, null,
+			"no-email@junodx.com", null, null, null, authorities);
+	public static UsernamePasswordAuthenticationToken usernamePasswordAuthenticationTokens = new UsernamePasswordAuthenticationToken(
+			userDetailsImpls, "Password&124");
+
+	public static UsernamePasswordAuthenticationToken usernamePasswordAuthenticationTokenProvider = new UsernamePasswordAuthenticationToken(
+			getMockUserDetailsImpls(), "Password&124");
+	public static UsernamePasswordAuthenticationToken usernamePasswordAuthenticationTokenProviderException = new UsernamePasswordAuthenticationToken(
+			getMockUserDetailsImplsss(), "Password&124");
+
+	public static UserDetailsImpl getMockUserDetailsImplsss() {
+		UserDetailsImpl userDetailsImpls = new UserDetailsImpl(1L, null, null, null, null, null, authorities);
+		// userDetailsImpls.setPracticeId("88L");
+		userDetailsImpls.setType(UserType.LAB);
+		return userDetailsImpls;
+
+	}
+//	public static UserDetailsImpl getMockUserDetailsImpls() {
+//		UserDetailsImpl userDetailsImpls = new UserDetailsImpl();
+//		// userDetailsImpls.setClientId("12345");
+//		// userDetailsImpls.setEmail("no-email@junodx.com");
+//		// userDetailsImpls.setId(1L);
+//		// userDetailsImpls.setPassword("Password&124");
+//		// userDetailsImpls.setUserId("1L");
+//		// userDetailsImpls.setUsername(user.getUsername());
+//		userDetailsImpls.setAuthorities(authorities);
+//		return userDetailsImpls;
+//	}
+
+	public static UserDetailsImpl userDetailsImpl = (UserDetailsImpl) new UserDetailsImpl(1L, "General_test_user",
+			"no-email@junodx.com", "1L", "Password&123", "12345", authorities);
+	public static UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+			userDetailsImpl, "Password&123");
+
+	public static UserDetailsImpl getMockUserDetailsImpl() {
+		UserDetailsImpl userDetailsImpls = new UserDetailsImpl(1L, "General_test_user", "no-email@junodx.com", "1L",
+				"Password&123", null, authorities);
+		userDetailsImpls.setPracticeId("2L");
+		userDetailsImpls.setType(UserType.LAB);
+		return userDetailsImpls;
+
+	}
+
+	public static UserDetailsImpl getMockUserDetailsImpls() {
+		UserDetailsImpl userDetailsImpls = new UserDetailsImpl(1L, "General_test_user", "no-email@junodx.com", "8L",
+				"Password&123", null, authorities);
+		userDetailsImpls.setPracticeId("2L");
+		userDetailsImpls.setType(UserType.LAB);
+		return userDetailsImpls;
+
+	}
+
+	public static UserDetailsImpl getMockUserDetailsImplId() {
+		UserDetailsImpl userDetailsImpls = new UserDetailsImpl(1L, "General_test_user", "no-email@junodx.com", "8L",
+				"Password&123", null, authorities);
+		userDetailsImpls.setPracticeId("b1ee000c-f947-46d9-b3df-e5f53cae34b3");
+		userDetailsImpls.setType(UserType.LAB);
+		return userDetailsImpls;
+
+	}
+
+	public static UserDetailsImpl getMockUserDetailsImplIds() {
+		UserDetailsImpl userDetailsImpls = new UserDetailsImpl(1L, "General_test_user", "no-email@junodx.com",
+				"b1ee000c-f947-46d9-b3df-e5f53cae34b3444", "Password&123", null, authorities);
+		userDetailsImpls.setPracticeId("b1ee000c-f947-46d9-b3df-e5f53cae34b3444");
+		userDetailsImpls.setType(UserType.LAB);
+		return userDetailsImpls;
+
+	}
+
+//	public static UserUpdatePayload mockuserUpdatePayload = new UserUpdatePayload("1L", "Juno_test", "User",
+//			"no-email@junodx.com", getMockPhone(), "15-12-1997", getMockAddress(), getMockAddress(), "123456657",
+//			"34677676", UserType.STANDARD);
+
+	public static UserUpdatePayload mockuserUpdatePayload() {
+		UserUpdatePayload userUpdatePayload = new UserUpdatePayload();
+		userUpdatePayload.setBillingAddress(getMockAddress());
+		userUpdatePayload.setDateOfBirth("15-12-1997");
+		userUpdatePayload.setEmail("no-email@junodx.com");
+		userUpdatePayload.setFirstName("Juno_test");
+		userUpdatePayload.setId("1L");
+		userUpdatePayload.setLastName("User");
+		userUpdatePayload.setLimsContactId("123456657");
+		userUpdatePayload.setPatientDetails(mockUserUpdatePatientDetailsPayload());
+		userUpdatePayload.setPreferences(mockUserUpdatePreferencesPayload());
+		userUpdatePayload.setPrimaryAddress(getMockAddress());
+		userUpdatePayload.setPrimaryPhone(getMockPhone());
+		userUpdatePayload.setStripeCustomerId("3467767688");
+		userUpdatePayload.setUserType(UserType.STANDARD);
+		userUpdatePayload.setInsurancePolicy(mockInsurancePolicy());
+		return userUpdatePayload;
+
+	}
+
+	public static UserDetailsImpl getMockUserDetailsImplss() {
+		UserDetailsImpl userDetailsImpls = new UserDetailsImpl(1L, "General_test_user", "no-email@junodx.com", "8L",
+				"Password&123", null, authorities);
+		userDetailsImpls.setPracticeId("6L");
+		userDetailsImpls.setType(UserType.LAB);
+		return userDetailsImpls;
+
+	}
+
+	public static UserDetailsImpl getMockUserDetailsImplPractice() {
+		UserDetailsImpl userDetailsImpls = new UserDetailsImpl(1L, "General_test_user", "no-email@junodx.com", "1L",
+				"Password&123", null, authorities);
+		userDetailsImpls.setPracticeId("b1ee000c-f947-46d9-b3df-e5f53cae34b3");
+		userDetailsImpls.setType(UserType.LAB);
+		return userDetailsImpls;
+
+	}
+
+	public static UsernamePasswordAuthenticationToken usernamePasswordAuthenticationTokenClient = new UsernamePasswordAuthenticationToken(
+			getMockUserDetailsImpl(), "Password&123");
+
+	public static UserDetailsImpl userDetailsImplAuthoritativeRelationship = (UserDetailsImpl) new UserDetailsImpl(1L,
+			"General_test_user", "no-email@junodx.com", "76c97d43-347f-4132-ba18-ddf3b313c226", "Password&123", "12345",
+			authorities);
+
+	public static UsernamePasswordAuthenticationToken usernamePasswordAuthenticationTokenAuthoritativeRelationship = new UsernamePasswordAuthenticationToken(
+			userDetailsImplAuthoritativeRelationship, "Password&123");
+
+//	public static UserDetailsImpl getMockUserDetailsImpl() {
+//		UserDetailsImpl userDetailsImpls = new UserDetailsImpl();
+//		userDetailsImpls.setClientId("12345");
+//		userDetailsImpls.setEmail("no-email@junodx.com");
+//		userDetailsImpls.setId(1L);
+//		userDetailsImpls.setPassword("Password&123");
+//		userDetailsImpls.setUserId("1L");
+//		userDetailsImpls.setUsername(user.getUsername());
+//		userDetailsImpls.setAuthorities(authorities);
+//		return userDetailsImpls;
+//	}
+
+	public static MedicalLicense getMockMedicalLicense() {
+		MedicalLicense medicalLicense = new MedicalLicense();
+		medicalLicense.setId(3L);
+		medicalLicense.setExpires(Calendar.getInstance());
+		medicalLicense.setIssueDate(Calendar.getInstance());
+		medicalLicense.setLicenseType("types");
+		medicalLicense.setLicensingBoard("Boarding");
+		medicalLicense.setStatus(ACTIVITY.ACTIVE);
+		medicalLicense.setLicenseNumber("1234567");
+		medicalLicense.setProvider(getMockProvider());
+		medicalLicense.setState(State.INDIANA);
+		return medicalLicense;
+	}
+
+	public static MedicalLicense getMockMedicalLicenses() {
+		MedicalLicense medicalLicense = new MedicalLicense();
+		medicalLicense.setId(8L);
+		medicalLicense.setExpires(Calendar.getInstance());
+		medicalLicense.setIssueDate(Calendar.getInstance());
+		medicalLicense.setLicenseType("type");
+		medicalLicense.setLicensingBoard("board");
+		medicalLicense.setStatus(ACTIVITY.INACTIVE);
+		medicalLicense.setLicenseNumber("1234567");
+		medicalLicense.setProvider(getMockProvider());
+		medicalLicense.setState(State.ALABAMA);
+		return medicalLicense;
+	}
+
+	public static MedicalLicense getMockMedicalLicenseNumbers() {
+		MedicalLicense medicalLicense = new MedicalLicense();
+		medicalLicense.setId(8L);
+		medicalLicense.setExpires(Calendar.getInstance());
+		medicalLicense.setIssueDate(Calendar.getInstance());
+		medicalLicense.setLicenseType("type");
+		medicalLicense.setLicensingBoard("board");
+		medicalLicense.setStatus(ACTIVITY.INACTIVE);
+		medicalLicense.setLicenseNumber("12345678");
+		medicalLicense.setProvider(getMockProvider());
+		medicalLicense.setState(State.ALABAMA);
+		return medicalLicense;
+	}
+
+	public static MedicalLicense getMockMedicalLicenseState() {
+		MedicalLicense medicalLicense = new MedicalLicense();
+		medicalLicense.setId(3L);
+		medicalLicense.setLicenseNumber("1234567");
+		medicalLicense.setProvider(getMockProvider());
+		medicalLicense.setState(State.INDIANA);
+		return medicalLicense;
+	}
+
+	public static Preferences getMockPreferencePreferenceDetails() {
+		Preferences preferences = new Preferences();
+		preferences.setId(UUID.randomUUID().toString());
+		preferences.setOptOut(false);
+		preferences.setSmsMessages(false);
+		preferences.setFstPreferences(getMockFetalSexResultsPreferences());
+		preferences.setUser(user);
+		return preferences;
+	}
+
+	public static Preferences getMockPreference() {
+		Preferences preferences = new Preferences();
+		preferences.setId(UUID.randomUUID().toString());
+		preferences.setOptOut(false);
+		preferences.setSmsMessages(false);
+		preferences.setFstPreferences(getMockFetalSexResultsPreferences());
+		// preferences.setUser(user);
+		return preferences;
+	}
+
+	public static Preferences getMockupdatePreferences() {
+		Preferences preferences = new Preferences();
+		preferences.setId(UUID.randomUUID().toString());
+		preferences.setOptOut(true);
+		preferences.setSmsMessages(true);
+		preferences.setFstPreferences(null);
+		// preferences.setUser(user);
+		return preferences;
+	}
+
+	public static Preferences getMockPreferenceFstResultsDelegatedEmail() {
+		Preferences preferences = new Preferences();
+		preferences.setId(UUID.randomUUID().toString());
+		preferences.setOptOut(false);
+		preferences.setSmsMessages(false);
+		preferences.setFstPreferences(getMockFetalSexResultsPreferencesFstResultsDelegatedEmail());
+		// preferences.setUser(user);
+		return preferences;
+	}
+
+	public static FetalSexResultsPreferences getMockFetalSexResultsPreferencesFstResultsDelegatedEmail() {
+		FetalSexResultsPreferences fetalSexResultsPreferences = new FetalSexResultsPreferences();
+		fetalSexResultsPreferences.setFstResultsDelegatedEmail("no-email@junodx.com");
+		fetalSexResultsPreferences.setGenderDelegated(true);
+		fetalSexResultsPreferences.setGenderFanfare(true);
+		fetalSexResultsPreferences.setGenderTerms(null);
+		return fetalSexResultsPreferences;
+	}
+
+	public static Preferences getMockPreferenceFstResultsGenderTerms() {
+		Preferences preferences = new Preferences();
+		preferences.setId(UUID.randomUUID().toString());
+		preferences.setOptOut(false);
+		preferences.setSmsMessages(false);
+		preferences.setFstPreferences(getMockFetalSexResultsPreferencesGenderTerms());
+		// preferences.setUser(user);
+		return preferences;
+	}
+
+	public static FetalSexResultsPreferences getMockFetalSexResultsPreferencesGenderTerms() {
+		FetalSexResultsPreferences fetalSexResultsPreferences = new FetalSexResultsPreferences();
+		fetalSexResultsPreferences.setFstResultsDelegatedEmail("no-email@junodx.com");
+		fetalSexResultsPreferences.setGenderDelegated(true);
+		fetalSexResultsPreferences.setGenderFanfare(true);
+		fetalSexResultsPreferences.setGenderTerms(GenderTerms.XX_XY);
+		return fetalSexResultsPreferences;
+	}
+
+	public static PurchaseWithTokenPayload getMockPurchaseWithTokenPayload() {
+		PurchaseWithTokenPayload purchaseWithTokenPayload = new PurchaseWithTokenPayload();
+		purchaseWithTokenPayload.setToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+
+		return purchaseWithTokenPayload;
+	}
+
+	public static Preferences getMockPreferences() {
+		Preferences preferences = new Preferences();
+		preferences.setId(UUID.randomUUID().toString());
+		preferences.setOptOut(false);
+		preferences.setSmsMessages(false);
+		// preferences.setFstPreferences(getMockFetalSexResultsPreferences());
+		preferences.setUser(user);
+		return preferences;
+	}
+
+	public static OAuthClient mockgetOAuthClient() {
+		OAuthClient oAuthClient = new OAuthClient();
+		oAuthClient.setAccessTokenValidityDuration(86400000);
+		oAuthClient.setAccountUser(user);
+		oAuthClient.setAwsRegion("us-east-2");
+		oAuthClient.setClientId("AKIAVD5K7Y5MSAT5SVMF");
+		oAuthClient.setClientSecret("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");
+		oAuthClient.setCognitoUserPoolId("us-east-2_zlz47vUAR");
+		oAuthClient.setGrantTypes("client_credentials");
+		oAuthClient.setId("1");
+		oAuthClient.setName("name");
+		oAuthClient.setScope(null);
+		oAuthClient.setUsesAWSCognito(false);
+		return oAuthClient;
+	}
+
+	public static RefreshToken mockRefreshToken() {
+		RefreshToken refreshToken = new RefreshToken();
+		refreshToken.setExpiryDate(Instant.now());
+		refreshToken.setId(8L);
+		refreshToken.setToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		refreshToken.setUser(mockUser());
+		return refreshToken;
+
+	}
+
+	public static RefreshToken mockRefreshTokens() {
+		RefreshToken refreshToken = new RefreshToken();
+		refreshToken.setExpiryDate(Instant.MAX);
+		refreshToken.setId(8L);
+		refreshToken.setToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		refreshToken.setUser(mockUser());
+		return refreshToken;
+
+	}
+
+	public static AccessToken mockAccessToken() {
+
+		AccessToken accessToken = new AccessToken();
+		accessToken.setExpiryDate(Instant.now());
+		accessToken.setId(8L);
+		accessToken.setToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		accessToken.setUser(mockUser());
+		return accessToken;
+
+	}
+
+	public static AccessToken mockAccessTokens() {
+
+		AccessToken accessToken = new AccessToken();
+		accessToken.setExpiryDate(Instant.MAX);
+		accessToken.setId(8L);
+		accessToken.setToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		accessToken.setUser(mockUser());
+		return accessToken;
+
+	}
+
+	public static OAuthClient mockgetOAuthClientSecretEmpty() {
+		OAuthClient oAuthClient = new OAuthClient();
+		oAuthClient.setAccessTokenValidityDuration(86400000);
+		oAuthClient.setAccountUser(user);
+		oAuthClient.setAwsRegion("us-east-2");
+		oAuthClient.setClientId("AKIAVD5K7Y5MSAT5SVMF");
+		oAuthClient.setClientSecret(null);
+		oAuthClient.setCognitoUserPoolId("us-east-2_zlz47vUAR");
+		oAuthClient.setGrantTypes("client_credentials");
+		oAuthClient.setId("1");
+		oAuthClient.setName("name");
+		oAuthClient.setScope(null);
+		oAuthClient.setUsesAWSCognito(false);
+		return oAuthClient;
+	}
+
+	public static CreateAccessionPayload mockCreateAccessionPayload() {
+		CreateAccessionPayload CreateAccessionPayload = new CreateAccessionPayload();
+		CreateAccessionPayload.setMessageHeader(mockMessageHeader());
+		CreateAccessionPayload.setPayload(mockAccessionPayload());
+		return CreateAccessionPayload;
+	}
+
+	public static MessageHeader mockMessageHeader() {
+		MessageHeader messageHeader = new MessageHeader();
+		messageHeader.setOrgAlias("Org");
+		messageHeader.setOrganizationName("Junos");
+		messageHeader.setSequenceNumber("123455");
+		messageHeader.setSourceApplication("Appplication");
+		messageHeader.setUserId("1L");
+		return messageHeader;
+
+	}
+
+	public static AccessionPayload mockAccessionPayload() {
+		AccessionPayload accessionPayload = new AccessionPayload();
+		accessionPayload.setCreateAccession(mockCreateAccession());
+		return accessionPayload;
+	}
+
+	public static CreateAccession mockCreateAccession() {
+		CreateAccession createAccession = new CreateAccession();
+		createAccession.setAccessionContactInfo(null);
+		createAccession.setAccessionId(null);
+		createAccession.setAccessionLevelDiagnosisCodes(null);
+		createAccession.setAdditionalReportCopy(null);
+		createAccession.setAdmitDate(null);
+		createAccession.setCallBack(false);
+		createAccession.setCallBackPhone(null);
+		createAccession.setChainOfCustody(null);
+		createAccession.setClinicalTrial(null);
+		createAccession.setClientId("");
+		createAccession.setCheckClientBillingRules(false);
+		createAccession.setClientBillingCategory(null);
+		createAccession.setCreateOrUpdatePatientDemo(false);
+		createAccession.setDateOfService(null);
+		createAccession.setStat(false);
+		createAccession.setReturnErrors(false);
+		createAccession.setReportCopyToPatient(false);
+		createAccession.setPhysicianSignatureOnFile(false);
+		return createAccession;
+	}
+
+	public static List<ReportTypes> reportTypesLims = new ArrayList<>();
+	public static List<ElementsDataSources> dataSourcesLims = new ArrayList<>();
+
+	public static ReportTypes mockReportTypes() {
+		ReportTypes reportTypes = new ReportTypes();
+		reportTypes.setId(1L);
+		reportTypes.setLimsConfiguration(mockLIMSConfigurationEntity());
+		reportTypes.setLimsId("8L");
+		reportTypes.setName("lims");
+		reportTypes.setReportConfiguration(ReportConfiguration.FST);
+		return reportTypes;
+
+	}
+
+	public static LIMSConfigurationEntity mockLIMSConfigurationEntityLimsAnotherExamples() {
+		LIMSConfigurationEntity lIMSConfigurationEntity = new LIMSConfigurationEntity();
+		lIMSConfigurationEntity.setApiClientConfiguration(null);
+		lIMSConfigurationEntity.setDataSources(dataSourcesLims);
+		lIMSConfigurationEntity.setDistributorId("8");
+		lIMSConfigurationEntity.setHostCode("12343");
+		lIMSConfigurationEntity.setReportTypes(reportTypesLims);
+		lIMSConfigurationEntity.setWebhookServerConfiguration(null);
+		return lIMSConfigurationEntity;
+	}
+
+	public static LIMSConfigurationEntity mockLIMSConfigurationEntityLimsAnotherExample() {
+		LIMSConfigurationEntity lIMSConfigurationEntity = new LIMSConfigurationEntity();
+		lIMSConfigurationEntity.setApiClientConfiguration(mockTokenApiClientConfigurationLimsAnotherExample());
+		lIMSConfigurationEntity.setDataSources(dataSourcesLims);
+		lIMSConfigurationEntity.setDistributorId("8");
+		lIMSConfigurationEntity.setHostCode("12343");
+		lIMSConfigurationEntity.setReportTypes(reportTypesLims);
+		lIMSConfigurationEntity.setWebhookServerConfiguration(mockWebhookServerConfigurationLimsAnotherExample());
+		return lIMSConfigurationEntity;
+	}
+
+	public static TokenApiClientConfiguration mockTokenApiClientConfigurationLimsAnotherExample() {
+		TokenApiClientConfiguration tokenApiClientConfiguration = new TokenApiClientConfiguration();
+		tokenApiClientConfiguration.setApiBaseUrl(null);
+		tokenApiClientConfiguration.setApiPath(null);
+		tokenApiClientConfiguration.setApiToken(null);
+		tokenApiClientConfiguration.setApiVersion(null);
+		tokenApiClientConfiguration.setId(1L);
+		return tokenApiClientConfiguration;
+
+	}
+
+	public static WebhookServerConfiguration mockWebhookServerConfigurationLimsAnotherExample() {
+		WebhookServerConfiguration webhookServerConfiguration = new WebhookServerConfiguration();
+		webhookServerConfiguration.setId(1L);
+		webhookServerConfiguration.setWebhookHashingAlgorithm(null);
+		webhookServerConfiguration.setWebhookId(null);
+		webhookServerConfiguration.setWebhookToken(null);
+		return webhookServerConfiguration;
+	}
+
+	public static LIMSConfigurationEntity mockLIMSConfigurationEntityLims() {
+		LIMSConfigurationEntity lIMSConfigurationEntity = new LIMSConfigurationEntity();
+		lIMSConfigurationEntity.setApiClientConfiguration(mockTokenApiClientConfigurationLims());
+		lIMSConfigurationEntity.setDataSources(dataSourcesLims);
+		lIMSConfigurationEntity.setDistributorId("8");
+		lIMSConfigurationEntity.setHostCode("12343");
+		lIMSConfigurationEntity.setReportTypes(reportTypesLims);
+		lIMSConfigurationEntity.setWebhookServerConfiguration(mockWebhookServerConfigurationLims());
+		return lIMSConfigurationEntity;
+	}
+
+	public static TokenApiClientConfiguration mockTokenApiClientConfigurationLims() {
+		TokenApiClientConfiguration tokenApiClientConfiguration = new TokenApiClientConfiguration();
+		tokenApiClientConfiguration.setApiBaseUrl("urls");
+		tokenApiClientConfiguration.setApiPath("paths");
+		tokenApiClientConfiguration.setApiToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLsTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		tokenApiClientConfiguration.setApiVersion("versions");
+		tokenApiClientConfiguration.setId(1L);
+		return tokenApiClientConfiguration;
+
+	}
+
+	public static WebhookServerConfiguration mockWebhookServerConfigurationLims() {
+		WebhookServerConfiguration webhookServerConfiguration = new WebhookServerConfiguration();
+		webhookServerConfiguration.setId(1L);
+		webhookServerConfiguration.setWebhookHashingAlgorithm("algorithms");
+		webhookServerConfiguration.setWebhookId("8L");
+		webhookServerConfiguration.setWebhookToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04OdddaddzDkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		return webhookServerConfiguration;
+	}
+
+	public static List<ReportTypes> reportTypes = new ArrayList<>();
+	public static List<ElementsDataSources> dataSources = new ArrayList<>();
+
+	public static LIMSConfigurationEntity mockLIMSConfigurationEntity() {
+		LIMSConfigurationEntity lIMSConfigurationEntity = new LIMSConfigurationEntity();
+		lIMSConfigurationEntity.setApiClientConfiguration(mockTokenApiClientConfiguration());
+		lIMSConfigurationEntity.setDataSources(dataSources);
+		lIMSConfigurationEntity.setDistributorId("1");
+		lIMSConfigurationEntity.setHostCode("12345");
+		lIMSConfigurationEntity.setId(8L);
+		lIMSConfigurationEntity.setReportTypes(reportTypes);
+		lIMSConfigurationEntity.setWebhookServerConfiguration(mockWebhookServerConfiguration());
+		return lIMSConfigurationEntity;
+	}
+
+	public static WebhookServerConfiguration mockWebhookServerConfiguration() {
+		WebhookServerConfiguration webhookServerConfiguration = new WebhookServerConfiguration();
+		webhookServerConfiguration.setId(1L);
+		webhookServerConfiguration.setWebhookHashingAlgorithm("algorithm");
+		webhookServerConfiguration.setWebhookId("1L");
+		webhookServerConfiguration.setWebhookToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		return webhookServerConfiguration;
+	}
+
+	public static TokenApiClientConfiguration mockTokenApiClientConfiguration() {
+		TokenApiClientConfiguration tokenApiClientConfiguration = new TokenApiClientConfiguration();
+		tokenApiClientConfiguration.setApiBaseUrl("url");
+		tokenApiClientConfiguration.setApiPath("path");
+		tokenApiClientConfiguration.setApiToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		tokenApiClientConfiguration.setApiVersion("version");
+		tokenApiClientConfiguration.setId(1L);
+		return tokenApiClientConfiguration;
+
+	}
+
+	public static UserUpdateFetalSexResultsPreferences mockUserUpdateFetalSexResultsPreferencesTerms() {
+		UserUpdateFetalSexResultsPreferences userUpdateFetalSexResultsPreferences = new UserUpdateFetalSexResultsPreferences();
+		userUpdateFetalSexResultsPreferences.setFstResultsDelegatedEmail("no-email@gmail.com");
+		userUpdateFetalSexResultsPreferences.setGenderDelegated(false);
+		userUpdateFetalSexResultsPreferences.setGenderFanfare(false);
+		userUpdateFetalSexResultsPreferences.setGenderTerms(GenderTerms.XX_XY);
+		return userUpdateFetalSexResultsPreferences;
+
+	}
+
+	public static UserUpdateFetalSexResultsPreferences mockUserUpdateFetalSexResultsPreferences() {
+		UserUpdateFetalSexResultsPreferences userUpdateFetalSexResultsPreferences = new UserUpdateFetalSexResultsPreferences();
+		userUpdateFetalSexResultsPreferences.setFstResultsDelegatedEmail("");
+		userUpdateFetalSexResultsPreferences.setGenderDelegated(false);
+		userUpdateFetalSexResultsPreferences.setGenderFanfare(false);
+		userUpdateFetalSexResultsPreferences.setGenderTerms(GenderTerms.BOY_GIRL);
+		return userUpdateFetalSexResultsPreferences;
+
+	}
+
+	public static UserUpdatePreferencesPayload mockUserUpdatePreferencesPayload() {
+		UserUpdatePreferencesPayload userUpdatePreferencesPayload = new UserUpdatePreferencesPayload();
+		userUpdatePreferencesPayload.setFstPreferences(mockUserUpdateFetalSexResultsPreferencesTerms());
+		userUpdatePreferencesPayload.setOptOut(true);
+		userUpdatePreferencesPayload.setSmsMessages(true);
+		return userUpdatePreferencesPayload;
+	}
+
+	public static UserUpdatePreferencesPayload mockUserUpdatePreferencesPayloadFstPreferences() {
+		UserUpdatePreferencesPayload userUpdatePreferencesPayload = new UserUpdatePreferencesPayload();
+		userUpdatePreferencesPayload.setFstPreferences(mockUserUpdateFetalSexResultsPreferencesFstPreferences());
+		userUpdatePreferencesPayload.setOptOut(true);
+		userUpdatePreferencesPayload.setSmsMessages(true);
+		return userUpdatePreferencesPayload;
+	}
+
+	public static UserUpdateFetalSexResultsPreferences mockUserUpdateFetalSexResultsPreferencesFstPreferences() {
+		UserUpdateFetalSexResultsPreferences userUpdateFetalSexResultsPreferences = new UserUpdateFetalSexResultsPreferences();
+		userUpdateFetalSexResultsPreferences.setFstResultsDelegatedEmail("");
+		userUpdateFetalSexResultsPreferences.setGenderDelegated(false);
+		userUpdateFetalSexResultsPreferences.setGenderFanfare(false);
+		userUpdateFetalSexResultsPreferences.setGenderTerms(GenderTerms.XX_XY);
+		return userUpdateFetalSexResultsPreferences;
+
+	}
+
+	public static FetalSexResultsPreferences getMockFetalSexResultsPreferences() {
+		FetalSexResultsPreferences fetalSexResultsPreferences = new FetalSexResultsPreferences();
+		fetalSexResultsPreferences.setFstResultsDelegatedEmail("");
+		fetalSexResultsPreferences.setGenderDelegated(true);
+		fetalSexResultsPreferences.setGenderFanfare(true);
+		fetalSexResultsPreferences.setGenderTerms(GenderTerms.BOY_GIRL);
+		return fetalSexResultsPreferences;
+	}
+
+	public static UserForgotPasswordPayload mockUserForgotPasswordPayload() {
+		UserForgotPasswordPayload userForgotPasswordPayload = new UserForgotPasswordPayload();
+		userForgotPasswordPayload.setEmail("no-email@junodx.com");
+		userForgotPasswordPayload.setClientId("89766");
+		userForgotPasswordPayload.setDestinationUrl("url");
+		return userForgotPasswordPayload;
+	}
+
+	public static UserForgotPasswordPayload mockUserForgotPasswordPayloadEmpty() {
+		UserForgotPasswordPayload userForgotPasswordPayload = new UserForgotPasswordPayload();
+		userForgotPasswordPayload.setEmail("no-email@junodx.com");
+		userForgotPasswordPayload.setClientId(null);
+		userForgotPasswordPayload.setDestinationUrl("url");
+		return userForgotPasswordPayload;
+	}
+
+	public static UserUpdatePasswordPayload mockUserUpdatePasswordPayload() {
+		UserUpdatePasswordPayload userUpdatePasswordPayload = new UserUpdatePasswordPayload();
+		userUpdatePasswordPayload.setClientId("9348-8892-9342-01");
+		userUpdatePasswordPayload.setPassword("password321&");
+		userUpdatePasswordPayload.setToken(
+				"am9uKzQxQGp1bm9keC5jb206OTM0OC04ODkyLTkzNDItMDE6OWEzOTA4MDktMGY5My00MmY2LTljMjAtMzEwOWZhYWU4Zjk1");
+		return userUpdatePasswordPayload;
+
+	}
+
+	public static UserUpdateInsurancePayload mockUserUpdateInsurancePayload() {
+		UserUpdateInsurancePayload userUpdateInsurancePayload = new UserUpdateInsurancePayload();
+		userUpdateInsurancePayload.setInsurancePolicy(mockInsurancePolicy());
+		userUpdateInsurancePayload.setUserId("1L");
+
+		return userUpdateInsurancePayload;
+	}
+
+	public static UserUpdateInsurancePayload mockUserUpdateInsurancePayloadExc() {
+		UserUpdateInsurancePayload userUpdateInsurancePayload = new UserUpdateInsurancePayload();
+		// userUpdateInsurancePayload.setInsurancePolicy(mockInsurancePolicy());
+		// userUpdateInsurancePayload.setUserId("1L");
+
+		return userUpdateInsurancePayload;
+	}
+
+	public static InsurancePolicy mockInsurancePolicy() {
+		InsurancePolicy insurancePolicy = new InsurancePolicy();
+		insurancePolicy.setAddress(getMockAddress());
+		insurancePolicy.setSubscriberId("12345");
+		insurancePolicy.setCarrier(mockInsuranceCarrier());
+		insurancePolicy.setExpiresAt(Calendar.getInstance());
+		insurancePolicy.setGroupId("1L");
+		insurancePolicy.setPatientRelationship(PatientRelationship.PARENT);
+		insurancePolicy.setPhone("12345678");
+		insurancePolicy.setPolicyHolderName("Jhon");
+		insurancePolicy.setSameAsPatient(true);
+		insurancePolicy.setUser(mockUser());
+		return insurancePolicy;
+	}
+
+	public static InsurancePolicy mockInsurancePolicyDiffrent() {
+		InsurancePolicy insurancePolicy = new InsurancePolicy();
+		insurancePolicy.setAddress(getMockAddress());
+		insurancePolicy.setSubscriberId("434");
+		insurancePolicy.setCarrier(mockInsuranceCarrier());
+		insurancePolicy.setExpiresAt(Calendar.getInstance());
+		insurancePolicy.setGroupId("8L");
+		insurancePolicy.setPatientRelationship(PatientRelationship.DOMESTIC_PARTNER);
+		insurancePolicy.setPhone("1234567888");
+		insurancePolicy.setPolicyHolderName("san-diego");
+		insurancePolicy.setSameAsPatient(false);
+		insurancePolicy.setUser(mockUser());
+		return insurancePolicy;
+	}
+
+	public static InsurancePolicy mockInsurancePolicyDiif() {
+		InsurancePolicy insurancePolicy = new InsurancePolicy();
+		insurancePolicy.setAddress(getMockAddress());
+		insurancePolicy.setSubscriberId("686878");
+		insurancePolicy.setCarrier(mockInsuranceCarrier());
+		insurancePolicy.setExpiresAt(Calendar.getInstance());
+		insurancePolicy.setGroupId("1L");
+		insurancePolicy.setPatientRelationship(PatientRelationship.PARENT);
+		insurancePolicy.setPhone("12345678");
+		insurancePolicy.setPolicyHolderName("Jhon");
+		insurancePolicy.setSameAsPatient(true);
+		insurancePolicy.setUser(mockUser());
+		return insurancePolicy;
+	}
+
+	public static InsuranceCarrier mockInsuranceCarrier() {
+		InsuranceCarrier insuranceCarrier = new InsuranceCarrier();
+		insuranceCarrier.setAddress(getMockAddress());
+		insuranceCarrier.setCarrierId("1L");
+		insuranceCarrier.setEmail("no-email@junodx.com");
+		insuranceCarrier.setName("jhon");
+		insuranceCarrier.setPhone(getMockPhone());
+		return insuranceCarrier;
+	}
+
+	public static UserUpdatePasswordPayload mockUserUpdatePasswordPayloads() {
+		UserUpdatePasswordPayload userUpdatePasswordPayload = new UserUpdatePasswordPayload();
+		userUpdatePasswordPayload.setClientId("9348-8892-9342-01");
+		userUpdatePasswordPayload.setPassword("password321&");
+		userUpdatePasswordPayload.setToken("toke");
+		return userUpdatePasswordPayload;
+
+	}
+
+	public static Vital mockVital() {
+		Vital vital = new Vital();
+		vital.setId(2L);
+		vital.setMedicalDetails(mockMedicalDetails());
+		vital.setRecordedAt(Calendar.getInstance());
+		vital.setRecordedBy("anjali");
+		vital.setType(VitalType.HEIGHT);
+		vital.setValue("67");
+		vital.setValueType(DataType.INT);
+		return vital;
+
+	}
+
+	public static Vital mockVitalDiff() {
+		Vital vital = new Vital();
+		vital.setId(2L);
+		vital.setMedicalDetails(mockMedicalDetails());
+		vital.setRecordedAt(Calendar.getInstance());
+		vital.setRecordedBy("anjali");
+		vital.setType(VitalType.HEIGHT);
+		vital.setValue("68");
+		vital.setValueType(DataType.STRING);
+		return vital;
+
+	}
+
+	public static List<Vital> vitals = new ArrayList<>();
+
+	public static MedicalDetails mockMedicalDetails() {
+		MedicalDetails medicalDetails = new MedicalDetails();
+		medicalDetails.setConceptionDate(Calendar.getInstance());
+		medicalDetails.setGestationalAge(9.8f);
+		medicalDetails.setId(8L);
+		medicalDetails.setLastUpdatedAt(Calendar.getInstance());
+		medicalDetails.setNoBloodTransfusion(false);
+		medicalDetails.setNoOrganTransplant(false);
+		medicalDetails.setNumberOfFetuses(5);
+		// medicalDetails.setPatientDetails(mockPatientDetails());
+		medicalDetails.setPregnant(false);
+		medicalDetails.setThreeOrMoreFetuses(false);
+		medicalDetails.setVitals(vitals);
+		return medicalDetails;
+
+	}
+
+	public static Medication mockMedication() {
+		Medication medication = new Medication();
+		medication.setId(6L);
+		medication.setName("medicine");
+		medication.setPatientDetails(mockPatientDetails());
+		medication.setType(MedicationType.PAIN_KILLER);
+		return medication;
+
+	}
+
+	public static Medication mockMedicationType() {
+		Medication medication = new Medication();
+		medication.setId(6L);
+		medication.setName("medicine");
+		medication.setPatientDetails(mockPatientDetails());
+		// medication.setType(MedicationType.);
+		return medication;
+
+	}
+
+	public static List<Medication> medications = new ArrayList<>();
+	public static List<Provider> providers = new ArrayList<>();
+
+	public static PatientDetails mockPatientDetails() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetails());
+		patientDetails.setMedications(medications);
+		patientDetails.setProviders(providers);
+		patientDetails.setUser(user);
+		return patientDetails;
+
+	}
+
+	public static PatientDetails mockPatientDetailDetails() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		// patientDetails.setMedicalDetails(mockMedicalDetails());
+		patientDetails.setMedications(medications);
+		patientDetails.setProviders(providers);
+		patientDetails.setUser(user);
+		return patientDetails;
+
+	}
+
+	public static PatientDetails mockPatientDetailsId() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId(null);
+		patientDetails.setMedicalDetails(mockMedicalDetails());
+		patientDetails.setMedications(medications);
+		patientDetails.setProviders(providers);
+		patientDetails.setUser(user);
+		return patientDetails;
+
+	}
+
+	public static PatientDetails mockPatientDetailssave() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetails());
+		patientDetails.setMedications(medications);
+		patientDetails.setProviders(providers);
+		patientDetails.setUser(mockUser());
+		return patientDetails;
+
+	}
+
+	public static PatientDetails mockPatientDetailsUserEmpty() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetails());
+		patientDetails.setMedications(medications);
+		patientDetails.setProviders(providers);
+		patientDetails.setUser(mockUserEmptyId());
+		return patientDetails;
+
+	}
+
+	public static User mockUserEmptyId() {
+		User u = new User();
+//		u.setUsername("General_test_user");
+//		u.setFirstName("Juno_test");
+//		u.setLastName("User");
+//		u.setEmail("no-email@junodx.com");
+//		u.setUserType(UserType.STANDARD);
+//		u.setDateOfBirth("1997-12-15");
+//		u.setPatientDetails(DataBuilder.mockPatientDetails());
+//		u.setLimsContactId("78788");
+//		//u.setId("1L");
+//		u.setPassword("Password&123");
+//		u.setClientId("12345");
+//		u.setXifinPatientId("1234");
+//		u.setStripeCustomerId("34677676");
+//		u.setActivated(true);
+//		u.setStatus(UserStatus.ACTIVATED);
+//		u.setActivationTs(Calendar.getInstance());
+//		u.setPrimaryPhone(DataBuilder.getMockPhone());
+//		u.setBillingAddress(DataBuilder.getMockAddress());
+//		u.setPreferences(DataBuilder.getMockPreferences());
+//		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static PatientDetails mockPatientDetailss() {
+		PatientDetails patientDetails = new PatientDetails();
+		patientDetails.setUser(mockUserPatient());
+		patientDetails.setId("8L");
+		patientDetails.setAllowReleaseOfMedicalRecords(false);
+//		patientDetails.setMedicalDetails(mockMedicalDetails());
+//		patientDetails.setMedications(medications);
+//		patientDetails.setProviders(providers);
+//		patientDetails.setUser(mockUserPatient());
+		return patientDetails;
+
+	}
+
+	public static ChartEntryPayload mockChartEntryPayload() {
+		ChartEntryPayload chartEntryPayload = new ChartEntryPayload();
+		chartEntryPayload.setEntry(mockPatientChartEntry());
+		chartEntryPayload.setUserId("1L");
+		return chartEntryPayload;
+	}
+
+	public static PatientChartEntryDto mockPatientChartEntryDto() {
+		PatientChartEntryDto patientChartEntryDto = new PatientChartEntryDto();
+		patientChartEntryDto.setAuthorEmail("author@gmail.com");
+		patientChartEntryDto.setAuthorName("anjali");
+		patientChartEntryDto.setAuthorSalesforceId("78889999");
+		patientChartEntryDto.setCallDuration(1);
+		patientChartEntryDto.setChartType(ChartType.COLLECTION);
+		patientChartEntryDto.setConsultType(ConsultType.IN_PERSON);
+		patientChartEntryDto.setId("2L");
+		patientChartEntryDto.setNote("book");
+		patientChartEntryDto.setOrder(mockOrderTruncatedDto());
+		patientChartEntryDto.setRelatedTestReportId("67890");
+		patientChartEntryDto.setSalesforceId("89878");
+		patientChartEntryDto.setTestRun(mockTestRunTruncatedDto());
+		patientChartEntryDto.setTimestamp(Calendar.getInstance());
+		patientChartEntryDto.setTitle("title");
+		return patientChartEntryDto;
+	}
+
+	public static TestRunTruncatedDto mockTestRunTruncatedDto() {
+		TestRunTruncatedDto testRunTruncatedDto = new TestRunTruncatedDto();
+		testRunTruncatedDto.setCompleted(false);
+		testRunTruncatedDto.setId("1L");
+		testRunTruncatedDto.setKit(mockKitTruncatedDto());
+		testRunTruncatedDto.setReport(mockTestReportTruncatedDto());
+		testRunTruncatedDto.setReportConfiguration(ReportConfiguration.FST);
+		return testRunTruncatedDto;
+
+	}
+
+	public static TestReportTruncatedDto mockTestReportTruncatedDto() {
+		TestReportTruncatedDto testReportTruncatedDto = new TestReportTruncatedDto();
+		testReportTruncatedDto.setAvailable(false);
+		testReportTruncatedDto.setId("2L");
+		testReportTruncatedDto.setSignedOut(false);
+		return testReportTruncatedDto;
+
+	}
+
+	public static KitTruncatedDto mockKitTruncatedDto() {
+		KitTruncatedDto kitTruncatedDto = new KitTruncatedDto();
+		kitTruncatedDto.setCode("JO135wwa33jj789");
+		kitTruncatedDto.setId("c06071ba-bf8e-414c-8622-2aa57d5b6a7f");
+		kitTruncatedDto.setPsdSleeveNumber("9897987");
+		kitTruncatedDto.setSampleNumber("123455");
+		return kitTruncatedDto;
+	}
+
+	public static OrderTruncatedDto mockOrderTruncatedDto() {
+		OrderTruncatedDto orderTruncatedDto = new OrderTruncatedDto();
+		orderTruncatedDto.setId("1L");
+		return orderTruncatedDto;
+	}
+
+	public static LabConstants mockLabConstants() {
+		LabConstants labConstants = new LabConstants();
+		labConstants.setChr13LowerCutoff(1f);
+		labConstants.setChr13UpperCutoff(1f);
+		labConstants.setChr18LowerCutoff(1f);
+		labConstants.setChr18UpperCutoff(1f);
+		labConstants.setChr21UpperCutoff(1f);
+		labConstants.setChr21LowerCutoff(1f);
+		return labConstants;
+	}
+
+	public static User mockUserPatient() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_test");
+		u.setLastName("User");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-15");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("1L");
+		u.setPassword("Password&123");
+		u.setClientId("12345");
+		u.setXifinPatientId("1234");
+		u.setStripeCustomerId("34677676");
+		u.setActivated(true);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		u.setPatientDetails(mockPatient());
+		return u;
+
+	}
+
+	public static PatientDetails mockPatient() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetails());
+		patientDetails.setMedications(medications);
+		patientDetails.setProviders(providers);
+		patientDetails.setUser(mockUser());
+		return patientDetails;
+
+	}
+
+	public static PatientDetails mockPatientDetailLmpDate() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetailsLmpDate());
+		patientDetails.setMedications(medications);
+		patientDetails.setProviders(providers);
+		patientDetails.setUser(user);
+		return patientDetails;
+	}
+
+	public static MedicalDetails mockMedicalDetailsLmpDate() {
+		MedicalDetails medicalDetails = new MedicalDetails();
+		medicalDetails.setConceptionDate(Calendar.getInstance());
+		medicalDetails.setGestationalAge(8f);
+		medicalDetails.setId(8L);
+		medicalDetails.setLastUpdatedAt(Calendar.getInstance());
+		medicalDetails.setNoBloodTransfusion(false);
+		medicalDetails.setNoOrganTransplant(false);
+		medicalDetails.setNumberOfFetuses(5);
+		// medicalDetails.setPatientDetails(mockPatientDetails());
+		medicalDetails.setPregnant(false);
+		medicalDetails.setThreeOrMoreFetuses(false);
+		medicalDetails.setVitals(vitals);
+		return medicalDetails;
+
+	}
+
+	public static List<Medication> medication = new ArrayList<>();
+	public static List<Provider> provider = new ArrayList<>();
+
+	public static PatientDetails mockPatientDetail() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(null);
+		patientDetails.setMedications(medication);
+		patientDetails.setProviders(provider);
+		patientDetails.setUser(user);
+		return patientDetails;
+
+	}
+
+	public static PatientDetails mockPatientDetailNotNull() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetailsLmpDateNotNull());
+		patientDetails.setMedications(medication);
+		patientDetails.setProviders(provider);
+		patientDetails.setUser(user);
+		return patientDetails;
+
+	}
+
+	public static MedicalDetails mockMedicalDetailsLmpDateNotNull() {
+		MedicalDetails medicalDetails = new MedicalDetails();
+		medicalDetails.setConceptionDate(Calendar.getInstance());
+		// medicalDetails.setLmpDate(null);
+		medicalDetails.setGestationalAge(8f);
+		medicalDetails.setId(8L);
+		medicalDetails.setLastUpdatedAt(Calendar.getInstance());
+		medicalDetails.setNoBloodTransfusion(false);
+		medicalDetails.setNoOrganTransplant(false);
+		medicalDetails.setNumberOfFetuses(5);
+		// medicalDetails.setPatientDetails(mockPatientDetails());
+		medicalDetails.setPregnant(false);
+		medicalDetails.setThreeOrMoreFetuses(false);
+		medicalDetails.setVitals(vitals);
+		return medicalDetails;
+
+	}
+
+	public static PatientDetails mockPatientDetailEmpty() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetailsLmpDateempty());
+		patientDetails.setMedications(medication);
+		patientDetails.setProviders(provider);
+		patientDetails.setUser(user);
+		return patientDetails;
+
+	}
+
+	public static MedicalDetails mockMedicalDetailsLmpDateempty() {
+		MedicalDetails medicalDetails = new MedicalDetails();
+		// medicalDetails.setGestationalAge(1.1f);
+		medicalDetails.setId(6L);
+		medicalDetails.setLastUpdatedAt(Calendar.getInstance());
+		medicalDetails.setNoBloodTransfusion(true);
+		medicalDetails.setNoOrganTransplant(true);
+		medicalDetails.setNumberOfFetuses(68);
+		// medicalDetails.setPatientDetails(mockPatientDetails());
+		medicalDetails.setPregnant(true);
+		medicalDetails.setThreeOrMoreFetuses(true);
+		medicalDetails.setVitals(vitals);
+		return medicalDetails;
+
+	}
+
+	public static PatientDetails mockPatientDetailEmptys() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetailsLmpDateemptys());
+		patientDetails.setMedications(medication);
+		patientDetails.setProviders(provider);
+		patientDetails.setUser(user);
+		return patientDetails;
+
+	}
+
+	public static List<Vital> vitalMedicalDetailsLmpDate = new ArrayList<>();
+
+	public static MedicalDetails mockMedicalDetailsLmpDateemptys() {
+		MedicalDetails medicalDetails = new MedicalDetails();
+		// medicalDetails.setGestationalAge(1.1f);
+		medicalDetails.setId(6L);
+		medicalDetails.setLastUpdatedAt(Calendar.getInstance());
+		medicalDetails.setNoBloodTransfusion(true);
+		medicalDetails.setNoOrganTransplant(true);
+		medicalDetails.setNumberOfFetuses(68);
+		// medicalDetails.setPatientDetails(mockPatientDetails());
+		medicalDetails.setPregnant(true);
+		medicalDetails.setThreeOrMoreFetuses(true);
+		medicalDetails.setVitals(vitals);
+		return medicalDetails;
+
+	}
+
+	public static PatientDetails mockPatientDetailLmp() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetailsLmp());
+		patientDetails.setMedications(medication);
+		patientDetails.setProviders(provider);
+		patientDetails.setUser(user);
+		return patientDetails;
+
+	}
+
+	public static MedicalDetails mockMedicalDetailsLmp() {
+		MedicalDetails medicalDetails = new MedicalDetails();
+		// medicalDetails.setGestationalAge(1.1f);
+		Calendar instance = Calendar.getInstance();
+		medicalDetails.setLmpDate(instance);
+		medicalDetails.setId(6L);
+		medicalDetails.setLastUpdatedAt(Calendar.getInstance());
+		medicalDetails.setNoBloodTransfusion(true);
+		medicalDetails.setNoOrganTransplant(true);
+		medicalDetails.setNumberOfFetuses(68);
+		// medicalDetails.setPatientDetails(mockPatientDetails());
+		medicalDetails.setPregnant(true);
+		medicalDetails.setThreeOrMoreFetuses(true);
+		medicalDetails.setVitals(vitals);
+		return medicalDetails;
+
+	}
+
+	public static PatientDetails mockPatientDetailvitalEmptys() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetailsLmpDatevitalemptys());
+		patientDetails.setMedications(medication);
+		patientDetails.setProviders(provider);
+		patientDetails.setUser(user);
+		return patientDetails;
+
+	}
+
+	public static MedicalDetails mockMedicalDetailsLmpDatevitalemptys() {
+		MedicalDetails medicalDetails = new MedicalDetails();
+		// medicalDetails.setGestationalAge(1.1f);
+		medicalDetails.setId(6L);
+		medicalDetails.setLastUpdatedAt(Calendar.getInstance());
+		medicalDetails.setNoBloodTransfusion(true);
+		medicalDetails.setNoOrganTransplant(true);
+		medicalDetails.setNumberOfFetuses(68);
+		// medicalDetails.setPatientDetails(mockPatientDetails());
+		medicalDetails.setPregnant(true);
+		medicalDetails.setThreeOrMoreFetuses(true);
+		// medicalDetails.setVitals(null);
+		return medicalDetails;
+
+	}
+
+	public static PatientDetails mockPatientDetailsEmptyChart() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChart());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetails());
+		patientDetails.setMedications(medications);
+		patientDetails.setProviders(providers);
+		patientDetails.setUser(user);
+		return patientDetails;
+
+	}
+
+	public static PatientChartEntry mockPatientChartEntry() {
+		PatientChartEntry patientChartEntry = new PatientChartEntry();
+		patientChartEntry.setAuthorEmail("author@gmail.com");
+		patientChartEntry.setChartType(ChartType.COLLECTION);
+		patientChartEntry.setConsultType(ConsultType.VIDEO_CALL);
+		patientChartEntry.setTestRun(DataBuilderOrder.mockTestRun());
+		patientChartEntry.setAuthorName("anjali");
+		patientChartEntry.setAuthorSalesforceId("78999888");
+		patientChartEntry.setId("2L");
+		patientChartEntry.setNote("book");
+		patientChartEntry.setTestRun(DataBuilderOrder.mockTestRun());
+		patientChartEntry.setPatientChart(mockPatientChart());
+		patientChartEntry.setRelatedTestReportId("67890");
+		patientChartEntry.setRelatedTestReportSalesforceId("78889999");
+		patientChartEntry.setSalesforceId("89878");
+		patientChartEntry.setTitle("authors");
+		patientChartEntry.setTimestamp(Calendar.getInstance());
+		return patientChartEntry;
+
+	}
+
+	public static PatientChartEntry mockPatientChartEntryId() {
+		PatientChartEntry patientChartEntry = new PatientChartEntry();
+		patientChartEntry.setAuthorEmail("author@gmail.com");
+		patientChartEntry.setChartType(ChartType.COLLECTION);
+		patientChartEntry.setTestRun(DataBuilderOrder.mockTestRun());
+		patientChartEntry.setAuthorName("anjali");
+		patientChartEntry.setAuthorSalesforceId("78999888");
+		patientChartEntry.setId("2L");
+		patientChartEntry.setNote("book");
+		patientChartEntry.setPatientChart(mockPatientChartId());
+		patientChartEntry.setRelatedTestReportId("67890");
+		patientChartEntry.setRelatedTestReportSalesforceId("78889999");
+		patientChartEntry.setSalesforceId("89878");
+		patientChartEntry.setTitle("authors");
+		patientChartEntry.setTimestamp(Calendar.getInstance());
+		return patientChartEntry;
+
+	}
+
+	public static PatientChart mockPatientChartId() {
+		PatientChart patientChart = new PatientChart();
+		patientChart.setChartEntries(patientChartEntrys);
+		patientChart.setId("6L");
+		patientChart.setUser(mockUserId());
+		return patientChart;
+
+	}
+
+	public static User mockUserId() {
+		User u = new User();
+		u.setUsername("General_test_user");
+		u.setFirstName("Juno_test");
+		u.setLastName("User");
+		u.setEmail("no-email@junodx.com");
+		u.setUserType(UserType.STANDARD);
+		u.setDateOfBirth("1997-12-15");
+		u.setPatientDetails(DataBuilder.mockPatientDetails());
+		u.setLimsContactId("78788");
+		u.setId("6L");
+		u.setPassword("Password&123");
+		u.setClientId("12345");
+		u.setXifinPatientId("1234");
+		u.setStripeCustomerId("34677676");
+		u.setActivated(true);
+		u.setStatus(UserStatus.ACTIVATED);
+		u.setActivationTs(Calendar.getInstance());
+		u.setPrimaryPhone(DataBuilder.getMockPhone());
+		u.setBillingAddress(DataBuilder.getMockAddress());
+		u.setPreferences(DataBuilder.getMockPreferences());
+		u.setMeta(DataBuilder.getMockMeta());
+		return u;
+
+	}
+
+	public static PatientChartEntry mockPatientChartEntryTimestamp() {
+		PatientChartEntry patientChartEntry = new PatientChartEntry();
+		patientChartEntry.setAuthorEmail("author@gmail.com");
+		patientChartEntry.setChartType(ChartType.COLLECTION);
+		patientChartEntry.setTestRun(DataBuilderOrder.mockTestRun());
+		patientChartEntry.setAuthorName("anjali");
+		patientChartEntry.setAuthorSalesforceId("78999888");
+		patientChartEntry.setId("2L");
+		patientChartEntry.setNote("book");
+		patientChartEntry.setPatientChart(mockPatientChart());
+		patientChartEntry.setRelatedTestReportId("67890");
+		patientChartEntry.setRelatedTestReportSalesforceId("78889999");
+		patientChartEntry.setSalesforceId("89878");
+		patientChartEntry.setTitle("authors");
+		Calendar expiresAt = Calendar.getInstance();
+		boolean before = !expiresAt.before(Calendar.getInstance());
+		patientChartEntry.setTimestamp(expiresAt.getInstance().getInstance());
+		return patientChartEntry;
+
+	}
+
+	public static PatientChartEntry mockPatientChartEntryTestRunEmpty() {
+		PatientChartEntry patientChartEntry = new PatientChartEntry();
+		patientChartEntry.setAuthorEmail("author@gmail.com");
+		patientChartEntry.setChartType(ChartType.COLLECTION);
+		patientChartEntry.setTestRun(DataBuilderOrder.mockTestRunReportEmpty());
+		patientChartEntry.setAuthorName("anjali");
+		patientChartEntry.setAuthorSalesforceId("78999888");
+		patientChartEntry.setId("2L");
+		patientChartEntry.setNote("book");
+		patientChartEntry.setPatientChart(mockPatientChart());
+		patientChartEntry.setRelatedTestReportId("67890");
+		patientChartEntry.setRelatedTestReportSalesforceId("78889999");
+		patientChartEntry.setSalesforceId("89878");
+		patientChartEntry.setTitle("authors");
+		patientChartEntry.setTimestamp(Calendar.getInstance());
+		return patientChartEntry;
+
+	}
+
+	public static PatientChartEntry mockPatientChartEntryHandle() {
+		PatientChartEntry patientChartEntry = new PatientChartEntry();
+		patientChartEntry.setAuthorEmail("author@gmail.com");
+		patientChartEntry.setAuthorName("anjali");
+		patientChartEntry.setAuthorSalesforceId("78999888");
+		patientChartEntry.setId("2L");
+		patientChartEntry.setNote("book");
+		patientChartEntry.setPatientChart(mockPatientChart());
+		patientChartEntry.setRelatedTestReportId("67890");
+		patientChartEntry.setRelatedTestReportSalesforceId("78889999");
+		patientChartEntry.setSalesforceId("89878");
+		patientChartEntry.setTitle("authors");
+		patientChartEntry.setTimestamp(Calendar.getInstance());
+		patientChartEntry.setChartType(ChartType.COLLECTION);
+		patientChartEntry.setConsultType(ConsultType.IN_PERSON);
+		patientChartEntry.setCallDuration(2L);
+		return patientChartEntry;
+
+	}
+
+	public static PatientChartEntry mockPatientChartEntryHandleOrder() {
+		PatientChartEntry patientChartEntry = new PatientChartEntry();
+		patientChartEntry.setAuthorEmail("author@gmail.com");
+		patientChartEntry.setAuthorName("anjali");
+		patientChartEntry.setAuthorSalesforceId("78999888");
+		patientChartEntry.setId("2L");
+		patientChartEntry.setNote("book");
+		patientChartEntry.setPatientChart(mockPatientChart());
+		patientChartEntry.setRelatedTestReportId("67890");
+		patientChartEntry.setRelatedTestReportSalesforceId("78889999");
+		patientChartEntry.setSalesforceId("89878");
+		patientChartEntry.setTitle("authors");
+		patientChartEntry.setOrder(DataBuilderOrder.mockOrder());
+		// patientChartEntry.setTestRun(DataBuilderOrder.mockTestRun());
+		patientChartEntry.setTimestamp(Calendar.getInstance());
+		patientChartEntry.setChartType(ChartType.COLLECTION);
+		patientChartEntry.setConsultType(ConsultType.IN_PERSON);
+		patientChartEntry.setCallDuration(2L);
+		return patientChartEntry;
+
+	}
+
+	public static PatientChartEntry mockPatientChartEntryHandleOrders() {
+		PatientChartEntry patientChartEntry = new PatientChartEntry();
+		patientChartEntry.setAuthorEmail("author@gmail.com");
+		patientChartEntry.setAuthorName("anjali");
+		patientChartEntry.setAuthorSalesforceId("78999888");
+		patientChartEntry.setId("2L");
+		patientChartEntry.setNote("book");
+		patientChartEntry.setPatientChart(mockPatientChart());
+		patientChartEntry.setRelatedTestReportId("67890");
+		patientChartEntry.setRelatedTestReportSalesforceId("78889999");
+		patientChartEntry.setSalesforceId("89878");
+		patientChartEntry.setTitle("authors");
+		// patientChartEntry.setOrder(DataBuilderOrder.mockOrder());
+		// patientChartEntry.setTestRun(DataBuilderOrder.mockTestRun());
+		patientChartEntry.setTimestamp(Calendar.getInstance());
+		patientChartEntry.setChartType(ChartType.COLLECTION);
+		patientChartEntry.setConsultType(ConsultType.IN_PERSON);
+		patientChartEntry.setCallDuration(2L);
+		return patientChartEntry;
+
+	}
+
+	public static PatientChartEntry mockPatientChartEntryHandleTestRun() {
+		PatientChartEntry patientChartEntry = new PatientChartEntry();
+		patientChartEntry.setAuthorEmail("author@gmail.com");
+		patientChartEntry.setAuthorName("anjali");
+		patientChartEntry.setAuthorSalesforceId("78999888");
+		patientChartEntry.setId("2L");
+		patientChartEntry.setNote("book");
+		patientChartEntry.setPatientChart(mockPatientChart());
+		patientChartEntry.setRelatedTestReportId("67890");
+		patientChartEntry.setRelatedTestReportSalesforceId("78889999");
+		patientChartEntry.setSalesforceId("89878");
+		patientChartEntry.setTitle("authors");
+		patientChartEntry.setTestRun(DataBuilderOrder.mockTestRun());
+		patientChartEntry.setTimestamp(Calendar.getInstance());
+		patientChartEntry.setChartType(ChartType.COLLECTION);
+		patientChartEntry.setConsultType(ConsultType.IN_PERSON);
+		patientChartEntry.setCallDuration(2L);
+		return patientChartEntry;
+
+	}
+
+	public static PatientChartEntry mockPatientChartEntryHandleTestRunId() {
+		PatientChartEntry patientChartEntry = new PatientChartEntry();
+		patientChartEntry.setAuthorEmail("author@gmail.com");
+		patientChartEntry.setAuthorName("anjali");
+		patientChartEntry.setAuthorSalesforceId("78999888");
+		patientChartEntry.setId("2L");
+		patientChartEntry.setNote("book");
+		patientChartEntry.setPatientChart(mockPatientChart());
+		patientChartEntry.setRelatedTestReportId("67890");
+		patientChartEntry.setRelatedTestReportSalesforceId("78889999");
+		patientChartEntry.setSalesforceId("8987888");
+		patientChartEntry.setTitle("authors");
+		patientChartEntry.setTestRun(DataBuilderOrder.mockTestRunId());
+		patientChartEntry.setTimestamp(Calendar.getInstance());
+		patientChartEntry.setChartType(ChartType.COLLECTION);
+		patientChartEntry.setConsultType(ConsultType.IN_PERSON);
+		patientChartEntry.setCallDuration(2L);
+		return patientChartEntry;
+
+	}
+
+	public static PatientChartEntry mockPatientChartEntryStringUtils() {
+		PatientChartEntry patientChartEntry = new PatientChartEntry();
+		patientChartEntry.setAuthorEmail("no-email@gmail.com");
+		patientChartEntry.setAuthorName("jhon");
+		patientChartEntry.setAuthorSalesforceId("7899988888");
+		patientChartEntry.setId("2L");
+		patientChartEntry.setNote("book");
+		patientChartEntry.setPatientChart(mockPatientChart());
+		patientChartEntry.setRelatedTestReportId("67890");
+		patientChartEntry.setRelatedTestReportSalesforceId("7888888");
+		patientChartEntry.setOrder(DataBuilderOrder.mockOrder());
+		patientChartEntry.setTestRun(DataBuilderOrder.mockTestRun());
+		patientChartEntry.setSalesforceId("89878");
+		patientChartEntry.setChartType(ChartType.CONSULT);
+		patientChartEntry.setTitle("JHON");
+		patientChartEntry.setConsultType(ConsultType.PHONE_CALL);
+		patientChartEntry.setTimestamp(Calendar.getInstance());
+		patientChartEntry.setCallDuration(3L);
+		return patientChartEntry;
+
+	}
+
+	public static Vital mockVitals() {
+		Vital vital = new Vital();
+		vital.setId(2L);
+		vital.setMedicalDetails(mockMedicalDetails());
+		vital.setRecordedAt(Calendar.getInstance());
+		vital.setRecordedBy("anjali");
+		vital.setType(VitalType.WEIGHT);
+		vital.setValue("67");
+		vital.setValueType(DataType.INT);
+		return vital;
+
+	}
+
+	public static List<PatientChartEntry> patientChartEntrys = new ArrayList<>();
+
+	public static PatientChart mockPatientChart() {
+		PatientChart patientChart = new PatientChart();
+		patientChart.setChartEntries(patientChartEntrys);
+		patientChart.setId("6L");
+		patientChart.setUser(mockUser());
+		return patientChart;
+
+	}
+
+	public static LaboratoryStatistics mockLaboratoryStatistics() {
+		LaboratoryStatistics laboratoryStatistics = new LaboratoryStatistics();
+		laboratoryStatistics.setId(1L);
+		laboratoryStatistics.setInterval(1);
+		laboratoryStatistics.setIntervalType(IntervalType.DAYS);
+		laboratoryStatistics.setLaboratory(DataBuilderOrder.mockLaboratory());
+		laboratoryStatistics.setMeta(getMockMeta());
+		laboratoryStatistics.setRecentlyAutomaticallySignedOut(1);
+		laboratoryStatistics.setRecentlyManuallySignedOut(1);
+		laboratoryStatistics.setRecentlySignedOut(1);
+		laboratoryStatistics.setResultsAwaitingInvestigation(1);
+		laboratoryStatistics.setResultsAwaitingSignOutConfirmation(1);
+		laboratoryStatistics.setRunsToBeApproved(1);
+		laboratoryStatistics.setUpcomingResults(1);
+		return laboratoryStatistics;
+	}
+
+	public static LaboratoryStatistics mockLaboratoryStatisticsLab() {
+		LaboratoryStatistics laboratoryStatistics = new LaboratoryStatistics();
+		laboratoryStatistics.setId(1L);
+		laboratoryStatistics.setInterval(1);
+		laboratoryStatistics.setIntervalType(IntervalType.DAYS);
+		laboratoryStatistics.setLaboratory(null);
+		laboratoryStatistics.setMeta(getMockMeta());
+		laboratoryStatistics.setRecentlyAutomaticallySignedOut(1);
+		laboratoryStatistics.setRecentlyManuallySignedOut(1);
+		laboratoryStatistics.setRecentlySignedOut(1);
+		laboratoryStatistics.setResultsAwaitingInvestigation(1);
+		laboratoryStatistics.setResultsAwaitingSignOutConfirmation(1);
+		laboratoryStatistics.setRunsToBeApproved(1);
+		laboratoryStatistics.setUpcomingResults(1);
+		return laboratoryStatistics;
+	}
+
+	public static PatientChart mockPatientChartException() {
+		PatientChart patientChart = new PatientChart();
+		// patientChart.setChartEntries(patientChartEntrys);
+		patientChart.setId("6L");
+		return patientChart;
+
+	}
+
+	public static PatientDetails mockPatientDetailException() {
+		PatientDetails patientDetails = new PatientDetails();
+		// patientDetails.setChart(mockPatientChartException());
+		patientDetails.setId("8L");
+		patientDetails.setMedicalDetails(mockMedicalDetails());
+		patientDetails.setMedications(medications);
+		patientDetails.setProviders(providers);
+		patientDetails.setUser(user);
+		return patientDetails;
+
+	}
+
+	public static PatientChart mockPatientCharts() {
+		PatientChart patientChart = new PatientChart();
+		patientChart.setChartEntries(patientChartEntrys);
+		patientChart.setId("6L");
+		// patientChart.setPatientDetails(mockPatientDetails());
+		return patientChart;
+
+	}
+
+	public static PatientChartEntry mockPatientChartEntrys() {
+		PatientChartEntry patientChartEntry = new PatientChartEntry();
+		patientChartEntry.setAuthorEmail("");
+		patientChartEntry.setPatientChart(mockPatientCharts());
+		patientChartEntry.setAuthorName("");
+		patientChartEntry.setAuthorSalesforceId("78999888");
+		patientChartEntry.setId("2L");
+		patientChartEntry.setNote("book");
+		patientChartEntry.setRelatedTestReportId("67890");
+		patientChartEntry.setRelatedTestReportSalesforceId("78889999");
+		patientChartEntry.setSalesforceId("3L");
+		patientChartEntry.setTitle("");
+		patientChartEntry.setTimestamp(Calendar.getInstance());
+		return patientChartEntry;
+
+	}
+
+	public static TestResult testResult;
+
+	public static SFBillingAddress mockSFBillingAddress() {
+		SFBillingAddress sfBillingAddress = new SFBillingAddress();
+		sfBillingAddress.setBillingAddress(true);
+		sfBillingAddress.setBillingCity("San Diego");
+		sfBillingAddress.setBillingCountry("United States");
+		sfBillingAddress.setBillingName("Juno Headquarters");
+		sfBillingAddress.setBillingPostalCode("98077");
+		sfBillingAddress.setBillingPrimaryAddress(true);
+		sfBillingAddress.setBillingState("CA");
+		sfBillingAddress.setBillingStreet("11511 Sorrento Valley Rd");
+		sfBillingAddress.setResidential(true);
+		return sfBillingAddress;
+
+	}
+
+	public static SalesforceChangedDataMap mockSalesforceChangedDataMap() {
+		SalesforceChangedDataMap salesforceChangedDataMap = new SalesforceChangedDataMap();
+		salesforceChangedDataMap.setActive(true);
+		salesforceChangedDataMap.setBillingAddress(mockSFBillingAddress());
+		salesforceChangedDataMap.setContactName("deepu");
+		salesforceChangedDataMap.setCreatedById("anjali");
+		salesforceChangedDataMap.setDateOfBirth("15-12-1997");
+		salesforceChangedDataMap.setDescription("descr");
+		salesforceChangedDataMap.setEmail("no-email@junodx.com");
+		salesforceChangedDataMap.setFirstName("Juno_test");
+		salesforceChangedDataMap.setId("3L");
+		salesforceChangedDataMap.setJunoUserId("3L");
+		salesforceChangedDataMap.setLastModifiedDate(Calendar.getInstance());
+		salesforceChangedDataMap.setLastModifiedById("12345");
+		salesforceChangedDataMap.setLastName("User");
+		salesforceChangedDataMap.setName("General_test_user");
+		salesforceChangedDataMap.setNpi("12345");
+		salesforceChangedDataMap.setOptOut(true);
+		salesforceChangedDataMap.setPhone("LocationTest.getMockPhone()");
+		salesforceChangedDataMap.setPracticing(true);
+		salesforceChangedDataMap.setPrimaryAddress(getMockAddress());
+		salesforceChangedDataMap.setSalesforceAccountId("112");
+		salesforceChangedDataMap.setSystemModStamp(Calendar.getInstance());
+		salesforceChangedDataMap.setTestResultId("112123");
+		salesforceChangedDataMap.setUserStatus("all");
+		salesforceChangedDataMap.setUserType("Standard");
+		return salesforceChangedDataMap;
+
+	}
+
+	public static List<SalesforcePracticeRecordChanged> recordsChanged = new ArrayList<>();
+	public static List<SalesforcePracticeAccountInfo> accountInfo = new ArrayList<>();
+
+	public static SalesforcePracticePayload mockSalesforcePracticePayload() {
+		SalesforcePracticePayload salesforcePracticePayload = new SalesforcePracticePayload();
+		salesforcePracticePayload.setRecordsChanged(recordsChanged);
+		salesforcePracticePayload.setAccountInfo(accountInfo);
+		return salesforcePracticePayload;
+
+	}
+
+	public static SalesforcePracticeAccountInfo mockSalesforcePracticeAccountInfo() {
+		SalesforcePracticeAccountInfo salesforcePracticeAccountInfo = new SalesforcePracticeAccountInfo();
+		salesforcePracticeAccountInfo.setAttributes(mockSalesforceAttributes());
+		return salesforcePracticeAccountInfo;
+
+	}
+
+	public static SalesforcePracticeRecordChanged mockSalesforcePracticeRecordChanged() {
+		SalesforcePracticeRecordChanged salesforcePracticeRecordChanged = new SalesforcePracticeRecordChanged();
+		salesforcePracticeRecordChanged.setChangedDataMap(mockSalesforcePracticeChangedDataMap());
+		salesforcePracticeRecordChanged.setId("1L");
+		return salesforcePracticeRecordChanged;
+
+	}
+
+	public static SalesforcePracticeChangedDataMap mockSalesforcePracticeChangedDataMap() {
+		SalesforcePracticeChangedDataMap salesforcePracticeChangedDataMap = new SalesforcePracticeChangedDataMap();
+		salesforcePracticeChangedDataMap.setBillingCity("San Diego");
+		salesforcePracticeChangedDataMap.setBillingCountry("United States");
+		salesforcePracticeChangedDataMap.setBillingEmail("no-email@junodx.com");
+		salesforcePracticeChangedDataMap.setBillingStateCode("98077");
+		salesforcePracticeChangedDataMap.setBillingStreet("11511 Sorrento Valley Rd");
+		salesforcePracticeChangedDataMap.setDescription("description");
+		salesforcePracticeChangedDataMap.setId("1L");
+		salesforcePracticeChangedDataMap.setLocation(mockSalesforceLocationData());
+		salesforcePracticeChangedDataMap.setLastModifiedDate(Calendar.getInstance());
+		salesforcePracticeChangedDataMap.setPhone("7698099");
+		salesforcePracticeChangedDataMap.setPrimaryEmail("no-email@junodx.com");
+		salesforcePracticeChangedDataMap.setSecondaryEmail("no-email@junodx.com");
+		salesforcePracticeChangedDataMap.setSystemModStamp(Calendar.getInstance());
+		return salesforcePracticeChangedDataMap;
+	}
+
+	public static SalesforcePracticeRecordChanged mockSalesforcePracticeRecordChangedId() {
+		SalesforcePracticeRecordChanged salesforcePracticeRecordChanged = new SalesforcePracticeRecordChanged();
+		salesforcePracticeRecordChanged.setChangedDataMap(mockSalesforcePracticeChangedDataMapId());
+		salesforcePracticeRecordChanged.setId("1L");
+		return salesforcePracticeRecordChanged;
+
+	}
+
+	public static SalesforcePracticeChangedDataMap mockSalesforcePracticeChangedDataMapId() {
+		SalesforcePracticeChangedDataMap salesforcePracticeChangedDataMap = new SalesforcePracticeChangedDataMap();
+		salesforcePracticeChangedDataMap.setBillingCity("San Diego");
+		salesforcePracticeChangedDataMap.setBillingCountry("United States");
+		salesforcePracticeChangedDataMap.setBillingEmail("");
+		salesforcePracticeChangedDataMap.setBillingStateCode("98077");
+		salesforcePracticeChangedDataMap.setBillingStreet("11511 Sorrento Valley Rd");
+		salesforcePracticeChangedDataMap.setDescription("description");
+		// salesforcePracticeChangedDataMap.setId("1L");
+		salesforcePracticeChangedDataMap.setLocation(mockSalesforceLocationData());
+		salesforcePracticeChangedDataMap.setLastModifiedDate(Calendar.getInstance());
+		salesforcePracticeChangedDataMap.setPhone("7698099");
+		salesforcePracticeChangedDataMap.setPrimaryEmail("");
+		salesforcePracticeChangedDataMap.setSecondaryEmail("no-email@junodx.com");
+		salesforcePracticeChangedDataMap.setSystemModStamp(Calendar.getInstance());
+		return salesforcePracticeChangedDataMap;
+	}
+
+	public static SalesforceLocationData mockSalesforceLocationData() {
+
+		SalesforceLocationData salesforceLocationData = new SalesforceLocationData();
+		salesforceLocationData.setAddress(getMockAddress());
+		salesforceLocationData.setId("6L");
+		salesforceLocationData.setName("Jhon");
+		salesforceLocationData.setPhone("7698099");
+		return salesforceLocationData;
+
+	}
+
+	public static SalesforceRecordChanged mockSalesforceRecordChanged() {
+		SalesforceRecordChanged salesforceRecordChanged = new SalesforceRecordChanged();
+		salesforceRecordChanged.setChangedDataMap(mockSalesforceChangedDataMap());
+		salesforceRecordChanged.setId("3L");
+		return salesforceRecordChanged;
+	}
+
+	public static SalesforceWhoRecord mockSalesforceWhoRecord() {
+		SalesforceWhoRecord salesforceWhoRecord = new SalesforceWhoRecord();
+		salesforceWhoRecord.setJunoUserId("12345");
+		salesforceWhoRecord.setName("General_test_user");
+		salesforceWhoRecord.setSalesforceUserId("3L");
+		return salesforceWhoRecord;
+
+	}
+
+	public static SalesforceChartUpdateInfo mockSalesforceChartUpdateInfo() {
+		SalesforceChartUpdateInfo salesforceChartUpdateInfo = new SalesforceChartUpdateInfo();
+		salesforceChartUpdateInfo.setAuthorId("112");
+		salesforceChartUpdateInfo.setDescription("des");
+		salesforceChartUpdateInfo.setId("3L");
+		salesforceChartUpdateInfo.setTestResult(testResult);
+		salesforceChartUpdateInfo.setWho(mockSalesforceWhoRecord());
+		return salesforceChartUpdateInfo;
+
+	}
+
+	public static SalesforceChartUpdateInfo mockSalesforceChartUpdateInfoException() {
+		SalesforceChartUpdateInfo salesforceChartUpdateInfo = new SalesforceChartUpdateInfo();
+		salesforceChartUpdateInfo.setAuthorId("112");
+		salesforceChartUpdateInfo.setDescription("des");
+		salesforceChartUpdateInfo.setId("3L");
+		salesforceChartUpdateInfo.setTestResult(testResult);
+		salesforceChartUpdateInfo.setWho(mockSalesforceWhoRecords());
+		return salesforceChartUpdateInfo;
+
+	}
+
+	public static SalesforceWhoRecord mockSalesforceWhoRecords() {
+		SalesforceWhoRecord salesforceWhoRecord = new SalesforceWhoRecord();
+		// salesforceWhoRecord.setJunoUserId("12345");
+		salesforceWhoRecord.setName("General_test_user");
+		salesforceWhoRecord.setSalesforceUserId("3L");
+		return salesforceWhoRecord;
+
+	}
+
+	public static SalesforceAttributes mockSalesforceAttributes() {
+		SalesforceAttributes salesforceAttributes = new SalesforceAttributes();
+		salesforceAttributes.setType("Standard");
+		salesforceAttributes.setUrl("url");
+		return salesforceAttributes;
+	}
+
+	public static SalesforceUserUpdateAccountInfo mockSalesforceUserUpdateAccountInfo() {
+		SalesforceUserUpdateAccountInfo salesforceUserUpdateAccountInfo = new SalesforceUserUpdateAccountInfo();
+		salesforceUserUpdateAccountInfo.setAttributes(mockSalesforceAttributes());
+		salesforceUserUpdateAccountInfo.setId("3L");
+		salesforceUserUpdateAccountInfo.setJunoUserId("12345");
+		return salesforceUserUpdateAccountInfo;
+
+	}
+
+	// public static OrderLineItemInfo orderLineItemInfo = new OrderLineItemInfo(1,
+	// true);
+
+	public static OrderLineItemInfo mockOrderLineItemInfo() {
+		OrderLineItemInfo orderLineItemInfo = new OrderLineItemInfo();
+		orderLineItemInfo.setDone(true);
+		orderLineItemInfo.setRecords(salesforceLineItemUpdateInfos);
+		orderLineItemInfo.setTotalSize(1);
+		return orderLineItemInfo;
+
+	}
+
+	public static List<SalesforceLineItemUpdateInfo> salesforceLineItemUpdateInfos = new ArrayList<>();
+
+	public static SalesforceOrderUpdateAccountInfo mockSalesforceOrderUpdateAccountInfo() {
+		SalesforceOrderUpdateAccountInfo salesforceOrderUpdateAccountInfo = new SalesforceOrderUpdateAccountInfo();
+		salesforceOrderUpdateAccountInfo.setAccountId("Juno_testss");
+		salesforceOrderUpdateAccountInfo.setActivatedById("General_test_users");
+		salesforceOrderUpdateAccountInfo.setAttributes(mockSalesforceAttributes());
+		salesforceOrderUpdateAccountInfo.setCarrierAddress1("Juno Headquarterss");
+		salesforceOrderUpdateAccountInfo.setCarrierAddress2("11511 Sorrento Valley Rds");
+		salesforceOrderUpdateAccountInfo.setCarrierCity("San Diego");
+		salesforceOrderUpdateAccountInfo.setCarrierCountry("United Statess");
+		salesforceOrderUpdateAccountInfo.setCarrierName("Juno Headquarters");
+		salesforceOrderUpdateAccountInfo.setCarrierPhone("85864723745");
+		salesforceOrderUpdateAccountInfo.setCarrierState("CA");
+		salesforceOrderUpdateAccountInfo.setCarrierZip("98078");
+		salesforceOrderUpdateAccountInfo.setCartId("afd66f9d-84c0-4aa7-82e8-8b7fb41b42dd8");
+		salesforceOrderUpdateAccountInfo.setCheckoutId("63d1a928-05b7-45b8-9a5b-fdc85b736cef8");
+		salesforceOrderUpdateAccountInfo.setClinicianNotes("notes");
+		salesforceOrderUpdateAccountInfo.setCreatedById("3L");
+		salesforceOrderUpdateAccountInfo.setCurrency("USD");
+		salesforceOrderUpdateAccountInfo.setDescription("descr");
+		salesforceOrderUpdateAccountInfo.setDiscountAmount("2f");
+		salesforceOrderUpdateAccountInfo.setDiscountApplied("true");
+		salesforceOrderUpdateAccountInfo.setDiscountMode("PERCENT");
+		salesforceOrderUpdateAccountInfo.setDiscountType("PROMO_CODE");
+		salesforceOrderUpdateAccountInfo.setGestationalAge("9.88f");
+		salesforceOrderUpdateAccountInfo.setId("3L");
+		salesforceOrderUpdateAccountInfo.setInsuranceBillingOrderId("898788");
+		salesforceOrderUpdateAccountInfo.setIsPregnant("true");
+		salesforceOrderUpdateAccountInfo.setKitId("c06071ba-bf8e-414c-8622-2aa57d5b6a7f");
+		salesforceOrderUpdateAccountInfo.setLabId("f450237e-20a3-4bf1-b64d-9ecaab16be7a");
+		salesforceOrderUpdateAccountInfo.setLastModifiedById("12345");
+		salesforceOrderUpdateAccountInfo.setLineItems(mockOrderLineItemInfo());
+		salesforceOrderUpdateAccountInfo.setOrderedAt("1997-12-15 00:00:00");
+		salesforceOrderUpdateAccountInfo.setOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8");
+		salesforceOrderUpdateAccountInfo.setPriceBook2Id("9898778");
+		salesforceOrderUpdateAccountInfo.setSampleNumber("123455");
+		salesforceOrderUpdateAccountInfo.setShipping("349.99f");
+		salesforceOrderUpdateAccountInfo.setShippingAddress("Dharpally");
+		salesforceOrderUpdateAccountInfo.setShippingOrderId("8L");
+		salesforceOrderUpdateAccountInfo.setStatus("CREATED");
+		salesforceOrderUpdateAccountInfo.setSubTotal("349.98f");
+		salesforceOrderUpdateAccountInfo.setTax("0.08f");
+		salesforceOrderUpdateAccountInfo.setThreeOrMore("true");
+		salesforceOrderUpdateAccountInfo.setTotalAmount("349.998f");
+		salesforceOrderUpdateAccountInfo.setType("Standard");
+		salesforceOrderUpdateAccountInfo.setWeight("");
+		return salesforceOrderUpdateAccountInfo;
+
+	}
+
+	public static List<SalesforceRecordChanged> salesforceRecordChangeds = new ArrayList<>();
+	public static List<SalesforceUserUpdateAccountInfo> salesforceUserUpdateAccountInfo = new ArrayList<>();
+
+	public static SalesforceUserUpdatePayload mockSalesforceUserUpdatePayload() {
+		SalesforceUserUpdatePayload salesforceUserUpdatePayload = new SalesforceUserUpdatePayload();
+		salesforceUserUpdatePayload.setRecordInfo(salesforceUserUpdateAccountInfo);
+		salesforceUserUpdatePayload.setRecordsChanged(salesforceRecordChangeds);
+		return salesforceUserUpdatePayload;
+	}
+
+	public static List<String> roles = new ArrayList<>();
+
+	public static JwtResponse mockJwtResponse() {
+		JwtResponse jwtResponse = new JwtResponse();
+		jwtResponse.setAccessToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		jwtResponse.setClientId("9348-8892-9342-01");
+		jwtResponse.setExpiresIn(0);
+		jwtResponse.setEmail("no-email@junodx.com");
+		jwtResponse.setId("1L");
+		jwtResponse.setName("Juno");
+		jwtResponse.setRefreshToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		jwtResponse.setRoles(roles);
+		jwtResponse.setUsername("Juno_test");
+		return jwtResponse;
+
+	}
+
+	public static IDTokenObject mockIDTokenObject() {
+		IDTokenObject iDTokenObject = new IDTokenObject();
+		iDTokenObject.setClientId("0352-8232-9622-03");
+		iDTokenObject.setDeviceId("9888-86678");
+		iDTokenObject.setEmail("no-email@junodx.com");
+		iDTokenObject.setProvider("cognito");
+		iDTokenObject.setToken(
+				"bWRuaXJhbmphbjgxNEBnbWFpbC5jb206OTM0OC04ODkyLTkzNDItMDE6Njk2MWVjZmEtODlmZi00MGRkLThlYmUtZjBkOTQ2MWE0ZmI5");
+		return iDTokenObject;
+
+	}
+
+	public static UserCredentialsPayload mockUserCredentialsPayload() {
+		UserCredentialsPayload userCredentialsPayload = new UserCredentialsPayload();
+		userCredentialsPayload.setClientId("9348-8892-9342-01");
+		userCredentialsPayload.setEmail("no-email@junodx.com");
+		userCredentialsPayload.setPassword("Password&123");
+		return userCredentialsPayload;
+	}
+
+	public static ClientCredentialsPayload mockClientCredentialsPayload() {
+		ClientCredentialsPayload clientCredentialsPayload = new ClientCredentialsPayload();
+		clientCredentialsPayload.setClientId("AKIAVD5K7Y5MSAT5SVMF");
+		clientCredentialsPayload.setClientSecret("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");
+		clientCredentialsPayload.setGrantType(OAuthGrantType.client_credentials);
+		clientCredentialsPayload.setScope(null);
+		return clientCredentialsPayload;
+
+	}
+
+	public static SalesforceLineItemUpdateInfo mockSalesforceLineItemUpdateInfo() {
+		SalesforceLineItemUpdateInfo salesforceLineItemUpdateInfo = new SalesforceLineItemUpdateInfo();
+		salesforceLineItemUpdateInfo.setAmount("349.98f");
+		salesforceLineItemUpdateInfo.setAmountDiscounted("24f");
+		salesforceLineItemUpdateInfo.setAvailableQuantity("8");
+		salesforceLineItemUpdateInfo.setClinicianNotes("notes");
+		salesforceLineItemUpdateInfo.setConcentFormName("anjali");
+		salesforceLineItemUpdateInfo.setConcentType("false");
+		salesforceLineItemUpdateInfo.setConsentApproval("false");
+		salesforceLineItemUpdateInfo.setConsentApprovalDate("false");
+		salesforceLineItemUpdateInfo.setCreatedById("3L");
+		salesforceLineItemUpdateInfo.setDescription(" ");
+		salesforceLineItemUpdateInfo.setInsurenceEstimatedCoveredAmount("8f");
+		salesforceLineItemUpdateInfo.setIsDirectlyProvided("true");
+		salesforceLineItemUpdateInfo.setIsInOfficeCollected("true");
+		salesforceLineItemUpdateInfo.setLabId("f450237e-20a3-4bf1-b64d-9ecaab16be7a");
+		salesforceLineItemUpdateInfo.setLineItemId("845dba6b-4c0f-4cc9-ba77-62e7216bd692");
+		salesforceLineItemUpdateInfo.setLabOrderId("76c97d43-347f-4132-ba18-ddf3b313c226");
+		salesforceLineItemUpdateInfo.setLastModifiedById("123455");
+		salesforceLineItemUpdateInfo.setOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8");
+		salesforceLineItemUpdateInfo.setOrderItemNumber("123458677");
+		salesforceLineItemUpdateInfo.setPatientConsentId("6L");
+		salesforceLineItemUpdateInfo.setProduct2Id("786518f5-4fa9-4576-a173-6318556ccb0b");
+		salesforceLineItemUpdateInfo.setProductName("Juno Early Fetal Sex Test");
+		salesforceLineItemUpdateInfo.setQuantity("88");
+		salesforceLineItemUpdateInfo.setReferralType("SELF_CREATED");
+		salesforceLineItemUpdateInfo.setRequiresShipping("false");
+		salesforceLineItemUpdateInfo.setSKU("KIT238349");
+		salesforceLineItemUpdateInfo.setTaxable("876f");
+		salesforceLineItemUpdateInfo.setTaxAmount("876f");
+		salesforceLineItemUpdateInfo.setTaxJurisdiction("jurisdiction");
+		salesforceLineItemUpdateInfo.setTaxRate("876f");
+		salesforceLineItemUpdateInfo.setTaxType("STATE");
+		salesforceLineItemUpdateInfo.setTotalPrice("349.99f");
+		salesforceLineItemUpdateInfo.setType("CREATED");
+		salesforceLineItemUpdateInfo.setUnitPrice("1");
+		return salesforceLineItemUpdateInfo;
+
+	}
+
+	public static List<Fulfillment> fulfillments = new ArrayList<>();
+
+	public static Fulfillment mockFulfillments() {
+		Fulfillment fulfillment = new Fulfillment();
+		// fulfillment.setCompleted(false);
+		fulfillment.setEstimatedToShipAt(Calendar.getInstance());
+		fulfillment.setFulfilledAt(Calendar.getInstance());
+		fulfillment.setFulfillmentOrderId("b1ee000c-f947-46d9-b3df-e5f53cae34b3");
+		fulfillment.setFulfillmentProvider(mockFulfillmentProvider());
+		fulfillment.setId("8fdf6101-f19a-4154-a36f-521528d02654");
+		fulfillment.setKit(mockKitss());
+		fulfillment.setMeta(DataBuilder.getMockMeta());
+		// fulfillment.setOrderLineItem(mockOrderLineItem());
+		fulfillment.setRedraw(false);
+		fulfillment.setShipmentCreated(false);
+		fulfillment.setShippingDetails(mockShippingDetail());
+		return fulfillment;
+	}
+
+	public static List<ShippingStatus> shippingStatuss = new ArrayList<>();
+
+	public static ShippingDetails mockShippingDetail() {
+		ShippingDetails shippingDetails = new ShippingDetails();
+		// shippingDetails.setFulfillment(mockFulfillment());
+		shippingDetails.setId("7l");
+		shippingDetails.setMeta(DataBuilder.getMockMeta());
+		shippingDetails.setReturnAddress(mockShippingTarget());
+		shippingDetails.setReturnMethod(mockShippingMethod());
+		// shippingStatuss.add(mockShippingStatus());
+		shippingDetails.setShippingStatus(shippingStatuss);
+		shippingDetails.setShippingTransactionDetails(mockShippingTransaction());
+		shippingDetails.setToAddress(mockShippingTarget());
+		shippingDetails.setToMethod(mockShippingMethod());
+		shippingDetails.setTrackingCode("68876");
+		return shippingDetails;
+	}
+
+	public static ShippingTransaction mockShippingTransaction() {
+		ShippingTransaction shippingTransactionDetails = new ShippingTransaction();
+		shippingTransactionDetails.setAmount(349.99f);
+		shippingTransactionDetails.setCurrency(Currency.getInstance("USD"));
+		// shippingTransactionDetails.setShippingDetails(mockShippingDetails());
+		shippingTransactionDetails.setTransactionDate(Calendar.getInstance());
+		shippingTransactionDetails.setId("1L");
+		return shippingTransactionDetails;
+	}
+
+	public static ShippingTarget mockShippingTarget() {
+		ShippingTarget toAddress = new ShippingTarget();
+		toAddress.setAddress(DataBuilder.getMockAddress());
+		toAddress.setId("5L");
+		toAddress.setRecipientName("San Diego");
+		toAddress.setPhone(DataBuilder.getMockPhone());
+		return toAddress;
+	}
+
+	public static ShippingMethod mockShippingMethod() {
+		ShippingMethod toMethod = new ShippingMethod();
+		toMethod.setCarrier(mockShippingCarrier());
+		toMethod.setDeliveryDescription("deleievery");
+		toMethod.setEta(Calendar.getInstance());
+		toMethod.setId("3L");
+		toMethod.setLabelId("89L");
+		toMethod.setLabelId("url");
+		toMethod.setReturn(false);
+		toMethod.setShipped(false);
+		// toMethod.setShippingDetails(mockShippingDetails());
+		toMethod.setTrackingCode("68876");
+		toMethod.setTrackingUrl("url");
+		toMethod.setType(ShippingDeliveryType.GROUND);
+		return toMethod;
+
+	}
+
+	public static ShippingCarrier mockShippingCarrier() {
+		ShippingCarrier shippingCarrier = new ShippingCarrier();
+		shippingCarrier.setContactAddress(DataBuilder.getMockAddress());
+		shippingCarrier.setContactPhone(DataBuilder.getMockPhone());
+		shippingCarrier.setId("1L");
+		shippingCarrier.setMeta(DataBuilder.getMockMeta());
+		shippingCarrier.setName("jhon");
+		return shippingCarrier;
+	}
+
+	public static List<ShippingCarrier> carriers = new ArrayList<>();
+
+	public static FulfillmentProvider mockFulfillmentProvider() {
+		FulfillmentProvider fulfillmentProvider = new FulfillmentProvider();
+		carriers.add(mockShippingCarrier());
+		fulfillmentProvider.setCarriers(carriers);
+		fulfillmentProvider.setCoveredCountries("CA");
+		fulfillmentProvider.setCoveredStates("INDIA");
+		fulfillmentProvider.setDefaultCarrierId("");
+		fulfillmentProvider.setDefaultProvider(true);
+		fulfillmentProvider.setEmail("no-email@junodx.com");
+		fulfillmentProvider.setId("1L");
+		fulfillmentProvider.setLabPortalAssigned(true);
+		fulfillmentProvider.setMeta(DataBuilder.getMockMeta());
+		fulfillmentProvider.setName("jhon");
+		fulfillmentProvider.setShipFromAddress(DataBuilder.getMockAddress());
+		fulfillmentProvider.setShipFromContactNumber(DataBuilder.getMockPhone());
+		fulfillmentProvider.setSubProviderLogoUrl("https://somewhere.ons3.com/finditpath.df3");
+		fulfillmentProvider.setSubProviderName("jhon");
+		return fulfillmentProvider;
+	}
+
+	public static Kit mockKitss() {
+		Kit kitss = new Kit();
+		kitss.setId("c06071ba-bf8e-414c-8622-2aa57d5b6a7f");
+		kitss.setCode("JO135wwa33jj789");
+		kitss.setSampleNumber("123455");
+		kitss.setPsdSleeveNumber(null);
+		kitss.setType(KitType.CAPILLARY);
+		kitss.setTestRunId(null);
+		kitss.setAddedToLimsAt(Calendar.getInstance());
+		kitss.setAssigned(true);
+		kitss.setActivated(true);
+		kitss.setUnusable(false);
+		kitss.setMeta(DataBuilder.getMockMeta());
+		return kitss;
+	}
+
+	public static List<OrderLineItem> lineItems = new ArrayList<>();
+
+	public static OrderLineItem mockOrderLineItemss() {
+		OrderLineItem orderLineItem = new OrderLineItem();
+		orderLineItem.setFulfillments(fulfillments);
+		orderLineItem.setAmount(349.99f);
+		orderLineItem.setCurrentFulfillmentId("8fdf6101-f19a-4154-a36f-521528d02654");
+		orderLineItem.setDescription("Juno Early Fetal Sex Test");
+		orderLineItem.setDirectlyProvided(false);
+		orderLineItem.setId("845dba6b-4c0f-4cc9-ba77-62e7216bd692");
+		orderLineItem.setInOfficeCollected(false);
+		orderLineItem.setInsuranceEstimatedCoveredAmount(5f);
+		orderLineItem.setLaboratoryOrderDetails(mockLaboratoryOrders());
+		orderLineItem.setMeta(DataBuilder.getMockMeta());
+		orderLineItem.setOrder(mockOrders());
+		orderLineItem.setOriginalUnitPrice(5f);
+		orderLineItem.setPriceBookEntryId(null);
+//		orderLineItem.setProductId("786518f5-4fa9-4576-a173-6318556ccb0b");
+//		orderLineItem.setProductName("Juno Early Fetal Sex Test");
+//		orderLineItem.setProductImageUrl("Juno Early Fetal Sex Test");
+		orderLineItem.setQuantity(1);
+		orderLineItem.setRequiresShipping(true);
+		orderLineItem.setSku("KIT238349");
+		orderLineItem.setTaxable(false);
+
+		orderLineItem.setType(ProductType.TEST);
+		return orderLineItem;
+	}
+
+	public static List<OrderStatus> orderStatusHistory = new ArrayList<>();
+
+	public static Order mockOrders() {
+		Order order = new Order();
+		order.setId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8");
+		order.setOrderNumber("1234");
+		order.setAmount(349.99f);
+		order.setSubTotal(349.99f);
+		order.setTotalShipping(5.99f);
+		order.setTotalTax(0.0f);
+		order.setWithInsurance(false);
+		order.setCurrency(Currency.getInstance("USD"));
+		order.setCustomer(mockUser());
+		order.setCheckoutId("63d1a928-05b7-45b8-9a5b-fdc85b736cef");
+		order.setCartId("afd66f9d-84c0-4aa7-82e8-8b7fb41b42dd");
+		order.setNotes("notes");
+		order.setDiscount(mockDiscount());
+		order.setTax(mockTax());
+		// orderStatusHistory.add(mockOrderStatus());
+		order.setOrderStatusHistory(orderStatusHistory);
+		// lineItems.add(orderLineItem);
+		order.setLineItems(lineItems);
+		order.setOrderedAt(Calendar.getInstance());
+		order.setRequiresShipment(false);
+		order.setResultsAvailable(false);
+		order.setRequiresRedraw(false);
+		order.setOpen(true);
+		order.setRequiresProviderApproval(false);
+		// order.setApprovingProviderName(null);
+		order.setMeta(DataBuilder.getMockMeta());
+		order.setShippingOrderId("3456");
+		order.setInsuranceBillingOrderId("89878");
+		order.setPriceBookId("989877");
+		// order.setAmountDue(0);
+		// order.setAmountPaid(0);
+		// order.setCrmOrderId(null);
+		// order.setCrmContactId(null);
+		// customerActionRequests.add(mockCustomerActionRequest());
+		// order.setCustomerActionRequests(customerActionRequests);
+		// order.setTransactions(transactions);
+		return order;
+	}
+
+	public static List<LaboratoryStatus> status = new ArrayList<>();
+
+	public static TestRun mockTestRuns() {
+		TestRun testRun = new TestRun();
+		testRun.setBatch(mockBatchRun());
+		testRun.setCompleted(false);
+		testRun.setEndTime(Calendar.getInstance());
+		testRun.setId("1L");
+		testRun.setKit(mockKitss());
+		testRun.setLaboratoryOrder(mockLaboratoryOrders());
+		testRun.setLimsReportId("78788");
+		testRun.setName("San Diego");
+		testRun.setRedraw(false);
+		testRun.setReflex(false);
+		testRun.setReport(mockTestReport());
+		testRun.setReportConfiguration(ReportConfiguration.NIPS_BASIC);
+		testRun.setRetest(false);
+		testRun.setStartTime(Calendar.getInstance());
+		// status.add(mockLaboratoryStatus());
+		testRun.setStatus(status);
+		testRun.setType(TestRunType.STANDARD);
+		return testRun;
+	}
+
+	public static List<ReportConfigurationCounts> reportConfigurations = new ArrayList<>();
+
+	public static BatchRun mockBatchRun() {
+		BatchRun batch = new BatchRun();
+		batch.setEndTime(Calendar.getInstance());
+		batch.setId("8L");
+		batch.setLaboratory(mockLaboratory());
+		batch.setLimsPlateId(null);
+		batch.setMeta(DataBuilder.getMockMeta());
+		batch.setModelId(null);
+		reportConfigurations.add(mockReportConfigurationCounts());
+		batch.setReportConfigurations(reportConfigurations);
+		batch.setReportConfigurationsInRun(null);
+		batch.setReviewed(false);
+		batch.setReviewedAt(Calendar.getInstance());
+		batch.setRunId(1L);
+		batch.setSequencingRunId("FST");
+		batch.setStartTime(Calendar.getInstance());
+		// testRuns.add(mockTestRun());
+		batch.setTestRuns(testRuns);
+		batch.setTotalSamples(1);
+		return batch;
+	}
+
+	public static ReportConfigurationCounts mockReportConfigurationCounts() {
+		ReportConfigurationCounts reportConfigurationCount = new ReportConfigurationCounts();
+		reportConfigurationCount.setConfig(ReportConfiguration.FST);
+		reportConfigurationCount.setCount(1);
+		return reportConfigurationCount;
+	}
+
+	public static TestReport mockTestReport() {
+		TestReport report = new TestReport();
+		report.setId("2L");
+		report.setAvailable(true);
+		report.setReportConfiguration(ReportConfiguration.NIPS_PLUS);
+		report.setEstimatedToBeAvailableAt(Calendar.getInstance());
+		report.setFirstAvailableAt(Calendar.getInstance());
+		report.setApproved(true);
+		report.setSignedOut(false);
+		report.setSignoutDetails(mockSignoutDetails());
+		report.setResultsUrl("url");
+		report.setOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8");
+		report.setOrderNumber("1234");
+		report.setLabId("f450237e-20a3-4bf1-b64d-9ecaab16be7a");
+		report.setPatient(mockUser());
+		report.setLaboratoryOrderId("76c97d43-347f-4132-ba18-ddf3b313c226");
+		report.setNoOrder(false);
+		report.setControl(false);
+		report.setResearchSample(false);
+		report.setReportType(ReportType.STANDARD);
+		report.setResearchProjectName("researchProjectName");
+		report.setBatchRunId("8L");
+		report.setCompletedAt(Calendar.getInstance());
+		// report.setSignedOutType(SignedOutType.AUTOMATIC);
+		report.setResultData(mockReport());
+		report.setPipelineRunId("12345");
+		report.setSampleNumber("67898");
+		report.setDeliveredToProvider(false);
+		report.setDeliveredToPatient(false);
+		report.setDeliveredToPatientAt(Calendar.getInstance());
+		report.setViewedByPatient(false);
+		report.setViewedByPatientAt(Calendar.getInstance());
+		report.setRetestRequested(true);
+		report.setRetestRequestDate(Calendar.getInstance());
+		report.setRetestRequester("request");
+		report.setReportable(false);
+		report.setMeta(DataBuilder.getMockMeta());
+		return report;
+	}
+
+	public static Report mockReport() {
+		Report resultData = new Report();
+		// resultData.setConfidenceIndex(ConfidenceIndexType.MEDIUM);
+		resultData.setData(mockFSTRawData().toString());
+		resultData.setRawDataClass(mockFSTRawData().getClass());
+		resultData.setId("6L");
+		resultData.setReportName(FSTRawData.NAME);
+		// resultData.setRawData(mockFSTRawData());
+		// resultData.setReport(mockTestReport()) ;
+		// resultData.setReport();
+		resultData.setQc(mockTestQC());
+		return resultData;
+	}
+
+	public static Signout mockSignoutDetails() {
+		Signout signoutDetails = new Signout();
+		signoutDetails.setId("6L");
+		signoutDetails.setNonReportable(false);
+		signoutDetails.setSignatory(mockUser());
+		signoutDetails.setSignedOutAt(Calendar.getInstance());
+		return signoutDetails;
+	}
+
+	public static TestQC mockTestQC() {
+		TestQC testQC = new TestQC();
+		testQC.setPipelineError(PASS_FAIL.PASS);
+		testQC.setC13Snr(true);
+		testQC.setChr13Sens(1.0f);
+		testQC.setC18Snr(true);
+		testQC.setC21Snr(true);
+		testQC.setChr18Sens(1.0f);
+		testQC.setChr18Sens(1.0f);
+		testQC.setChr21Sens(1.0f);
+		testQC.setFragmentDistribution(true);
+		testQC.setFragmentDistributionPlotUrl("");
+		testQC.setLowReads(true);
+		testQC.setPassed(false);
+		testQC.setRawCounts(15976784);
+		testQC.setSnpIdentity(SnpIdentityType.PASS);
+		testQC.setType(QCType.SEQUENCING);
+		return testQC;
+
+	}
+
+	public static TestReport mockTestReportss() throws JsonProcessingException {
+		TestReport report = new TestReport();
+		report.setId("2L");
+		report.setAvailable(true);
+		report.setReportConfiguration(ReportConfiguration.NIPS_PLUS);
+		report.setEstimatedToBeAvailableAt(Calendar.getInstance());
+		report.setFirstAvailableAt(Calendar.getInstance());
+		report.setApproved(true);
+		report.setSignedOut(false);
+		report.setSignoutDetails(mockSignoutDetails());
+		report.setResultsUrl("url");
+		report.setOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8");
+		report.setOrderNumber("1234");
+		report.setLabId("f450237e-20a3-4bf1-b64d-9ecaab16be7a");
+		report.setPatient(mockUser());
+		report.setLaboratoryOrderId("76c97d43-347f-4132-ba18-ddf3b313c226");
+		report.setNoOrder(false);
+		report.setControl(false);
+		report.setResearchSample(false);
+		report.setReportType(ReportType.STANDARD);
+		report.setResearchProjectName("researchProjectName");
+		report.setBatchRunId("8L");
+		report.setCompletedAt(Calendar.getInstance());
+		// report.setSignedOutType(SignedOutType.AUTOMATIC);
+		report.setResultData(mockReportss());
+		report.setPipelineRunId("12345");
+		report.setSampleNumber("67898");
+		report.setDeliveredToProvider(false);
+		report.setDeliveredToPatient(false);
+		report.setDeliveredToPatientAt(Calendar.getInstance());
+		report.setViewedByPatient(false);
+		report.setViewedByPatientAt(Calendar.getInstance());
+		report.setRetestRequested(true);
+		report.setRetestRequestDate(Calendar.getInstance());
+		report.setRetestRequester("request");
+		report.setReportable(false);
+		report.setMeta(DataBuilder.getMockMeta());
+		return report;
+	}
+
+	public static DocumentStorageConfiguration mockDocumentStorageConfiguration() {
+		DocumentStorageConfiguration documentStorageConfiguration = new DocumentStorageConfiguration();
+		documentStorageConfiguration.setId(1L);
+		documentStorageConfiguration.setPdfWriterLambdaArn("PdfWriterLambdaArn");
+		documentStorageConfiguration.setPdfWriterLambdaKey("PdfWriterLambdaKey");
+		documentStorageConfiguration.setPdfWriterLambdaSecret("PdfWriterLambdaSecret");
+		documentStorageConfiguration.setReportDomainUriRoot("ReportDomainUriRoot");
+		documentStorageConfiguration.setReportRootFolder("ReportRootFolder");
+		documentStorageConfiguration.setTestReportBucket("TestReportBucket");
+		documentStorageConfiguration.setTestReportBucketKey("TestReportBucketKey");
+		documentStorageConfiguration.setTestReportBucketSecret("TestReportBucketSecret");
+		documentStorageConfiguration.setTestReportRegion("TestReportRegion");
+		documentStorageConfiguration.setTrfBucket("TrfBucket");
+		documentStorageConfiguration.setTrfRootFolder("TrfRootFolder");
+		return documentStorageConfiguration;
+
+	}
+
+	public static TestReport mockTestReports() {
+		TestReport report = new TestReport();
+		report.setId("2L");
+		report.setAvailable(true);
+		report.setReportConfiguration(ReportConfiguration.NIPS_PLUS);
+		report.setEstimatedToBeAvailableAt(Calendar.getInstance());
+		report.setFirstAvailableAt(Calendar.getInstance());
+		report.setApproved(true);
+		report.setSignedOut(false);
+		report.setSignoutDetails(mockSignoutDetails());
+		report.setResultsUrl("url");
+		report.setOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8");
+		report.setOrderNumber("1234");
+		report.setLabId("f450237e-20a3-4bf1-b64d-9ecaab16be7a");
+		report.setPatient(mockUser());
+		report.setLaboratoryOrderId("76c97d43-347f-4132-ba18-ddf3b313c226");
+		report.setNoOrder(false);
+		report.setControl(false);
+		report.setResearchSample(false);
+		report.setReportType(ReportType.STANDARD);
+		report.setResearchProjectName("researchProjectName");
+		report.setBatchRunId("8L");
+		report.setCompletedAt(Calendar.getInstance());
+		report.setSignedOutType(SignedOutType.AUTOMATIC);
+		report.setResultData(mockReport());
+		report.setPipelineRunId("12345");
+		report.setTestRun(mockTestRuns());
+		report.setSampleNumber("67898");
+		report.setDeliveredToProvider(false);
+		report.setDeliveredToPatient(false);
+		report.setDeliveredToPatientAt(Calendar.getInstance());
+		report.setViewedByPatient(false);
+		report.setViewedByPatientAt(Calendar.getInstance());
+		report.setRetestRequested(true);
+		report.setRetestRequestDate(Calendar.getInstance());
+		report.setRetestRequester("request");
+		report.setReportable(false);
+		report.setMeta(DataBuilder.getMockMeta());
+		return report;
+	}
+
+	public static Report mockReportss() throws JsonProcessingException {
+		Report resultData = new Report();
+		// resultData.setConfidenceIndex(ConfidenceIndexType.MEDIUM);
+		resultData.setData(mockNIPSBasicRawData().NAME);
+		resultData.setRawDataClass(mockFSTRawData().getClass());
+		resultData.setId("6L");
+		resultData.setReportName(mockNIPSBasicRawData().NAME);
+		resultData.setRawData(mockNIPSBasicRawData());
+		// resultData.setReport(mockTestReport()) ;
+		// resultData.setReport();
+		resultData.setQc(mockTestQC());
+		return resultData;
+	}
+
+	public static NIPSBasicRawData mockNIPSBasicRawData() {
+		NIPSBasicRawData nIPSBasicRawData = new NIPSBasicRawData();
+		nIPSBasicRawData.setEuploid(mockEuploidTest());
+		nIPSBasicRawData.setFetalFraction(1f);
+		// nIPSBasicRawData.setFst(mockFetalSexTest());
+		nIPSBasicRawData.setSca(mockSCATest());
+		nIPSBasicRawData.setT13(mockT13Test());
+		nIPSBasicRawData.setT18(mockT18Test());
+		nIPSBasicRawData.setT21(mockT21Test());
+		return nIPSBasicRawData;
+	}
+
+	public static EuploidTest mockEuploidTest() {
+		EuploidTest euploidTest = new EuploidTest();
+		euploidTest.setEuploid(true);
+		euploidTest.setId("1L");
+		return euploidTest;
+	}
+
+	public static SCATest mockSCATest() {
+		SCATest sCATest = new SCATest();
+		sCATest.setGenderConfidence(1f);
+		sCATest.setGenderResult(GenderResultType.MALE);
+		sCATest.setId("1L");
+		sCATest.setScaConfidence(1f);
+		sCATest.setScaResult("Result");
+		sCATest.setScaResultType(SCAResultType.XY);
+		sCATest.setxVec(1f);
+		sCATest.setXzScores(1f);
+		sCATest.setyVec(1f);
+		sCATest.setyVec2(1f);
+		return sCATest;
+
+	}
+
+	public static T13Test mockT13Test() {
+		T13Test t13Test = new T13Test();
+		t13Test.setCall(POSITIVE_NEGATIVE.POSITIVE);
+		t13Test.setConfidence(1f);
+		t13Test.setConfidenceLower(1f);
+		t13Test.setConfidenceUpper(1f);
+		t13Test.setId("1L");
+		t13Test.setzScore(1f);
+		return t13Test;
+	}
+
+	public static T18Test mockT18Test() {
+		T18Test t18Test = new T18Test();
+		t18Test.setCall(POSITIVE_NEGATIVE.POSITIVE);
+		t18Test.setConfidence(1f);
+		t18Test.setConfidenceLower(1f);
+		t18Test.setConfidenceUpper(1f);
+		t18Test.setId("1L");
+		t18Test.setzScore(1f);
+		return t18Test;
+	}
+
+	public static T21Test mockT21Test() {
+		T21Test t21Test = new T21Test();
+		t21Test.setCall(POSITIVE_NEGATIVE.POSITIVE);
+		t21Test.setConfidence(1f);
+		t21Test.setConfidenceLower(1f);
+		t21Test.setConfidenceUpper(1f);
+		t21Test.setId("1L");
+		t21Test.setzScore(1f);
+		return t21Test;
+	}
+
+	public static FSTRawData mockFSTRawData() {
+		FSTRawData fSTRawData = new FSTRawData();
+		fSTRawData.setFetalFraction(1f);
+		fSTRawData.setFst(mockFetalSexTest());
+		return fSTRawData;
+
+	}
+
+	public static FetalSexTest mockFetalSexTest() {
+		FetalSexTest fetalSexTest = new FetalSexTest();
+		fetalSexTest.setGenderConfidence(1f);
+		fetalSexTest.setGenderResult(GenderResultType.FEMALE);
+		fetalSexTest.setId("1L");
+		fetalSexTest.setScaConfidence(1f);
+		fetalSexTest.setScaResult("result");
+		fetalSexTest.setScaResultType(SCAResultType.XY);
+		fetalSexTest.setxVec(1f);
+		fetalSexTest.setyVec(1f);
+		fetalSexTest.setyVec2(1f);
+		return fetalSexTest;
+
+	}
+
+	public static Discount mockDiscount() {
+		Discount discount = new Discount();
+		discount.setType(DiscountType.PROMO_CODE);
+		discount.setMode(DiscountMode.AMOUNT);
+		discount.setDiscountApplied(true);
+		discount.setAmountDiscounted(25f);
+		return discount;
+	}
+
+	public static Tax mockTax() {
+		Tax tax = new Tax();
+		tax.setAmount(876f);
+		tax.setJurisdiction("jurisdiction");
+		tax.setRate(876f);
+		tax.setType(TaxType.STATE);
+		return tax;
+	}
+
+	public static List<TestRun> testRuns = new ArrayList<>();
+
+	public static LaboratoryOrder mockLaboratoryOrders() {
+		LaboratoryOrder laboratoryOrderDetails = new LaboratoryOrder();
+		laboratoryOrderDetails.setDateReceivedInLab(Calendar.getInstance());
+		laboratoryOrderDetails.setEstArrivalInLab(Calendar.getInstance());
+		laboratoryOrderDetails.setId("76c97d43-347f-4132-ba18-ddf3b313c226");
+		laboratoryOrderDetails.setLab(mockLaboratory());
+		laboratoryOrderDetails.setLimsOrderId(null);
+		laboratoryOrderDetails.setLimsReportId("78788");
+		laboratoryOrderDetails.setMeta(DataBuilder.getMockMeta());
+		laboratoryOrderDetails.setNotes("notes");
+		laboratoryOrderDetails.setPatientConsent(mockConsent());
+		laboratoryOrderDetails.setParentOrderId("aa86f0ec-9ea1-487c-a814-b1c6001be7e8");
+		// laboratoryOrderDetails.setOrderLineItem(mockOrderLineItemss());
+		laboratoryOrderDetails.setOrderType(OrderType.SELF_CREATED);
+		laboratoryOrderDetails.setParentOrder(mockOrders());
+		laboratoryOrderDetails.setPatient(mockUser());
+		laboratoryOrderDetails.setPatientConsent(mockConsent());
+		laboratoryOrderDetails.setProviderApproval(mockProviderApproval());
+		laboratoryOrderDetails.setReportableTestReportId(null);
+		laboratoryOrderDetails.setReportableTestRunId(null);
+		laboratoryOrderDetails.setReportConfiguration(ReportConfiguration.NIPS_PLUS);
+		laboratoryOrderDetails.setRequisitionFormUrl("https://somewhere.ons3.com/finditpath.df3");
+		// testRuns.add(mockTestRun());
+		laboratoryOrderDetails.setTestRuns(testRuns);
+		return laboratoryOrderDetails;
+	}
+
+	public static ProviderApproval mockProviderApproval() {
+		ProviderApproval providerApproval = new ProviderApproval();
+		providerApproval.setApprovalDate(Calendar.getInstance());
+		providerApproval.setApproved(true);
+		providerApproval.setApprovingProvider(mockapprovingProvider());
+		providerApproval.setRequiresApproval(true);
+		return providerApproval;
+	}
+
+	public static Laboratory mockLaboratory() {
+		Laboratory lab = new Laboratory();
+		lab.setContact(DataBuilder.getMockPhone());
+		lab.setDefaultLaboratory(true);
+		lab.setId("f450237e-20a3-4bf1-b64d-9ecaab16be7a");
+		lab.setLocation(DataBuilder.getMockAddress());
+		lab.setMeta(DataBuilder.getMockMeta());
+		lab.setName("San Diego");
+		return lab;
+	}
+
+	public static Consent mockConsent() {
+		Consent patientConsent = new Consent();
+		patientConsent.setApproval(true);
+		patientConsent.setApprovalDate(Calendar.getInstance());
+		patientConsent.setFormName("Medical Informed Consent Form");
+		patientConsent.setId("6L");
+		// patientConsent.setLaboratoryOrder(mockLaboratoryOrder());
+		patientConsent.setPatient(mockUser());
+		patientConsent.setType(ConsentType.MEDICAL);
+		return patientConsent;
+	}
+
+	public static Provider mockapprovingProvider() {
+		Provider approvingProvider = new Provider();
+		approvingProvider.setContactAddress(DataBuilder.getMockAddress());
+		approvingProvider.setContactPhone(DataBuilder.getMockPhone());
+		approvingProvider.setDefaultProvider(true);
+		approvingProvider.setEmail("no-email@junodx.com");
+		approvingProvider.setFirstName("Ralphie");
+		approvingProvider.setId("b1ee000c-f947-46d9-b3df-e5f53cae34b3");
+		approvingProvider.setLastName("Jones");
+		licenses.add(DataBuilder.getMockMedicalLicense());
+		approvingProvider.setLicenses(licenses);
+		approvingProvider.setLimsId("78788");
+		approvingProvider.setMeta(DataBuilder.getMockMeta());
+		approvingProvider.setNpi("234234324");
+		approvingProvider.setPractice(DataBuilder.getMockPractice());
+		approvingProvider.setPracticing(true);
+		// approvingProvider.setSalesforceId(null);
+		// specialties.add(mockSpecialty());
+		approvingProvider.setSpecialties(specialties);
+		approvingProvider.setStatus(UserStatus.NEW);
+		approvingProvider.setUpin("345435435345");
+		// approvingProvider.setXifinId(null);
+		return approvingProvider;
+	}
+}

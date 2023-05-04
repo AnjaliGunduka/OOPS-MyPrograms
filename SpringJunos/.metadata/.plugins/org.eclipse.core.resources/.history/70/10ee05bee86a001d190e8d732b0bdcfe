@@ -1,0 +1,17 @@
+package com.junodx.api.models.commerce;
+
+public class DataBuilder {
+	public static UserDetailsImpl userDetailsImpl = (UserDetailsImpl) new UserDetailsImpl(1L, "General_test_user",
+			"no-email@junodx.com", "1L", "Password&123", "12345", authorities);
+	public static UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+			userDetailsImpl, "Password&123");
+
+	public static UserDetailsImpl getMockUserDetailsImpl() {
+		UserDetailsImpl userDetailsImpls = new UserDetailsImpl(1L, "General_test_user", "no-email@junodx.com", "1L",
+				"Password&123", null, authorities);
+		userDetailsImpls.setPracticeId("2L");
+		userDetailsImpls.setType(UserType.LAB);
+		return userDetailsImpls;
+
+	}
+}

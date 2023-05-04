@@ -1,0 +1,34 @@
+info:
+    app:
+        java:
+            version: 11
+        name: college Service
+        type: Spring Boot
+management:
+    endpoints:
+        web:
+            exposure:
+                include: '*'
+server:
+    port: 6583
+spring:
+    application:
+        name: collegeservice
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: Tiger
+        url: jdbc:mysql://localhost:3306/clgs
+        username: root
+    flyway:
+        baseline-on-migrate: true
+        baseline-version: 1
+        enabled: true
+        table: COLLEGE_SERVICE_FLYWAY_HISTORY
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL57Dialect
+        generate-ddl: true
+        hibernate:
+            ddl-auto: validate
+            naming:
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        show-sql: true

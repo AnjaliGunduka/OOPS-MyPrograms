@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="java.lang.Math"/>
+<fullyQualifiedTypeName name="org.junit.jupiter.api.BeforeEach"/>
+<fullyQualifiedTypeName name="org.junit.jupiter.api.BeforeAll"/>
+<fullyQualifiedTypeName name="org.junit.jupiter.api.AfterEach"/>
+<fullyQualifiedTypeName name="org.junit.jupiter.api.TestInstance"/>
+<fullyQualifiedTypeName name="org.junit.jupiter.api.TestInstance.Lifecycle"/>
+<fullyQualifiedTypeName name="org.junit.jupiter.api.DisplayName"/>
+<fullyQualifiedTypeName name="org.junit.jupiter.api.Disabled"/>
+<fullyQualifiedTypeName name="org.junit.jupiter.api.Nested"/>
+<fullyQualifiedTypeName name="org.junit.Test"/>
+<fullyQualifiedTypeName name="java.util.logging.Logger"/>
+<fullyQualifiedTypeName name="java.security.Timestamp"/>
+<fullyQualifiedTypeName name="java.sql.Timestamp"/>
+<fullyQualifiedTypeName name="org.apache.log4j.Logger"/>
+<fullyQualifiedTypeName name="com.information.example.Calculator"/>
+<fullyQualifiedTypeName name="org.junit.jupiter.api.RepeatedTest"/>
+<fullyQualifiedTypeName name="junit.framework.Assert"/>
+</qualifiedTypeNameHistroy>

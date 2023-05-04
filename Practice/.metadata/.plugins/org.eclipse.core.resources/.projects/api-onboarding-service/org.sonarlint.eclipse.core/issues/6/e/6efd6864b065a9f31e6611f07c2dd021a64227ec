@@ -1,0 +1,20 @@
+
+g
+java:S2209¡"5Change this instance-reference to a static reference.(ŽœøžýÿÿÿÿHœMRMAJORZ
+CODE_SMELL
+‹
+java:S2293ÿ"YReplace the type specification in this constructor call with the diamond operator ("<>").(›³ªóûÿÿÿÿH˜MRMINORZ
+CODE_SMELL
+‹
+java:S2293ì"YReplace the type specification in this constructor call with the diamond operator ("<>").(¼³…‰ýÿÿÿÿH–MRMINORZ
+CODE_SMELL
+G
+java:S2119²"Save and re-use this "Random".(–áÍÈH¢MRCRITICALZBUG
+h	java:S125¨"<This block of commented-out lines of code should be removed.(˜­H MRMAJORZ
+CODE_SMELL
+‹
+java:S2293Š"YReplace the type specification in this constructor call with the diamond operator ("<>").(¼³…‰ýÿÿÿÿHšMRMINORZ
+CODE_SMELL
+g
+java:S2209¤"5Change this instance-reference to a static reference.(µÙ²ßùÿÿÿÿHžMRMAJORZ
+CODE_SMELL

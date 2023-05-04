@@ -1,0 +1,88 @@
+
+x	java:S112"FDefine and throw a dedicated exception instead of using a generic one.(ÉöÜİşÿÿÿÿHÉ§RMAJORZ
+CODE_SMELL
+x	java:S112¼"FDefine and throw a dedicated exception instead of using a generic one.(ÆÍìÀşÿÿÿÿHÊ§RMAJORZ
+CODE_SMELL
+x	java:S112º"FDefine and throw a dedicated exception instead of using a generic one.(ÕáÉúÿÿÿÿHË§RMAJORZ
+CODE_SMELL
+s	java:S112Â"FDefine and throw a dedicated exception instead of using a generic one.(îæ‰‚HÌ§RMAJORZ
+CODE_SMELL
+x	java:S112À"FDefine and throw a dedicated exception instead of using a generic one.(ğªà±øÿÿÿÿHÍ§RMAJORZ
+CODE_SMELL
+b
+java:S3740˜"/Provide the parametrized type for this generic.(°ùı§ÿÿÿÿÿHÎ§RMAJORZ
+CODE_SMELL
+b
+java:S3740˜"/Provide the parametrized type for this generic.(°ùı§ÿÿÿÿÿHÏ§RMAJORZ
+CODE_SMELL
+]
+java:S3740™"/Provide the parametrized type for this generic.(˜¿—HĞ§RMAJORZ
+CODE_SMELL
+]
+java:S3740™"/Provide the parametrized type for this generic.(˜¿—HÑ§RMAJORZ
+CODE_SMELL
+]
+java:S3740š"/Provide the parametrized type for this generic.(ÈàÄıHÒ§RMAJORZ
+CODE_SMELL
+]
+java:S3740š"/Provide the parametrized type for this generic.(ÈàÄıHÓ§RMAJORZ
+CODE_SMELL
+€
+java:S3655ğ"TCall "lookupUser.isPresent()" or "!lookupUser.isEmpty()" before accessing the value.(şäû¡øÿÿÿÿHÔ§RMAJORZBUG
+p
+java:S2583Ç"DChange this condition so that it does not always evaluate to "false"(°«ŞüÿÿÿÿHÕ§RMAJORZBUG
+c
+java:S11359"2Complete the task associated to this TODO comment.(Ğ£Ë´şÿÿÿÿHØ§RINFOZ
+CODE_SMELL
+‚
+java:S3776g"RRefactor this method to reduce its Cognitive Complexity from 46 to the 15 allowed.(ÔºîÂHÙ§RCRITICALZ
+CODE_SMELL
+j
+java:S1854"<Remove this useless assignment to local variable "deviceId".(ïĞïµHú§RMAJORZ
+CODE_SMELL
+o
+java:S1854Ÿ"<Remove this useless assignment to local variable "provider".(ËœØÜÿÿÿÿÿHû§RMAJORZ
+CODE_SMELL
+n	java:S125„"<This block of commented-out lines of code should be removed.(õ‹£‰ùÿÿÿÿHü§RMAJORZ
+CODE_SMELL
+[
+java:S1481"-Remove this unused "deviceId" local variable.(ïĞïµH‡¨RMINORZ
+CODE_SMELL
+`
+java:S1481Ÿ"-Remove this unused "provider" local variable.(ËœØÜÿÿÿÿÿH‰¨RMINORZ
+CODE_SMELL
+n	java:S125¬"<This block of commented-out lines of code should be removed.(ÏŒ»ÊùÿÿÿÿH‹¨RMAJORZ
+CODE_SMELL
+d
+java:S1135Á"2Complete the task associated to this TODO comment.(®áÓœùÿÿÿÿHŒ¨RINFOZ
+CODE_SMELL
+n	java:S125Ã"<This block of commented-out lines of code should be removed.(ßúíùÿÿÿÿÿH¨RMAJORZ
+CODE_SMELL
+_
+java:S1135Ú"2Complete the task associated to this TODO comment.(ôöÕH¨RINFOZ
+CODE_SMELL
+n	java:S125æ"<This block of commented-out lines of code should be removed.(½Ä°úÿÿÿÿH¨RMAJORZ
+CODE_SMELL
+i	java:S125ú"<This block of commented-out lines of code should be removed.(ˆãÈ¯H¨RMAJORZ
+CODE_SMELL
+n	java:S125ˆ"<This block of commented-out lines of code should be removed.(½Ä°úÿÿÿÿH–¨RMAJORZ
+CODE_SMELL
+‚
+java:S2159"VRemove this call to "equals"; comparisons between unrelated types always return false.(šœñ»úÿÿÿÿH—¨RMAJORZBUG
+i	java:S125’"<This block of commented-out lines of code should be removed.(”¤ÓH˜¨RMAJORZ
+CODE_SMELL
+ˆ
+java:S3776¯"RRefactor this method to reduce its Cognitive Complexity from 22 to the 15 allowed.(ÊØƒÔûÿÿÿÿH™¨RCRITICALZ
+CODE_SMELL
+_
+java:S1135Ã"2Complete the task associated to this TODO comment.(‰»éúH¦¨RINFOZ
+CODE_SMELL
+q
+java:S1155Ä">Use isEmpty() to check whether the collection is empty or not.(„´êÏıÿÿÿÿH§¨RMINORZ
+CODE_SMELL
+{
+java:S1128"IRemove this unused import 'com.junodx.api.models.core.types.ClientTypes'.(Á×òæøÿÿÿÿH©¨RMINORZ
+CODE_SMELL
+\
+java:S1068a"*Remove this unused "logger" private field.(áª–¢øÿÿÿÿH«¨RMAJORZ
+CODE_SMELL

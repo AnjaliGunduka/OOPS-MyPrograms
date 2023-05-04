@@ -1,0 +1,4 @@
+GitRepositoriesView.GitDirectories=D\:\\Practice\\spring\\.git;D\:\\Practice\\api-onboarding-service\\.git;D\:\\Practice\\EmailService\\.git;
+GitRepositoriesView.GitDirectories.relative=spring\\.git;api-onboarding-service\\.git;EmailService\\.git;
+core_autoIgnoreDerivedResources=false
+eclipse.preferences.version=1

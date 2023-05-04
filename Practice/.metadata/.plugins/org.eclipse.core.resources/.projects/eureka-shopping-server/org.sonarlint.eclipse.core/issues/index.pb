@@ -1,0 +1,7 @@
+
+R
+"src/main/resources/application.yml,a\6\a6d8b8556fee0e03112ce2bf34b8cb27a7dc9e58
+r
+Bsrc/test/java/com/example/demo/ShoppingServerApplicationTests.java,b\b\bbcb2644574cd5e0c580f9eb403739396e71e80e
+7
+pom.xml,4\4\442292b8a7efeabbe4cc176709b833b1792140ec

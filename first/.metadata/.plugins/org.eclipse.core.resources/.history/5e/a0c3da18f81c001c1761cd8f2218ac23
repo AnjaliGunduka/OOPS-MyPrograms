@@ -1,0 +1,13 @@
+package com.jdbc.spring.hiber.dao;
+import java.util.List;
+
+import com.jdbc.spring.hiber.model.Customer;
+public interface UserDAO {
+	public List<Customer> list();
+    
+    public Customer get(int id);
+     
+    public void saveOrUpdate(Customer user);
+     
+    public void delete(int id);
+}

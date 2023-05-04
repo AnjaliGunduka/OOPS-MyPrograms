@@ -1,0 +1,68 @@
+package com.library.service.book.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.library.service.book.entity.Book;
+import com.library.service.book.entity.RequestBook;
+import com.library.service.book.entity.Student;
+import com.library.service.book.enums.RequestStatus;
+import com.library.service.book.exception.Constants;
+import com.library.service.book.exception.NotFoundException;
+import com.library.service.book.repository.RequestRepository;
+
+
+@Service
+public class RequestBookService {
+
+	@Autowired
+	RequestRepository requestRepository;
+
+	/**
+	 * This method is used to search RequestBooks based on Cardno
+	 * 
+	 * @param cardNo
+	 * @param requestId
+	 * @return
+	 */
+
+	public RequestBook getRequestBook(String cardNo) {
+		return requestRepository.findBycardNo(cardNo)
+				.orElseThrow(() -> new NotFoundException(Constants.REQUESTBOOK_NOT_FOUND + cardNo));
+	}
+	public RequestBook addRequestBook(RequestBookDto requestBookDto, Long studentId) throws RequestStatusException {
+		Student student = bookServiceClient.getStudent(authService.getAuthToken(), studentId);
+		Book book = bookServiceClient.getBooksByBookName(authService.getAuthToken(), requestBookDto.getBookName());
+		RequestBook requestBook = requestMapper.mapCreateStudentRequest(requestBookDto, student, book);
+	//	requestBook=requestRepository.findByStudentId(studentId);
+		if (requestBook.getStatus() == RequestStatus.REQUESTED) {
+			requestRepository.save(requestBook);
+		} else {
+			throw new RequestStatusException(Constants.STATUS_NOT_FOUND);
+		}
+		return requestBook;
+	}
+	/**
+	 * This method is used to search RequestBooks based on id
+	 * 
+	 * @param requestId
+	 * @return
+	 */
+	public RequestBook getRequestBook(Long requestBookId) {
+		return requestRepository.findById(requestBookId)
+				.orElseThrow(() -> new NotFoundException(Constants.REQUESTBOOK_NOT_FOUND + requestBookId));
+	}
+
+	/**
+	 * This method is used to get all RequestBooks
+	 * 
+	 * @return List
+	 */
+
+	public List<RequestBook> getAllRequestedBooks() {
+		return requestRepository.findAll();
+	}
+
+}

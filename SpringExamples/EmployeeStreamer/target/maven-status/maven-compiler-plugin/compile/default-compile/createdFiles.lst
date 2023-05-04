@@ -1,0 +1,5 @@
+com\javatechie\jpastreamer\entity\Employee.class
+com\javatechie\jpastreamer\SpringBootJpastreamerApplication.class
+com\javatechie\jpastreamer\service\EmployeeService.class
+com\javatechie\jpastreamer\repository\EmployeeRepository.class
+com\javatechie\jpastreamer\controller\EmployeeController.class

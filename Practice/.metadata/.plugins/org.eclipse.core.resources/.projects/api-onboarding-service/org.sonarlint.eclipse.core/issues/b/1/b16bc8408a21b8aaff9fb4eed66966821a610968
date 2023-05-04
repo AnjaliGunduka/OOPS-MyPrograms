@@ -1,0 +1,27 @@
+
+r
+java:S2259ë"FA "NullPointerException" could be thrown; "pathFile" is nullable here.(Œ¥¬­ıÿÿÿÿH†“RMAJORZBUG
+r
+java:S2259ü"FA "NullPointerException" could be thrown; "pathFile" is nullable here.(Œ¥¬­ıÿÿÿÿH‹“RMAJORZBUG
+f
+java:S1854Ü"8Remove this useless assignment to local variable "path".(Ë£öÉH“RMAJORZ
+CODE_SMELL
+W
+java:S1481Ü")Remove this unused "path" local variable.(Ë£öÉH‘“RMINORZ
+CODE_SMELL
+i	java:S125ç"<This block of commented-out lines of code should be removed.(«•†æH““RMAJORZ
+CODE_SMELL
+V	java:S108è")Either remove or fill this block of code.(ï­£ÄH”“RMAJORZ
+CODE_SMELL
+V	java:S108í")Either remove or fill this block of code.(ï­£ÄH•“RMAJORZ
+CODE_SMELL
+V	java:S108ø")Either remove or fill this block of code.(ï­£ÄH–“RMAJORZ
+CODE_SMELL
+V	java:S108ş")Either remove or fill this block of code.(ï­£ÄH—“RMAJORZ
+CODE_SMELL
+o
+java:S1128"BRemove this unused import 'com.bmt.onboarding.entity.EventOffers'.(ĞŸÒ¬H˜“RMINORZ
+CODE_SMELL
+b
+java:S1144ó"/Remove this unused private "getPdfPath" method.(Š¶ŞêşÿÿÿÿHš“RMAJORZ
+CODE_SMELL

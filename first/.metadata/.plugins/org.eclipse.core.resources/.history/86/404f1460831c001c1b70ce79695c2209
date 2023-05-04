@@ -1,0 +1,38 @@
+
+<html>
+
+<title>Stock Management System Demo</title>
+
+<body>
+
+	<h2>
+		<u><</u><u>center</u> <u>style</u><u>=</u><em><u>"margin-left:30%;
+				margin-right:30%;background-color: 11632E; color:#FFFFFF"</u></em><u>></u><u>
+			Welcome to Stock Management System</u><u></</u><u>center</u><u>></u>
+	</h2>
+
+	<div
+		style=" text-align:<em>center</em>; margin-left:<em>30%</em>; background-color: <em>#F1E6E6</em>; width:<em>40%</em>">
+
+		<c:url value=<em>"showadditionform"</em> var=<em>"add_form"</em> />
+
+		<h2>
+			<a href=<em>"</em> ${add_form} <em>"</em>> Add New Product</a>
+		</h2>
+
+		<br>
+
+		<c:url value=<em>"getall"</em> var=<em>"show_products"</em> />
+
+		<h2>
+			<a href=<em>"</em> ${show_products} <em>"</em>> Display All
+				Products</a>
+		</h2>
+
+
+
+	</div>
+
+</body>
+
+</html>

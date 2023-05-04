@@ -1,0 +1,79 @@
+
+¥
+java:S1192Ô"oDefine a constant instead of duplicating this literal "Cannot create or update product availability: " 3 times.(†›ßÁşÿÿÿÿHè€	RCRITICALZ
+CODE_SMELL
+a
+java:S1066K"/Merge this if statement with the enclosing one.(¥àãıÿÿÿÿHì€	RMAJORZ
+CODE_SMELL
+b
+java:S1066ú"/Merge this if statement with the enclosing one.(¥¹ÙºÿÿÿÿÿHñ€	RMAJORZ
+CODE_SMELL
+
+java:S2259»"UA "NullPointerException" could be thrown; "commerceMapStructMapper" is nullable here.(‚÷¦ıÿÿÿÿHõ€	RMAJORZBUG
+e
+java:S23879"1"mapper" is the name of a field in "ServiceBase".(íÉûÿÿÿÿHø€	RBLOCKERZ
+CODE_SMELL
+h	java:S125?"<This block of commented-out lines of code should be removed.(¬Ÿ±ÌHù€	RMAJORZ
+CODE_SMELL
+p
+java:S1155O">Use isEmpty() to check whether the collection is empty or not.(Å×ıüÿÿÿÿHü€	RMINORZ
+CODE_SMELL
+p
+java:S1155S">Use isEmpty() to check whether the collection is empty or not.(Ò¬äÿÿÿÿÿHÿ€	RMINORZ
+CODE_SMELL
+t
+java:S1126Ÿ"AReplace this if-then-else statement by a single return statement.(Â×ìšüÿÿÿÿH‚	RMINORZ
+CODE_SMELL
+y
+java:S4034Ÿ"FReplace this "filter().findAny().isPresent()" chain with "anyMatch()".(Â×ìšüÿÿÿÿHƒ	RMINORZ
+CODE_SMELL
+‚
+java:S2159Ÿ"VRemove this call to "equals"; comparisons between unrelated types always return false.(Â×ìšüÿÿÿÿH„	RMAJORZBUG
+ˆ
+java:S3776¥"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(¾ãš¸üÿÿÿÿH…	RCRITICALZ
+CODE_SMELL
+q
+java:S1155Á">Use isEmpty() to check whether the collection is empty or not.(‡¨¡—ıÿÿÿÿHš	RMINORZ
+CODE_SMELL
+q
+java:S1155Ã">Use isEmpty() to check whether the collection is empty or not.(€ƒ¼ÊşÿÿÿÿH	RMINORZ
+CODE_SMELL
+l
+java:S1155Å">Use isEmpty() to check whether the collection is empty or not.(ĞÅ¦“H 	RMINORZ
+CODE_SMELL
+ƒ
+java:S3776é"RRefactor this method to reduce its Cognitive Complexity from 22 to the 15 allowed.(¨‹÷¾H£	RCRITICALZ
+CODE_SMELL
+u
+java:S1126‰"BReplace this if-then-else statement by a single method invocation.(—ò”·ÿÿÿÿÿH±	RMINORZ
+CODE_SMELL
+ƒ
+java:S3776™"RRefactor this method to reduce its Cognitive Complexity from 43 to the 15 allowed.(€ĞÍçH²	RCRITICALZ
+CODE_SMELL
+q
+java:S1155©">Use isEmpty() to check whether the collection is empty or not.(Å×ıüÿÿÿÿHÉ	RMINORZ
+CODE_SMELL
+q
+java:S1155®">Use isEmpty() to check whether the collection is empty or not.(Ò¬äÿÿÿÿÿHÌ	RMINORZ
+CODE_SMELL
+…
+java:S2737Ä"WAdd logic to this catch clause or eliminate it and rethrow the exception automatically.(ö™ûHÏ	RMINORZ
+CODE_SMELL
+}
+java:S1128"KRemove this unused import 'com.junodx.api.dto.mappers.UserMapStructMapper'.(˜Çé’úÿÿÿÿHĞ	RMINORZ
+CODE_SMELL
+u
+java:S1128"CRemove this unused import 'com.junodx.api.models.auth.OAuthClient'.(¦àÛ­ûÿÿÿÿHÒ	RMINORZ
+CODE_SMELL
+€
+java:S1128"NRemove this unused import 'com.junodx.api.repositories.OAuthClientRepository'.(ëË¤ŞıÿÿÿÿHÔ	RMINORZ
+CODE_SMELL
+x
+java:S1128"FRemove this unused import 'com.junodx.api.services.auth.OAuthService'.(·±øßüÿÿÿÿHÖ	RMINORZ
+CODE_SMELL
+v
+java:S1128"DRemove this unused import 'org.springframework.data.domain.Example'.(³˜œÍüÿÿÿÿHØ	RMINORZ
+CODE_SMELL
+\
+java:S10689"*Remove this unused "mapper" private field.(íÉûÿÿÿÿHÚ	RMAJORZ
+CODE_SMELL

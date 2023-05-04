@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.junodx.api.controllers.lab.TestRunControllerTest
+-------------------------------------------------------------------------------
+Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.094 s - in com.junodx.api.controllers.lab.TestRunControllerTest

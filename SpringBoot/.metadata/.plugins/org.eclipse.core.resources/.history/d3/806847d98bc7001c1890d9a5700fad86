@@ -1,0 +1,10 @@
+package com.javatechie.redis.respository;
+
+import org.springframework.data.repository.CrudRepository;
+
+import com.javatechie.redis.entity.Product;
+
+
+public interface ProductDaos extends CrudRepository<Product, Integer>{
+
+}

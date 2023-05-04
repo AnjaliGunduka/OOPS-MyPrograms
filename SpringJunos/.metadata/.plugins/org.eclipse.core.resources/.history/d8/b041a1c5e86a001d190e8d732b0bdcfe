@@ -1,0 +1,29 @@
+package com.junodx.api.models.commerce;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+
+import com.junodx.api.models.auth.User;
+import com.junodx.api.services.auth.UserDetailsImpl;
+
+public class DataBuilder {
+	public static User user = User.createDummyUser();
+	public static List<GrantedAuthority> authorities = user.getAuthorities().stream()
+			.map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+	public static UserDetailsImpl userDetailsImpl = (UserDetailsImpl) new UserDetailsImpl(1L, "General_test_user",
+			"no-email@junodx.com", "1L", "Password&123", "12345", authorities);
+	public static UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+			userDetailsImpl, "Password&123");
+
+	public static UserDetailsImpl getMockUserDetailsImpl() {
+		UserDetailsImpl userDetailsImpls = new UserDetailsImpl(1L, "General_test_user", "no-email@junodx.com", "1L",
+				"Password&123", null, authorities);
+		userDetailsImpls.setPracticeId("2L");
+		userDetailsImpls.setType(UserType.LAB);
+		return userDetailsImpls;
+
+	}
+}

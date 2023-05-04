@@ -1,0 +1,19 @@
+
+ƒ
+java:S1128"VRemove this unused import 'io.github.resilience4j.ratelimiter.annotation.RateLimiter'.(ÿƒŠHİ’RMINORZ
+CODE_SMELL
+U
+java:S11722"(Remove this unused method parameter "e".(®Â°¡Hå’RMAJORZ
+CODE_SMELL
+|
+java:S1128"JRemove this unused import 'io.github.resilience4j.retry.annotation.Retry'.(Ä³ß¾úÿÿÿÿHÛ’RMINORZ
+CODE_SMELL
+^
+java:S1068&"+Remove this unused "attempt" private field.(£Ÿş8”Û£Øì0HÙ’RMAJORZ
+CODE_SMELL
+_
+java:S1128"+Remove this unused import 'java.util.Date'.(¸…¼ü8”Û£Øì0Hß’RMINORZ
+CODE_SMELL
+
+java:S11924"LDefine a constant instead of duplicating this literal "electronics" 3 times.(ª°§»şÿÿÿÿHá’RCRITICALZ
+CODE_SMELL

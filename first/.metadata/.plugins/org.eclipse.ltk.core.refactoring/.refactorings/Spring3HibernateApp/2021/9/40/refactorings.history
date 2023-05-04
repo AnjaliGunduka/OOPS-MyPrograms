@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;database.properties&apos; to &apos;resources&apos;&#x0D;&#x0A;- Original project: &apos;Spring3HibernateApp&apos;&#x0D;&#x0A;- Destination element: &apos;resources&apos;&#x0D;&#x0A;- Original element: &apos;database.properties&apos;" description="Copy file" element1="src/resources/database.properties" files="1" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1632754868105" target="/Hiber_crud/src/main/resources" units="0" version="1.0"/>
+</session>

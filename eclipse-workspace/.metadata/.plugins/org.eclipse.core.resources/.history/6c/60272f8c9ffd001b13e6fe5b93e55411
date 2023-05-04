@@ -1,0 +1,13 @@
+package Classes;
+
+public class AcceesSpecifierMethod {
+int add1;
+int add2;
+int c=add(add1+add2);
+private int add(int i,int j) {
+	// TODO Auto-generated method stub
+	return add1+add2;
+}
+
+
+}

@@ -1,0 +1,7 @@
+
+[
+java:S1452,"&Remove usage of generic wildcard type.(ΨΕ²ϊÿÿÿÿHΊΥRCRITICALZ
+CODE_SMELL
+|
+java:S4488+"JReplace "@RequestMapping(method = RequestMethod.POST)" with "@PostMapping"(ΓθοϋÿÿÿÿH»ΥRMINORZ
+CODE_SMELL

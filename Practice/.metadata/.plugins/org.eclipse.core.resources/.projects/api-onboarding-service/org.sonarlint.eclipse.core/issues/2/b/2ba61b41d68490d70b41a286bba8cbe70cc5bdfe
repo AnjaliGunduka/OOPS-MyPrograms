@@ -1,0 +1,10 @@
+
+|
+java:S1128+"JRemove this unused import 'com.bmt.onboarding.service.UserCronJobService'.(ÃèßÝúÿÿÿÿHÊ˜RMINORZ
+CODE_SMELL
+v
+java:S1128 "IRemove this unused import 'com.bmt.onboarding.model.TokenPayLoadDetails'.(½Þ¨“HÌ˜RMINORZ
+CODE_SMELL
+u
+java:S1128""HRemove this unused import 'com.bmt.onboarding.request.EventByIdRequest'.(í¿û–HÎ˜RMINORZ
+CODE_SMELL

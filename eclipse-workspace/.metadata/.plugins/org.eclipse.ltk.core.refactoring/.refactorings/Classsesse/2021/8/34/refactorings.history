@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename local variable &apos;t&apos; in &apos;Classes.ScopeVariables.method1(...)&apos; to &apos;var&apos;&#x0D;&#x0A;- Original project: &apos;Classsesse&apos;&#x0D;&#x0A;- Original element: &apos;Classes.ScopeVariables.method1(int).t&apos;&#x0D;&#x0A;- Renamed element: &apos;t&apos;&#x0D;&#x0A;- Update references to refactored element" description="Rename local variable &apos;t&apos;" id="org.eclipse.jdt.ui.rename.local.variable" input="/src&lt;Classes{ScopeVariables.java[ScopeVariables~method1~I@t!140!179!155!155!QScopeVariables;!0!false" name="var" references="true" stamp="1629017579924" version="1.0"/>
+</session>

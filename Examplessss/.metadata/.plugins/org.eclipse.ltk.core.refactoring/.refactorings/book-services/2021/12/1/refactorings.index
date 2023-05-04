@@ -1,0 +1,23 @@
+1640502196254	Delete element
+1640505048412	Rename package 'com.library.service.book.entity'
+1640513648081	Delete element
+1640513653677	Delete element
+1640515933251	Rename local variable 'bookRequest'
+1640515970339	Rename local variable 'studentBookIssueResponse'
+1640516032802	Rename local variable 'studentBookIssueRequest'
+1640753963808	Copy package
+1640753969669	Copy package
+1640753974800	Copy package
+1640753979466	Copy package
+1640753984070	Copy package
+1640754009145	Copy package
+1640754014750	Copy package
+1640754019324	Copy package
+1640754024360	Copy package
+1640754028856	Copy package
+1640754034063	Copy package
+1640754038922	Copy package
+1640754875647	Copy compilation unit
+1640754885209	Copy compilation unit
+1640754892846	Copy compilation unit
+1640763337936	Rename field 'AUTH_WHITELIST'

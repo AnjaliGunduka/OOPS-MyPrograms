@@ -1,0 +1,5 @@
+package com.junodx.api.services.fulfillment;
+
+public class ShippoTest {
+
+}

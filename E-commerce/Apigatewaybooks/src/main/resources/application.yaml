@@ -1,0 +1,19 @@
+server:
+    port: 9999
+spring:
+    application:
+        name: gateway
+zuul:
+    routes:
+        book-service-1:
+            path: /bookServicess/**
+            url: http://localhost:9090/
+            stripPrefix: false
+        order-service-2:
+            path: /*
+            url: http://localhost:9092/
+            stripPrefix: false
+    sensitiveHeaders: Cookie,Set-Cookie
+    host:
+        connect-timeout-millis: 10000
+        socket-timeout-millis: 1000000

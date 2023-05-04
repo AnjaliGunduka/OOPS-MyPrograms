@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.Hiber</groupId>
+  <artifactId>Com.hiber.crud</artifactId>
+  <packaging>war</packaging>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Com.hiber.crud Maven Webapp</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+        <spring.version>5.1.0.RELEASE</spring.version>
+        <hibernate.version>5.3.5.Final</hibernate.version>
+        <hibernate.validator>5.4.1.Final</hibernate.validator>
+        <c3p0.version>0.9.5.2</c3p0.version>
+        <jstl.version>1.2.1</jstl.version>
+        <tld.version>1.1.2</tld.version>
+        <servlets.version>3.1.0</servlets.version>
+        <jsp.version>2.3.1</jsp.version>
+        <hsqldb.version>1.8.0.10</hsqldb.version>
+    </properties>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <build>
+    <finalName>Com.hiber.crud</finalName>
+    <plugins>
+		  <plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-war-plugin</artifactId>
+			  <version>2.4</version>
+			  <configuration>
+				 <warName>${context.path}</warName>
+			  </configuration>
+		  </plugin>
+	  </plugins>
+  </build>
+</project>
+    
+    
+    
+    
+    
+    
+  
+  
+

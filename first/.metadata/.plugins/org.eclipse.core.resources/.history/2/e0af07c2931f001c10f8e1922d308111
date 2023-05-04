@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<web-app xmlns="<a class="vglnk" href="http://java.sun.com/xml/ns/javaee" rel="nofollow"><span>http</span><span>://</span><span>java</span><span>.</span><span>sun</span><span>.</span><span>com</span><span>/</span><span>xml</span><span>/</span><span>ns</span><span>/</span><span>javaee</span></a>" xmlns:xsi="<a class="vglnk" href="http://www.w3.org/2001/XMLSchema-instance" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>w3</span><span>.</span><span>org</span><span>/</span><span>2001</span><span>/</span><span>XMLSchema</span><span>-</span><span>instance</span></a>"
+    xsi:schemaLocation="<a class="vglnk" href="http://java.sun.com/xml/ns/javaee" rel="nofollow"><span>http</span><span>://</span><span>java</span><span>.</span><span>sun</span><span>.</span><span>com</span><span>/</span><span>xml</span><span>/</span><span>ns</span><span>/</span><span>javaee</span></a>
+          <a class="vglnk" href="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" rel="nofollow"><span>http</span><span>://</span><span>java</span><span>.</span><span>sun</span><span>.</span><span>com</span><span>/</span><span>xml</span><span>/</span><span>ns</span><span>/</span><span>javaee</span><span>/</span><span>web</span><span>-</span><span>app</span><span>_</span><span>3</span><span>_</span><span>0</span><span>.</span><span>xsd</span></a>"
+    version="3.0">
+ 
+    <display-name>Spring MVC Hibernate CRUD Example</display-name>
+ 
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/spring-servlet.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>spring</servlet-name>
+        <servlet-class>
+            org.springframework.web.servlet.DispatcherServlet
+        </servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+ 
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+ 
+</web-app>

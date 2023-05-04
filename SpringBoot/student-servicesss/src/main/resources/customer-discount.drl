@@ -1,0 +1,27 @@
+package com.student.library.services;
+import com.student.library.services.request.RequestBookDto;
+import com.student.library.services.config.DroolsConfig;
+import com.student.library.services.enums.RequestStatus;
+import com.student.library.services.repository.RequestRepository;
+import com.student.library.services.exception.RequestStatusException;
+global com.student.library.services.entity.RequestBook requestBook;
+ 
+dialect "mvel"
+ 
+
+ 
+rule "Book Based On Requested"
+    when
+        requestBookDtoObject:RequestBookDto(status=="REQUESTED");
+    then
+        System.out.println("==========Adding 5% discount for LOYAL customer=============");
+            requestRepository.save(requestBook);        
+end;
+     
+rule "Book Based On Requested - others"
+    when
+    requestBookDtoObject:RequestBookDto(status!="APPROVED");
+    then
+         throw new RequestStatusException("You cannot have an access to Approve/Reject ie,.you can only Request a Book");
+end;
+ 

@@ -1,0 +1,59 @@
+<beans xmlns="<a class="vglnk" href="http://www.springframework.org/schema/beans" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>beans</span></a>"
+    xmlns:xsi="<a class="vglnk" href="http://www.w3.org/2001/XMLSchema-instance" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>w3</span><span>.</span><span>org</span><span>/</span><span>2001</span><span>/</span><span>XMLSchema</span><span>-</span><span>instance</span></a>" xmlns:tx="<a class="vglnk" href="http://www.springframework.org/schema/tx" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>tx</span></a>"
+    xmlns:mvc="<a class="vglnk" href="http://www.springframework.org/schema/mvc" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>mvc</span></a>" xmlns:context="<a class="vglnk" href="http://www.springframework.org/schema/context" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>context</span></a>"
+    xsi:schemaLocation="<a class="vglnk" href="http://www.springframework.org/schema/beans" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>beans</span></a> <a class="vglnk" href="http://www.springframework.org/schema/beans/spring-beans.xsd" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>beans</span><span>/</span><span>spring</span><span>-</span><span>beans</span><span>.</span><span>xsd</span></a>
+       <a class="vglnk" href="http://www.springframework.org/schema/tx" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>tx</span></a> <a class="vglnk" href="http://www.springframework.org/schema/tx/spring-tx.xsd" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>tx</span><span>/</span><span>spring</span><span>-</span><span>tx</span><span>.</span><span>xsd</span></a>
+       <a class="vglnk" href="http://www.springframework.org/schema/mvc" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>mvc</span></a> <a class="vglnk" href="http://www.springframework.org/schema/mvc/spring-mvc.xsd" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>mvc</span><span>/</span><span>spring</span><span>-</span><span>mvc</span><span>.</span><span>xsd</span></a>
+       <a class="vglnk" href="http://www.springframework.org/schema/context" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>context</span></a> <a class="vglnk" href="http://www.springframework.org/schema/context/spring-context.xsd" rel="nofollow"><span>http</span><span>://</span><span>www</span><span>.</span><span>springframework</span><span>.</span><span>org</span><span>/</span><span>schema</span><span>/</span><span>context</span><span>/</span><span>spring</span><span>-</span><span>context</span><span>.</span><span>xsd</span></a>">
+ 
+    <!-- Specifying base package of the Components like Controller, Service,
+        DAO -->
+    <context:component-scan base-package="com.jwt" />
+ 
+    <!-- Getting Database properties -->
+    <context:property-placeholder location="classpath:application.properties" />
+ 
+    <mvc:annotation-driven />
+ 
+    <!-- Specifying the Resource location to load JS, CSS, Images etc -->
+    <mvc:resources mapping="/resources/**" location="/resources/" />
+ 
+    <!-- View Resolver -->
+    <bean
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/pages/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+ 
+    <!-- DataSource -->
+    <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+        id="dataSource">
+        <property name="driverClassName" value="${database.driver}"></property>
+        <property name="url" value="${database.url}"></property>
+        <property name="username" value="${database.user}"></property>
+        <property name="password" value="${database.password}"></property>
+    </bean>
+ 
+    <!-- Hibernate SessionFactory -->
+    <bean id="sessionFactory"
+        class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+                <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+                <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+            </props>
+        </property>
+        <property name="packagesToScan" value="com.jwt.model"></property>
+    </bean>
+ 
+    <!-- Transaction -->
+    <bean id="transactionManager"
+        class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+ 
+    <tx:annotation-driven transaction-manager="transactionManager" />
+</beans>

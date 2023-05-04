@@ -1,0 +1,36 @@
+info:
+    app:
+        java:
+            version: 11
+        name: Book Service
+        type: Spring Boot
+management:
+    endpoints:
+        web:
+            exposure:
+                include: '*'
+server:
+    port: 9090
+spring:
+    application:
+        name: book-service
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: Tiger
+        url: jdbc:mysql://localhost:3306/booking
+        username: root
+    flyway:
+        baseline-on-migrate: true
+        baseline-version: 1
+        enabled: true
+        table: BANK_SERVICE_FLYWAY_HISTORY
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL57Dialect
+        generate-ddl: true
+        hibernate:
+            ddl-auto: validate
+            naming:
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        show-sql: true
+jwt:
+    secret: testoper-secret

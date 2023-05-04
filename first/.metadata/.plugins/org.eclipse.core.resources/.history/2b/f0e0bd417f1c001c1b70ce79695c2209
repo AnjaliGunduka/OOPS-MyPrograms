@@ -1,0 +1,5 @@
+package com.hiber.model;
+
+public class Product {
+
+}

@@ -1,0 +1,5 @@
+dockerMachineInstallDir=C\:\\Program Files\\Docker\\Docker\\resources\\bin
+eclipse.preferences.version=1
+filterWithLabels=false
+showAllContainers=true
+showAllImages=false

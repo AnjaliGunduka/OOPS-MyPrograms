@@ -1,0 +1,9 @@
+
+€
+java:S1128"SRemove this unused import 'org.springframework.web.bind.annotation.ResponseStatus'.(―ΧρHΡÿRMINORZ
+CODE_SMELL
+Λ
+java:S1845"›Rename field "CODE" to prevent any misunderstanding/clash with field "code" defined in superclass "com.junodx.api.services.exceptions.JdxServiceException".(―υÒHΣÿRBLOCKERZ
+CODE_SMELL
+‰	java:S115	"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(Ψΐ£ζHΤÿRCRITICALZ
+CODE_SMELL

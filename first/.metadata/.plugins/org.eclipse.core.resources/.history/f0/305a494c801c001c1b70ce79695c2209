@@ -1,0 +1,5 @@
+package com.hiber.dao;
+
+public class ProductDAOImpl {
+
+}

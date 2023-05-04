@@ -1,0 +1,27 @@
+package com.spring.demo;
+
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
+
+@Service
+public class StudentService {
+	@Autowired
+    private KieContainer kieContainer;
+	@Autowired
+	StudentRepository studentRepository;
+	public Student getStudent(Student orderRequest) {
+        KieSession kieSession = kieContainer.newKieSession();
+        kieSession.insert(orderRequest);
+        kieSession.fireAllRules();
+        kieSession.dispose();    
+        return studentRepository.save(orderRequest);
+    }
+//	public Ticket createTicket(Ticket ticket) {
+//		return ticketBookingDao.save(ticket);
+//	}
+	
+}

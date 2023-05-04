@@ -1,0 +1,14 @@
+version: "3"
+services:
+  BookStore:
+    image: mongo:latest
+    container_name: "BookStore"
+    ports:
+      - 27017:27017
+  sprin-mongodb:
+    image: sprin-mongodb:1.0
+    container_name: sprin-mongodb
+    ports:
+      - 9080:9080
+    links:
+      - BookStore

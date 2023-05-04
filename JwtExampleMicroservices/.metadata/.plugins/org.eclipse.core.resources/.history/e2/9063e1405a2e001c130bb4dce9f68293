@@ -1,0 +1,12 @@
+spring.Citizenservice.datasource.jdbcUrl=jdbc:postgresql://localhost:5432/appointmentsdb
+spring.Citizenservice.datasource.username=postgres
+spring.Citizenservice.datasource.password=root
+
+#Admissions Datasource
+spring.VaccinationExample.datasource.jdbcUrl=jdbc:mysql://localhost:3301/admissionsdb?serverTimezone=UTC
+spring.VaccinationExample.datasource.username=root
+spring.VaccinationExample.datasource.password=root
+spring.VaccinationExample.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+spring.jpa.generate-ddl=true
+spring.jpa.show-sql=true

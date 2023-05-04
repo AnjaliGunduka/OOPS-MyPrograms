@@ -1,0 +1,35 @@
+package com.sergio.bookstore.service.prices.services;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import com.bookstore.service.prices.dto.PriceDto;
+import com.bookstore.service.prices.exceptions.AppException;
+import com.bookstore.service.prices.mappers.PriceMapper;
+import com.bookstore.service.prices.respositories.PriceRepository;
+
+
+@Service
+public class PriceService {
+	@Autowired
+    private  PriceRepository priceRepository;
+	@Autowired
+    private  PriceMapper priceMapper;
+	
+
+    public PriceDto getPrice(long bookId) {
+        var priceOptional = priceRepository.findByBookId(bookId);
+
+        if (priceOptional.isEmpty()) {
+            throw new AppException("No price for book " + bookId, HttpStatus.NOT_FOUND);
+        }
+
+        var priceDto = priceMapper.toPriceDto(priceOptional.get());
+
+//        var book = serviceBooks.getBook(bookId);
+//        priceDto.setBook(book);
+
+        return priceDto;
+    }
+}

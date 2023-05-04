@@ -1,0 +1,20 @@
+package Classes;
+
+public class StaticMethod {
+	String name;
+	int id;
+
+	public StaticMethod(String name, int id) {
+		super();
+		this.name = name;
+		this.id = id;
+	}
+
+	static void a() {
+		System.out.println("hi");
+	}
+
+	public static void main(String[] args) {
+
+	}
+}

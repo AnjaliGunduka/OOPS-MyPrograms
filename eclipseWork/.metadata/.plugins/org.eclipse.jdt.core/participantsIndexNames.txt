@@ -1,0 +1,3 @@
+INDEX VERSION 1.131
+D:\eclipseWork\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2080939791.index
+\LoginStructs\src\main\java

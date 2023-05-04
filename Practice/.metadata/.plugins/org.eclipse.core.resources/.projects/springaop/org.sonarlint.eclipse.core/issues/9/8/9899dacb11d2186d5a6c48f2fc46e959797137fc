@@ -1,0 +1,19 @@
+
+–
+java:S1128"^Remove this unused import 'org.springframework.security.authentication.AuthenticationManager'.(ğş–şÿÿÿÿ8éÿÕ¹é0HÆ_RMINORZ
+CODE_SMELL
+´
+java:S1128"€Remove this unused import 'org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder'.(£ØÓ‰8ûªÔ¹é0H³_RMINORZ
+CODE_SMELL
+
+java:S1128"]Remove this unused import 'org.springframework.security.core.userdetails.UserDetailsService'.(¶…¥à8ûªÔ¹é0Hµ_RMINORZ
+CODE_SMELL
+¤
+java:S1128"qRemove this unused import 'org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter'.(÷ìïŠ8öÌÊ¹é0H_RMINORZ
+CODE_SMELL
+®
+java:S1128"{Remove this unused import 'org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity'.(Ô¦ø8í…Ò¹é0H¥_RMINORZ
+CODE_SMELL
+“
+java:S1128"[Remove this unused import 'org.springframework.security.config.http.SessionCreationPolicy'.(‚ÌÎîüÿÿÿÿ8ĞòĞ¹é0H˜_RMINORZ
+CODE_SMELL

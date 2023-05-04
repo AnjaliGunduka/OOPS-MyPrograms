@@ -1,0 +1,5 @@
+package com.junodx.api.models.commerce;
+
+public class DataBuilderOrder {
+
+}

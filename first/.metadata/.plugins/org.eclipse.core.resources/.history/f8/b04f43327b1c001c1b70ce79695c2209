@@ -1,0 +1,5 @@
+package com.hiber.config;
+
+public class AppContext {
+
+}

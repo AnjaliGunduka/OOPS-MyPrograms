@@ -1,0 +1,5 @@
+package com.hiber.Service;
+
+public interface ProductService {
+
+}

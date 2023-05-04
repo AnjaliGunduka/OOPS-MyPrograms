@@ -1,0 +1,1733 @@
+package com.junodx.api.controllers.lab;
+
+import static org.assertj.core.api.Assertions.anyOf;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.any;
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.TokenBuffer;
+
+import java.net.URI;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Spliterator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+
+import org.apache.http.HttpStatus;
+import org.hibernate.mapping.ManyToOne;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.convert.threetenbp.ThreeTenBackPortJpaConverters.LocalTimeConverter;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import com.junodx.api.models.laboratory.types.ReportType;
+import com.junodx.api.models.laboratory.types.RetestActionType;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.graph.ElementOrder.Type;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.junodx.api.controllers.SortType;
+import com.junodx.api.controllers.lab.actions.TestReportUpdateActions;
+import com.junodx.api.controllers.lab.types.TestReportSortBy;
+import com.junodx.api.controllers.users.payloads.RolePayload;
+import com.junodx.api.dto.mappers.CommerceMapStructMapper;
+import com.junodx.api.dto.mappers.LaboratoryMapStructMapper;
+import com.junodx.api.dto.models.commerce.OrderBatchDto;
+import com.junodx.api.models.auth.Authority;
+import com.junodx.api.models.commerce.DataBuilderOrder;
+import com.junodx.api.models.laboratory.TestReport;
+import com.junodx.api.models.laboratory.reports.types.SignedOutType;
+import com.junodx.api.models.laboratory.types.ReportConfiguration;
+import com.junodx.api.models.providers.DataBuilder;
+import com.junodx.api.models.strings.TargetPortal;
+import com.junodx.api.services.exceptions.JdxServiceException;
+import com.junodx.api.services.lab.TestReportService;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+@AutoConfigureMockMvc
+@ContextConfiguration
+@SpringBootTest(classes = { TestReportControllerTest.class })
+public class TestReportControllerTest {
+
+	@Mock
+	private TestReportService testReportService;
+	@Mock
+	private ObjectMapper mapper;
+	@Mock
+	private LaboratoryMapStructMapper laboratoryMapStructMapper;
+
+	@Mock
+	private CommerceMapStructMapper commerceMapStructMapper;
+	@Mock
+	private Authentication authentication;
+	@Mock
+	private AuthenticationManager authenticationManager;
+	@Mock
+	private SecurityContext securityContext;
+	@Mock
+	private UsernamePasswordAuthenticationToken usernamePasswordAuthenticationTokens;
+	@InjectMocks
+	private TestReportController testReportController;
+	@Autowired
+	private MockMvc mockMvc;
+
+	private static TestReportUpdateActions mockedValueTestReportUpdateActions;
+
+	@BeforeEach
+	public void setUp() {
+		mockMvc = MockMvcBuilders.standaloneSetup(testReportController).build();
+		HttpServletRequest mockRequest = new MockHttpServletRequest();
+		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(mockRequest);
+		RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+	}
+
+	@Test
+	public void testReportActionsCreatetest() throws Exception {
+		String request = new Gson().toJson(DataBuilderOrder.mockTestReport().getSampleNumber());
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ObjectMapper objmapper = new ObjectMapper();
+		String inputJson = objmapper.writeValueAsString(request);
+		System.out.println(inputJson);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		JsonNode jsonNode = Mockito.spy(JsonNode.class);
+		when(mapper.readTree(request)).thenReturn(jsonNode);
+		TestReportUpdateActions[] newEnumValues = TestReportUpdateActions.APPROVE.values();
+		try (MockedStatic mockStatic = mockStatic(TestReportUpdateActions.class)) {
+			mockStatic.when(TestReportUpdateActions::values).thenReturn(newEnumValues);
+			mockedValueTestReportUpdateActions = newEnumValues[newEnumValues.length - 7];
+			mockStatic.when(() -> TestReportUpdateActions.valueOf(any()))
+					.thenReturn(mockedValueTestReportUpdateActions);
+			Mockito.when(jsonNode.get("action")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("APPROVE");
+			Mockito.when(jsonNode.get("pipelineRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("pipelineRunIdss");
+			Mockito.when(jsonNode.get("sequencingRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("sequencingRunIdss");
+			Mockito.when(jsonNode.get("userId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("userIdss");
+			Mockito.when(jsonNode.get("name")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("namess");
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			List<JsonNode> datasets = StreamSupport.stream(jsonNode.get("reports").spliterator(), true)
+					.collect(Collectors.toList());
+			datasets.add(jsonNode);
+			Iterator<JsonNode> iterator = datasets.iterator();
+			Iterator<JsonNode> iterators = jsonNode.get("reports").elements();
+			when(iterators).thenReturn(iterator);
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("reportssss");
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+			when(testReportService.approveTestReports(Mockito.any(), Mockito.anyString(), Mockito.any()))
+					.thenReturn(DataBuilderOrder.testReports);
+
+			this.mockMvc.perform(post("/api/labs/reports").content(request).contentType(MediaType.APPLICATION_JSON))
+					.andExpect(status().isOk()).andDo(print());
+		}
+	}
+
+	@Test
+	public void testReportActionsSignouttest() throws Exception {
+		String request = new Gson().toJson(DataBuilderOrder.mockTestReport().getSampleNumber());
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ObjectMapper objmapper = new ObjectMapper();
+		String inputJson = objmapper.writeValueAsString(request);
+		System.out.println(inputJson);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		JsonNode jsonNode = Mockito.spy(JsonNode.class);
+		when(mapper.readTree(request)).thenReturn(jsonNode);
+		TestReportUpdateActions[] newEnumValues = TestReportUpdateActions.APPROVE.values();
+		try (MockedStatic mockStatic = mockStatic(TestReportUpdateActions.class)) {
+			// myMockedCreate = mockStatic(TestReportUpdateActions.class);
+			mockStatic.when(TestReportUpdateActions::values).thenReturn(newEnumValues);
+			mockedValueTestReportUpdateActions = newEnumValues[newEnumValues.length - 5];
+			mockStatic.when(() -> TestReportUpdateActions.valueOf(any()))
+					.thenReturn(mockedValueTestReportUpdateActions);
+			Mockito.when(jsonNode.get("action")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("APPROVE");
+			Mockito.when(jsonNode.get("pipelineRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("pipelineRunIdss");
+			Mockito.when(jsonNode.get("sequencingRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("sequencingRunIdss");
+			Mockito.when(jsonNode.get("userId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("userIdss");
+			Mockito.when(jsonNode.get("name")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("namess");
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			List<JsonNode> datasets = StreamSupport.stream(jsonNode.get("reports").spliterator(), true)
+					.collect(Collectors.toList());
+			datasets.add(jsonNode);
+			Iterator<JsonNode> iterator = datasets.iterator();
+			Iterator<JsonNode> iterators = jsonNode.get("reports").elements();
+			when(iterators).thenReturn(iterator);
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("reportssss");
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+			when(testReportService.approveTestReports(Mockito.any(), Mockito.anyString(), Mockito.any()))
+					.thenReturn(DataBuilderOrder.testReports);
+
+			this.mockMvc.perform(post("/api/labs/reports").content(request).contentType(MediaType.APPLICATION_JSON))
+					.andExpect(status().isOk()).andDo(print());
+		}
+	}
+
+	@Test
+	public void testReportActionsApprovetest() throws Exception {
+		String request = new Gson().toJson(DataBuilderOrder.mockTestReport().getSampleNumber());
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ObjectMapper objmapper = new ObjectMapper();
+		String inputJson = objmapper.writeValueAsString(request);
+		System.out.println(inputJson);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		JsonNode jsonNode = Mockito.spy(JsonNode.class);
+		when(mapper.readTree(request)).thenReturn(jsonNode);
+		TestReportUpdateActions[] newEnumValues = TestReportUpdateActions.APPROVE.values();
+		try (MockedStatic mockStatic = mockStatic(TestReportUpdateActions.class)) {
+			// myMockedCreate = mockStatic(TestReportUpdateActions.class);
+			mockStatic.when(TestReportUpdateActions::values).thenReturn(newEnumValues);
+			mockedValueTestReportUpdateActions = newEnumValues[newEnumValues.length - 8];
+			mockStatic.when(() -> TestReportUpdateActions.valueOf(any()))
+					.thenReturn(mockedValueTestReportUpdateActions);
+			Mockito.when(jsonNode.get("action")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("APPROVE");
+			Mockito.when(jsonNode.get("pipelineRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("pipelineRunIdss");
+			Mockito.when(jsonNode.get("sequencingRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("sequencingRunIdss");
+			Mockito.when(jsonNode.get("userId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("userIdss");
+			Mockito.when(jsonNode.get("name")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("namess");
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			List<JsonNode> datasets = StreamSupport.stream(jsonNode.get("reports").spliterator(), true)
+					.collect(Collectors.toList());
+			datasets.add(jsonNode);
+			Iterator<JsonNode> iterator = datasets.iterator();
+			Iterator<JsonNode> iterators = jsonNode.get("reports").elements();
+			when(iterators).thenReturn(iterator);
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("reportssss");
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+			when(testReportService.approveTestReports(Mockito.any(), Mockito.anyString(), Mockito.any()))
+					.thenReturn(DataBuilderOrder.testReports);
+
+			this.mockMvc.perform(post("/api/labs/reports").content(request).contentType(MediaType.APPLICATION_JSON))
+					.andExpect(status().isOk()).andDo(print());
+		}
+	}
+
+	@Test
+	public void testReportActionsSetNotReportabletestException() throws Exception {
+		String request = new Gson().toJson(DataBuilderOrder.mockTestReport().getSampleNumber());
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ObjectMapper objmapper = new ObjectMapper();
+		String inputJson = objmapper.writeValueAsString(request);
+		System.out.println(inputJson);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		JsonNode jsonNode = Mockito.spy(JsonNode.class);
+		when(mapper.readTree(request)).thenReturn(jsonNode);
+		TestReportUpdateActions[] newEnumValues = TestReportUpdateActions.APPROVE.values();
+		try (MockedStatic mockStatic = mockStatic(TestReportUpdateActions.class)) {
+			// myMockedCreate = mockStatic(TestReportUpdateActions.class);
+			mockStatic.when(TestReportUpdateActions::values).thenReturn(newEnumValues);
+			mockedValueTestReportUpdateActions = newEnumValues[newEnumValues.length - 1];
+			mockStatic.when(() -> TestReportUpdateActions.valueOf(any()))
+					.thenReturn(mockedValueTestReportUpdateActions);
+			Mockito.when(jsonNode.get("action")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("APPROVE");
+			Mockito.when(jsonNode.get("pipelineRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("pipelineRunIdss");
+			Mockito.when(jsonNode.get("sequencingRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("sequencingRunIdss");
+			Mockito.when(jsonNode.get("userId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("userIdss");
+			Mockito.when(jsonNode.get("name")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("namess");
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			List<JsonNode> datasets = StreamSupport.stream(jsonNode.get("reports").spliterator(), true)
+					.collect(Collectors.toList());
+			datasets.add(jsonNode);
+			Iterator<JsonNode> iterator = datasets.iterator();
+			Iterator<JsonNode> iterators = jsonNode.get("reports").elements();
+			when(iterators).thenReturn(iterator);
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("reportssss");
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+			when(testReportService.setTestReportToNotReportable(Mockito.any(), Mockito.anyString(), Mockito.any()))
+					.thenReturn(DataBuilderOrder.mockTestReport());
+
+			this.mockMvc.perform(post("/api/labs/reports").content(request).contentType(MediaType.APPLICATION_JSON))
+					.andExpect(status().isOk()).andDo(print());
+		}
+	}
+
+//	@Test
+//	public void testReportActionsretest() throws Exception {
+//		String request = "{\"reports\" : [\"\"reportConfiguration\": \"NIPS_PLUS\", "
+//				+ "\"estimatedToBeAvailableAt\": \"2022-04-07 05:21:14\", \"Three\"]}" + "reTestType\": \"REDRAW\"";
+//		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+//		SecurityContextHolder.setContext(securityContext);
+//		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+//				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+//		ObjectMapper objmapper = new ObjectMapper();
+//		String inputJson = objmapper.writeValueAsString(request);
+//		System.out.println(inputJson);
+//		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+//		JsonNode jsonNode = Mockito.spy(JsonNode.class);
+//		when(mapper.readTree(request)).thenReturn(jsonNode);
+//		TestReportUpdateActions[] newEnumValues = TestReportUpdateActions.APPROVE.values();
+//		try (MockedStatic myMockedCreate = mockStatic(TestReportUpdateActions.class)) {
+//			myMockedCreate.when(TestReportUpdateActions::values).thenReturn(newEnumValues);
+//			mockedValueTestReportUpdateActions = newEnumValues[newEnumValues.length - 4];
+//			myMockedCreate.when(() -> TestReportUpdateActions.valueOf(any()))
+//					.thenReturn(mockedValueTestReportUpdateActions);
+//			Mockito.when(jsonNode.get("action")).thenReturn(jsonNode);
+//			Mockito.when(jsonNode.textValue()).thenReturn("APPROVE");
+//			Mockito.when(jsonNode.get("pipelineRunId")).thenReturn(jsonNode);
+//			Mockito.when(jsonNode.textValue()).thenReturn("pipelineRunIdss");
+//			Mockito.when(jsonNode.get("sequencingRunId")).thenReturn(jsonNode);
+//			Mockito.when(jsonNode.textValue()).thenReturn("sequencingRunIdss");
+//			Mockito.when(jsonNode.get("userId")).thenReturn(jsonNode);
+//			Mockito.when(jsonNode.textValue()).thenReturn("userIdss");
+//			Mockito.when(jsonNode.get("name")).thenReturn(jsonNode);
+//			Mockito.when(jsonNode.textValue()).thenReturn("namess");
+//			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+//			List<JsonNode> datasets = StreamSupport.stream(jsonNode.get("reports").spliterator(), true)
+//					.collect(Collectors.toList());
+//			datasets.add(jsonNode);
+//			Iterator<JsonNode> iterator = datasets.iterator();
+//			Iterator<JsonNode> iterators = jsonNode.get("reports").elements();
+//			when(iterators).thenReturn(iterator);
+//			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+//			Mockito.when(jsonNode.textValue()).thenReturn("reportssss");
+//			Mockito.when(jsonNode.isArray()).thenReturn(true);
+//
+//			ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+//			when(testReportService.setTestReportToNotReportable(Mockito.any(), Mockito.anyString(), Mockito.any()))
+//					.thenReturn(DataBuilderOrder.mockTestReport());
+//			this.mockMvc.perform(post("/api/labs/reports").content(request).contentType(MediaType.APPLICATION_JSON))
+//					.andExpect(status().isOk()).andDo(print());
+//
+//		}
+//	}
+
+	@Test
+	public void testReportActionsReprotstestException() throws Exception {
+		String request = new Gson().toJson(DataBuilderOrder.mockTestReport().getSampleNumber());
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ObjectMapper objmapper = new ObjectMapper();
+		String inputJson = objmapper.writeValueAsString(request);
+		System.out.println(inputJson);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		JsonNode jsonNode = Mockito.spy(JsonNode.class);
+		when(mapper.readTree(request)).thenReturn(jsonNode);
+		TestReportUpdateActions[] newEnumValues = TestReportUpdateActions.APPROVE.values();
+		try (MockedStatic mockStatic = mockStatic(TestReportUpdateActions.class)) {
+			// myMockedCreate = mockStatic(TestReportUpdateActions.class);
+			mockStatic.when(TestReportUpdateActions::values).thenReturn(newEnumValues);
+			mockedValueTestReportUpdateActions = newEnumValues[newEnumValues.length - 8];
+			mockStatic.when(() -> TestReportUpdateActions.valueOf(any()))
+					.thenReturn(mockedValueTestReportUpdateActions);
+			Mockito.when(jsonNode.get("action")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("APPROVE");
+			Mockito.when(jsonNode.get("pipelineRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("pipelineRunIdss");
+			Mockito.when(jsonNode.get("sequencingRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("sequencingRunIdss");
+			Mockito.when(jsonNode.get("userId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("userIdss");
+			Mockito.when(jsonNode.get("name")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("namess");
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+			when(testReportService.approveTestReports(Mockito.any(), Mockito.anyString(), Mockito.any()))
+					.thenReturn(DataBuilderOrder.testReports);
+			this.mockMvc.perform(post("/api/labs/reports").content(request).contentType(MediaType.APPLICATION_JSON))
+					.andExpect(status().isBadRequest()).andDo(print());
+		}
+	}
+
+	@Test
+	public void testgetTestReport() throws Exception {
+		String[] includes = { "anjali" };
+		String reportId = "6L";
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		when(testReportService.getTestReport(reportId, Optional.of(TargetPortal.PATIENT), true,
+				DataBuilder.userDetailsImpl)).thenReturn(Optional.of(DataBuilderOrder.mockTestReport()));
+		assertEquals(reportId, DataBuilderOrder.mockReport().getId());
+		this.mockMvc
+				.perform(get("/api/labs/reports/{reportId}" + "?reportId=6L&target=PATIENT&withstrings=true&", reportId)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsException() throws Exception {
+		String request = new Gson().toJson(DataBuilderOrder.mockTestReport().getSampleNumber());
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ObjectMapper objmapper = new ObjectMapper();
+		String inputJson = objmapper.writeValueAsString(request);
+		System.out.println(inputJson);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		JsonNode jsonNode = Mockito.spy(JsonNode.class);
+		when(mapper.readTree(request)).thenReturn(jsonNode);
+		try (MockedStatic mockStatic = mockStatic(TestReportUpdateActions.class)) {
+			mockStatic.when(() -> TestReportUpdateActions.valueOf(any())).thenReturn(null);
+			Mockito.when(jsonNode.get("action")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			this.mockMvc.perform(post("/api/labs/reports").content(request).contentType(MediaType.APPLICATION_JSON))
+					.andExpect(status().isBadRequest()).andDo(print());
+		}
+	}
+
+	@Test
+	public void testgetResultsPdfUrl() throws Exception {
+		URI uri = new URI("6L");
+		String reportId = "6L";
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		URI resultsPdfUrl2 = testReportService.getResultsPdfUrl(Mockito.anyString(), Mockito.any());
+		when(resultsPdfUrl2).thenReturn(uri);
+		assertEquals(reportId, DataBuilderOrder.mockReport().getId());
+
+		this.mockMvc.perform(get("/api/labs/reports/pdf/{reportId}" + "?reportId=6L", reportId)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testgetResultsPdfUrlException() throws Exception {
+		String reportId = "6L";
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		assertEquals(reportId, DataBuilderOrder.mockReport().getId());
+		assertThrows(JdxServiceException.class, () -> testReportController.getResultsPdfUrl(reportId));
+	}
+
+//	@Test
+//	public void testgetTestReportUserNotOwnerException() throws Exception {
+//		Authority auth = new Authority();
+//		auth.setName("ROLE_PATIENT");
+//		List<Authority> authority = new ArrayList<>();
+//		authority.add(auth);
+//		DataBuilder.mockUser().setAuthorities(authority);
+//		RolePayload roles = new RolePayload(auth);
+//		roles.setRole(auth);
+//		SimpleGrantedAuthority authoritys = new SimpleGrantedAuthority(Authority.ROLE_PATIENT);
+//		List<SimpleGrantedAuthority> updatedAuthorities = new ArrayList<SimpleGrantedAuthority>();
+//		updatedAuthorities.add(authoritys);
+//		DataBuilder.authorities.add(authoritys);
+//		String[] includes = { "anjali" };
+//		String reportId = "6L";
+//		SecurityContextHolder.setContext(securityContext);
+//		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+//				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationTokens);
+//		when(testReportService.getTestReport(reportId, Optional.of(TargetPortal.PATIENT), true,
+//				DataBuilder.userDetailsImpl)).thenReturn(Optional.of(DataBuilderOrder.mockTestReport()));
+//		assertEquals(reportId, DataBuilderOrder.mockReport().getId());
+//		this.mockMvc.perform(get("/api/labs/reports/{reportId}" + "?reportId=6L&include=anjali", reportId)
+//				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andDo(print());
+//	}
+
+	@Test
+	public void testgetTestReportException() throws Exception {
+		String[] includes = { "anjali" };
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		when(testReportService.getTestReport("6L", Optional.of(TargetPortal.PATIENT), true,
+				DataBuilder.userDetailsImpl)).thenReturn(Optional.empty());
+		String reportId = "6L";
+		assertEquals(reportId, DataBuilderOrder.mockReport().getId());
+		this.mockMvc.perform(get("/api/labs/reports/{reportId}" + "?reportId=6L&include=anjali", reportId)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).andDo(print());
+	}
+
+	@Test
+	public void testgetReportableTestReportForOrderLineItem() throws Exception {
+		String orderId = "aa86f0ec-9ea1-487c-a814-b1c6001be7e8";
+		String orderLineItemId = "845dba6b-4c0f-4cc9-ba77-62e7216bd692";
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		when(testReportService.getTestReportForOrderLineItem(orderId, orderLineItemId,
+				Optional.of(TargetPortal.PATIENT), true, DataBuilder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockTestReport()));
+		assertEquals(orderId, DataBuilderOrder.mockTestReport().getOrderId());
+		assertEquals(orderLineItemId, DataBuilderOrder.mockOrderLineItem().getId());
+		this.mockMvc
+				.perform(get(
+						"/api/labs/reports/order/{orderId}/{orderLineItemId}"
+								+ "?orderId=aa86f0ec-9ea1-487c-a814-b1c6001be7e8&orderLineItemId"
+								+ "=845dba6b-4c0f-4cc9-ba77-62e7216bd692&target=PATIENT&withstrings=true&",
+						orderId, orderLineItemId).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testgetReportableTestReportForOrderLineItemUserNotOwnerException() throws Exception {
+		String orderId = "aa86f0ec-9ea1-487c-a814-b1c6001be7e8";
+		String orderLineItemId = "845dba6b-4c0f-4cc9-ba77-62e7216bd692";
+		Authority auth = new Authority();
+		auth.setName("ROLE_PATIENT");
+		List<Authority> authority = new ArrayList<>();
+		authority.add(auth);
+		DataBuilder.mockUser().setAuthorities(authority);
+		RolePayload roles = new RolePayload();
+		roles.setRole(auth);
+		SimpleGrantedAuthority authoritys = new SimpleGrantedAuthority(Authority.ROLE_PATIENT);
+		List<SimpleGrantedAuthority> updatedAuthorities = new ArrayList<SimpleGrantedAuthority>();
+		updatedAuthorities.add(authoritys);
+		DataBuilder.authorities.add(authoritys);
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationTokens);
+		when(testReportService.getTestReportForOrderLineItem(orderId, orderLineItemId,
+				Optional.of(TargetPortal.PATIENT), true, DataBuilder.userDetailsImpl))
+						.thenReturn(Optional.of(DataBuilderOrder.mockTestReport()));
+		assertEquals(orderId, DataBuilderOrder.mockTestReport().getOrderId());
+		assertEquals(orderLineItemId, DataBuilderOrder.mockOrderLineItem().getId());
+		this.mockMvc.perform(get("/api/labs/reports/order/{orderId}/{orderLineItemId}"
+				+ "?orderId=aa86f0ec-9ea1-487c-a814-b1c6001be7e8&orderLineItemId=845dba6b-4c0f-4cc9-ba77-62e7216bd692&target=PATIENT&withstrings=true&",
+				orderId, orderLineItemId).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
+				.andDo(print());
+	}
+
+	@Test
+	public void testgetReportableTestReportForOrderLineItemException() throws Exception {
+		String orderId = "aa86f0ec-9ea1-487c-a814-b1c6001be7e8";
+		String orderLineItemId = "845dba6b-4c0f-4cc9-ba77-62e7216bd692";
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+//		when(testReportService.getTestReportForOrderLineItem(orderId, orderLineItemId, DataBuilder.userDetailsImpl))
+//				.thenReturn(Optional.of(DataBuilderOrder.mockTestReport()));
+		assertEquals(orderId, DataBuilderOrder.mockTestReport().getOrderId());
+		assertEquals(orderLineItemId, DataBuilderOrder.mockOrderLineItem().getId());
+		this.mockMvc.perform(get("/api/labs/reports/order/{orderId}/{orderLineItemId}"
+				+ "?orderId=aa86f0ec-9ea1-487c-a814-b1c6001be7e8&orderLineItemId=845dba6b-4c0f-4cc9-ba77-62e7216bd692",
+				orderId, orderLineItemId).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound())
+				.andDo(print());
+	}
+
+	@Test
+	public void testgetTestReportsForPatient() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		String userId = "1L";
+		when(testReportService.findAllAvailableTestReportsByPatient(userId, paging)).thenReturn(pages);
+
+		mockMvc.perform(get("/api/labs/reports/patient/{userId}" + "?userId=1L&page=5&size=5&", userId))
+				.andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testgetTestReportsForPatientException() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		String userId = "1L";
+		when(testReportService.findAllAvailableTestReportsByPatient(userId, paging)).thenReturn(null);
+		mockMvc.perform(get("/api/labs/reports/patient/{userId}" + "?userId=1L&page=5&size=5&", userId))
+				.andExpect(status().isNotFound()).andDo(print());
+	}
+
+	@Test
+	public void testgetTestReportsForPatientMaxmimum() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		String userId = "1L";
+		when(testReportService.findAllAvailableTestReportsByPatient(userId, paging)).thenReturn(pages);
+		mockMvc.perform(get("/api/labs/reports/patient/{userId}" + "?userId=1L&page=5&size=21&", userId));
+
+	}
+
+	@Test
+	public void testgetfindIntervaldefaults() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		String labId = "f450237e-20a3-4bf1-b64d-9ecaab16be7a";
+		SignedOutType type = SignedOutType.MANUAL;
+		ReportConfiguration config = ReportConfiguration.NIPS_PLUS;
+		boolean signedOut = true;
+		ReportType reportType = ReportType.STANDARD;
+		String patientId = "1L";
+		String firstName = "Juno_test";
+		String lastName = "User";
+		String email = "no-email@junodx.com";
+		String sampleNumber = "123455";
+		String batchRunId = "8L";
+		String labOrderId = "76c97d43-347f-4132-ba18-ddf3b313c226";
+		String orderNumber = "1234";
+		boolean isAvailable = true;
+		boolean upcomingOnly = true;
+		boolean reportable = true;
+		boolean approved = true;
+		boolean condensed = true;
+		boolean retest = false;
+		boolean redraw = true;
+		TestReportSortBy sortBy = TestReportSortBy.age;
+		SortType sortDirection = SortType.ASC;
+		assertEquals(approved, DataBuilderOrder.mockTestReport().isApproved());
+		assertEquals(isAvailable, DataBuilderOrder.mockTestReport().isAvailable());
+		assertEquals(reportable, DataBuilderOrder.mockTestReport().isReportable());
+		assertEquals(config, DataBuilderOrder.mockTestReport().getReportConfiguration());
+		assertEquals(orderNumber, DataBuilderOrder.mockTestReport().getOrderNumber());
+		assertEquals(sampleNumber, DataBuilderOrder.mockTestReport().getSampleNumber());
+		assertEquals(batchRunId, DataBuilderOrder.mockTestReport().getBatchRunId());
+		assertEquals(labOrderId, DataBuilderOrder.mockTestReport().getLaboratoryOrderId());
+		assertEquals(patientId, DataBuilderOrder.mockTestReport().getPatient().getId());
+		assertEquals(firstName, DataBuilderOrder.mockTestReport().getPatient().getFirstName());
+		assertEquals(lastName, DataBuilderOrder.mockTestReport().getPatient().getLastName());
+		assertEquals(email, DataBuilderOrder.mockTestReport().getPatient().getEmail());
+		assertEquals(signedOut, DataBuilderOrder.mockTestReport().isSignedOut());
+		assertEquals(labId, DataBuilderOrder.mockLaboratory().getId());
+		assertEquals(reportType, DataBuilderOrder.mockTestReport().getReportType());
+		assertEquals(type, DataBuilderOrder.mockTestReport().getSignedOutType());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		// when(testReportService.getAllTestReports(paging)).thenReturn(pages);
+		when(testReportService.search(Optional.of(labId), Optional.of(type), Optional.of(config),
+				Optional.of(reportType), Optional.of(signedOut), Optional.of(true), Optional.of(patientId),
+				Optional.of(firstName), Optional.of(lastName), Optional.of(email), Optional.of(sampleNumber),
+				Optional.of(batchRunId), Optional.of(labOrderId), Optional.of(orderNumber), Optional.of(isAvailable),
+				Optional.of(upcomingOnly), Optional.of(reportable), Optional.of(retest), Optional.of(redraw),
+				Optional.of(approved), Optional.of(sortBy), Optional.of(sortDirection), Optional.of(condensed),
+				Optional.empty(), paging)).thenReturn(pages);
+		mockMvc.perform(get("/api/labs/reports" + "?page=5&size=5" + "&labid=f450237e-20a3-4bf1-b64d-9ecaab16be7a"
+		// + "&interval=1"
+				+ "&units=WEEKS" + "&bytype=MANUAL" + "&byreport=NIPS_PLUS" + "&byreporttype=STANDARD"
+				+ "&bysignedout=true" + "&byapproved=true" + "&byunreportedsecondaryresult=true" + "&bypatient=1L"
+				+ "&byfirstname=Juno_test" + "&bylastname=User" + "&byemail=no-email@junodx.com"
+				+ "&bysamplenumber=123455" + "&bybatchrunid=8L" + "&bylaborder=76c97d43-347f-4132-ba18-ddf3b313c226"
+				+ "&byordernumber=1234" + "&isavailable=true" + "&upcomingonly=true&isretest=true&isredraw=true"
+				+ "&sortby=age" + "&sorttype=ASC&" + "condensed=true" + "&bynotreportable=true&"))
+				.andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testgetfindcondensed() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		String labId = "f450237e-20a3-4bf1-b64d-9ecaab16be7a";
+		SignedOutType type = SignedOutType.MANUAL;
+		ReportConfiguration config = ReportConfiguration.NIPS_PLUS;
+		boolean signedOut = true;
+		ReportType reportType = ReportType.STANDARD;
+		String patientId = "1L";
+		String firstName = "Juno_test";
+		String lastName = "User";
+		String email = "no-email@junodx.com";
+		String sampleNumber = "123455";
+		String batchRunId = "8L";
+		String labOrderId = "76c97d43-347f-4132-ba18-ddf3b313c226";
+		String orderNumber = "1234";
+		boolean isAvailable = true;
+		boolean upcomingOnly = true;
+		boolean reportable = true;
+		boolean approved = true;
+		boolean condensed = false;
+		boolean retest = false;
+		boolean redraw = true;
+		TestReportSortBy sortBy = TestReportSortBy.age;
+		SortType sortDirection = SortType.ASC;
+		assertEquals(approved, DataBuilderOrder.mockTestReport().isApproved());
+		assertEquals(isAvailable, DataBuilderOrder.mockTestReport().isAvailable());
+		assertEquals(reportable, DataBuilderOrder.mockTestReport().isReportable());
+		assertEquals(config, DataBuilderOrder.mockTestReport().getReportConfiguration());
+		assertEquals(orderNumber, DataBuilderOrder.mockTestReport().getOrderNumber());
+		assertEquals(sampleNumber, DataBuilderOrder.mockTestReport().getSampleNumber());
+		assertEquals(batchRunId, DataBuilderOrder.mockTestReport().getBatchRunId());
+		assertEquals(labOrderId, DataBuilderOrder.mockTestReport().getLaboratoryOrderId());
+		assertEquals(patientId, DataBuilderOrder.mockTestReport().getPatient().getId());
+		assertEquals(firstName, DataBuilderOrder.mockTestReport().getPatient().getFirstName());
+		assertEquals(lastName, DataBuilderOrder.mockTestReport().getPatient().getLastName());
+		assertEquals(email, DataBuilderOrder.mockTestReport().getPatient().getEmail());
+		assertEquals(signedOut, DataBuilderOrder.mockTestReport().isSignedOut());
+		assertEquals(labId, DataBuilderOrder.mockLaboratory().getId());
+		assertEquals(reportType, DataBuilderOrder.mockTestReport().getReportType());
+		assertEquals(type, DataBuilderOrder.mockTestReport().getSignedOutType());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		// when(testReportService.getAllTestReports(paging)).thenReturn(pages);
+
+		when(testReportService.search(Optional.of(labId), Optional.of(type), Optional.of(config),
+				Optional.of(reportType), Optional.of(signedOut), Optional.of(true), Optional.of(patientId),
+				Optional.of(firstName), Optional.of(lastName), Optional.of(email), Optional.of(sampleNumber),
+				Optional.of(batchRunId), Optional.of(labOrderId), Optional.of(orderNumber), Optional.of(isAvailable),
+				Optional.of(upcomingOnly), Optional.of(reportable), Optional.of(retest), Optional.of(redraw),
+				Optional.of(approved), Optional.of(sortBy), Optional.of(sortDirection), Optional.of(condensed),
+				Optional.empty(), paging)).thenReturn(pages);
+		mockMvc.perform(get("/api/labs/reports" + "?page=5&size=5" + "&labid=f450237e-20a3-4bf1-b64d-9ecaab16be7a"
+		// + "&interval=1"
+				+ "&units=WEEKS" + "&bytype=MANUAL" + "&byreport=NIPS_PLUS" + "&byreporttype=STANDARD"
+				+ "&bysignedout=true" + "&byapproved=true" + "&byunreportedsecondaryresult=true" + "&bypatient=1L"
+				+ "&byfirstname=Juno_test" + "&bylastname=User" + "&byemail=no-email@junodx.com"
+				+ "&bysamplenumber=123455" + "&bybatchrunid=8L" + "&bylaborder=76c97d43-347f-4132-ba18-ddf3b313c226"
+				+ "&byordernumber=1234" + "&isavailable=true" + "&upcomingonly=true&isretest=true&isredraw=true"
+				+ "&sortby=age" + "&sorttype=ASC&" + "condensed=false" + "&bynotreportable=true&"))
+				.andExpect(status().isOk()).andDo(print());
+
+	}
+
+	@Test
+	public void testgetfindcondensedEmpty() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		String labId = "f450237e-20a3-4bf1-b64d-9ecaab16be7a";
+		SignedOutType type = SignedOutType.MANUAL;
+		ReportConfiguration config = ReportConfiguration.NIPS_PLUS;
+		boolean signedOut = true;
+		ReportType reportType = ReportType.STANDARD;
+		String patientId = "1L";
+		String firstName = "Juno_test";
+		String lastName = "User";
+		String email = "no-email@junodx.com";
+		String sampleNumber = "123455";
+		String batchRunId = "8L";
+		String labOrderId = "76c97d43-347f-4132-ba18-ddf3b313c226";
+		String orderNumber = "1234";
+		boolean isAvailable = true;
+		boolean upcomingOnly = true;
+		boolean reportable = true;
+		boolean approved = true;
+		boolean condensed = false;
+		boolean retest = false;
+		boolean redraw = true;
+		TestReportSortBy sortBy = TestReportSortBy.age;
+		SortType sortDirection = SortType.ASC;
+		assertEquals(approved, DataBuilderOrder.mockTestReport().isApproved());
+		assertEquals(isAvailable, DataBuilderOrder.mockTestReport().isAvailable());
+		assertEquals(reportable, DataBuilderOrder.mockTestReport().isReportable());
+		assertEquals(config, DataBuilderOrder.mockTestReport().getReportConfiguration());
+		assertEquals(orderNumber, DataBuilderOrder.mockTestReport().getOrderNumber());
+		assertEquals(sampleNumber, DataBuilderOrder.mockTestReport().getSampleNumber());
+		assertEquals(batchRunId, DataBuilderOrder.mockTestReport().getBatchRunId());
+		assertEquals(labOrderId, DataBuilderOrder.mockTestReport().getLaboratoryOrderId());
+		assertEquals(patientId, DataBuilderOrder.mockTestReport().getPatient().getId());
+		assertEquals(firstName, DataBuilderOrder.mockTestReport().getPatient().getFirstName());
+		assertEquals(lastName, DataBuilderOrder.mockTestReport().getPatient().getLastName());
+		assertEquals(email, DataBuilderOrder.mockTestReport().getPatient().getEmail());
+		assertEquals(signedOut, DataBuilderOrder.mockTestReport().isSignedOut());
+		assertEquals(labId, DataBuilderOrder.mockLaboratory().getId());
+		assertEquals(reportType, DataBuilderOrder.mockTestReport().getReportType());
+		assertEquals(type, DataBuilderOrder.mockTestReport().getSignedOutType());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		// when(testReportService.getAllTestReports(paging)).thenReturn(pages);
+		when(testReportService.search(Optional.of(labId), Optional.of(type), Optional.of(config),
+				Optional.of(reportType), Optional.of(signedOut), Optional.of(true), Optional.of(patientId),
+				Optional.of(firstName), Optional.of(lastName), Optional.of(email), Optional.of(sampleNumber),
+				Optional.of(batchRunId), Optional.of(labOrderId), Optional.of(orderNumber), Optional.of(isAvailable),
+				Optional.of(upcomingOnly), Optional.of(reportable), Optional.of(retest), Optional.of(redraw),
+				Optional.of(approved), Optional.of(sortBy), Optional.of(sortDirection), Optional.empty(),
+				Optional.empty(), paging)).thenReturn(pages);
+		mockMvc.perform(get("/api/labs/reports" + "?page=5&size=5" + "&labid=f450237e-20a3-4bf1-b64d-9ecaab16be7a"
+		// + "&interval=1"
+				+ "&units=WEEKS" + "&bytype=MANUAL" + "&byreport=NIPS_PLUS" + "&byreporttype=STANDARD"
+				+ "&bysignedout=true" + "&byapproved=true" + "&byunreportedsecondaryresult=true" + "&bypatient=1L"
+				+ "&byfirstname=Juno_test" + "&bylastname=User" + "&byemail=no-email@junodx.com"
+				+ "&bysamplenumber=123455" + "&bybatchrunid=8L" + "&bylaborder=76c97d43-347f-4132-ba18-ddf3b313c226"
+				+ "&byordernumber=1234" + "&isavailable=true" + "&upcomingonly=true&isretest=true&isredraw=true"
+				+ "&sortby=age" + "&sorttype=ASC&" + "&bynotreportable=true&")).andExpect(status().isOk())
+				.andDo(print());
+	}
+
+	@Test
+	public void testgetfindIntervalWeeks() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		String labId = "f450237e-20a3-4bf1-b64d-9ecaab16be7a";
+		SignedOutType type = SignedOutType.MANUAL;
+		ReportConfiguration config = ReportConfiguration.NIPS_PLUS;
+		boolean signedOut = true;
+		ReportType reportType = ReportType.STANDARD;
+		String patientId = "1L";
+		String firstName = "Juno_test";
+		String lastName = "User";
+		String email = "no-email@junodx.com";
+		String sampleNumber = "123455";
+		String batchRunId = "8L";
+		String labOrderId = "76c97d43-347f-4132-ba18-ddf3b313c226";
+		String orderNumber = "1234";
+		boolean isAvailable = true;
+		boolean upcomingOnly = true;
+		boolean reportable = true;
+		boolean approved = true;
+		boolean condensed = true;
+		boolean retest = false;
+		boolean redraw = true;
+		TestReportSortBy sortBy = TestReportSortBy.age;
+		SortType sortDirection = SortType.ASC;
+		assertEquals(approved, DataBuilderOrder.mockTestReport().isApproved());
+		assertEquals(isAvailable, DataBuilderOrder.mockTestReport().isAvailable());
+		assertEquals(reportable, DataBuilderOrder.mockTestReport().isReportable());
+		assertEquals(config, DataBuilderOrder.mockTestReport().getReportConfiguration());
+		assertEquals(orderNumber, DataBuilderOrder.mockTestReport().getOrderNumber());
+		assertEquals(sampleNumber, DataBuilderOrder.mockTestReport().getSampleNumber());
+		assertEquals(batchRunId, DataBuilderOrder.mockTestReport().getBatchRunId());
+		assertEquals(labOrderId, DataBuilderOrder.mockTestReport().getLaboratoryOrderId());
+		assertEquals(patientId, DataBuilderOrder.mockTestReport().getPatient().getId());
+		assertEquals(firstName, DataBuilderOrder.mockTestReport().getPatient().getFirstName());
+		assertEquals(lastName, DataBuilderOrder.mockTestReport().getPatient().getLastName());
+		assertEquals(email, DataBuilderOrder.mockTestReport().getPatient().getEmail());
+		assertEquals(signedOut, DataBuilderOrder.mockTestReport().isSignedOut());
+		assertEquals(labId, DataBuilderOrder.mockLaboratory().getId());
+		assertEquals(reportType, DataBuilderOrder.mockTestReport().getReportType());
+		assertEquals(type, DataBuilderOrder.mockTestReport().getSignedOutType());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		when(testReportService.search(Optional.of(labId), Optional.of(type), Optional.of(config),
+				Optional.of(reportType), Optional.of(signedOut), Optional.of(true), Optional.of(patientId),
+				Optional.of(firstName), Optional.of(lastName), Optional.of(email), Optional.of(sampleNumber),
+				Optional.of(batchRunId), Optional.of(labOrderId), Optional.of(orderNumber), Optional.of(isAvailable),
+				Optional.of(upcomingOnly), Optional.of(reportable), Optional.of(retest), Optional.of(redraw),
+				Optional.of(approved), Optional.of(sortBy), Optional.of(sortDirection), Optional.of(condensed),
+				Optional.of(Calendar.getInstance()), paging)).thenReturn(pages);
+		mockMvc.perform(get("/api/labs/reports" + "?page=5&size=5" + "&labid=f450237e-20a3-4bf1-b64d-9ecaab16be7a"
+				+ "&interval=1" + "&units=WEEKS" + "&bytype=MANUAL" + "&byreport=NIPS_PLUS" + "&byreporttype=STANDARD"
+				+ "&bysignedout=true" + "&byapproved=true" + "&byunreportedsecondaryresult=true" + "&bypatient=1L"
+				+ "&byfirstname=Juno_test" + "&bylastname=User" + "&byemail=no-email@junodx.com"
+				+ "&bysamplenumber=123455" + "&bybatchrunid=8L" + "&bylaborder=76c97d43-347f-4132-ba18-ddf3b313c226"
+				+ "&byordernumber=1234" + "&isavailable=true" + "&upcomingonly=true&isretest=true&isredraw=true"
+				+ "&sortby=age" + "&sorttype=ASC&" + "condensed=true" + "&bynotreportable=true&")).andDo(print());
+	}
+
+	@Test
+	public void testgetfindIntervalMinutes() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		String labId = "f450237e-20a3-4bf1-b64d-9ecaab16be7a";
+		SignedOutType type = SignedOutType.MANUAL;
+		ReportConfiguration config = ReportConfiguration.NIPS_PLUS;
+		boolean signedOut = true;
+		ReportType reportType = ReportType.STANDARD;
+		String patientId = "1L";
+		String firstName = "Juno_test";
+		String lastName = "User";
+		String email = "no-email@junodx.com";
+		String sampleNumber = "123455";
+		String batchRunId = "8L";
+		String labOrderId = "76c97d43-347f-4132-ba18-ddf3b313c226";
+		String orderNumber = "1234";
+		boolean isAvailable = true;
+		boolean upcomingOnly = true;
+		boolean reportable = true;
+		boolean approved = true;
+		boolean condensed = true;
+		boolean retest = false;
+		boolean redraw = true;
+		TestReportSortBy sortBy = TestReportSortBy.age;
+		SortType sortDirection = SortType.ASC;
+		assertEquals(approved, DataBuilderOrder.mockTestReport().isApproved());
+		assertEquals(isAvailable, DataBuilderOrder.mockTestReport().isAvailable());
+		assertEquals(reportable, DataBuilderOrder.mockTestReport().isReportable());
+		assertEquals(config, DataBuilderOrder.mockTestReport().getReportConfiguration());
+		assertEquals(orderNumber, DataBuilderOrder.mockTestReport().getOrderNumber());
+		assertEquals(sampleNumber, DataBuilderOrder.mockTestReport().getSampleNumber());
+		assertEquals(batchRunId, DataBuilderOrder.mockTestReport().getBatchRunId());
+		assertEquals(labOrderId, DataBuilderOrder.mockTestReport().getLaboratoryOrderId());
+		assertEquals(patientId, DataBuilderOrder.mockTestReport().getPatient().getId());
+		assertEquals(firstName, DataBuilderOrder.mockTestReport().getPatient().getFirstName());
+		assertEquals(lastName, DataBuilderOrder.mockTestReport().getPatient().getLastName());
+		assertEquals(email, DataBuilderOrder.mockTestReport().getPatient().getEmail());
+		assertEquals(signedOut, DataBuilderOrder.mockTestReport().isSignedOut());
+		assertEquals(labId, DataBuilderOrder.mockLaboratory().getId());
+		assertEquals(reportType, DataBuilderOrder.mockTestReport().getReportType());
+		assertEquals(type, DataBuilderOrder.mockTestReport().getSignedOutType());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		when(testReportService.search(Optional.of(labId), Optional.of(type), Optional.of(config),
+				Optional.of(reportType), Optional.of(signedOut), Optional.of(true), Optional.of(patientId),
+				Optional.of(firstName), Optional.of(lastName), Optional.of(email), Optional.of(sampleNumber),
+				Optional.of(batchRunId), Optional.of(labOrderId), Optional.of(orderNumber), Optional.of(isAvailable),
+				Optional.of(upcomingOnly), Optional.of(reportable), Optional.of(retest), Optional.of(redraw),
+				Optional.of(approved), Optional.of(sortBy), Optional.of(sortDirection), Optional.of(condensed),
+				Optional.of(Calendar.getInstance()), paging)).thenReturn(pages);
+		mockMvc.perform(get("/api/labs/reports" + "?page=5&size=5" + "&labid=f450237e-20a3-4bf1-b64d-9ecaab16be7a"
+				+ "&interval=1" + "&units=MINUTES" + "&bytype=MANUAL" + "&byreport=NIPS_PLUS" + "&byreporttype=STANDARD"
+				+ "&bysignedout=true" + "&byapproved=true" + "&byunreportedsecondaryresult=true" + "&bypatient=1L"
+				+ "&byfirstname=Juno_test" + "&bylastname=User" + "&byemail=no-email@junodx.com"
+				+ "&bysamplenumber=123455" + "&bybatchrunid=8L" + "&bylaborder=76c97d43-347f-4132-ba18-ddf3b313c226"
+				+ "&byordernumber=1234" + "&isavailable=true" + "&upcomingonly=true&isretest=true&isredraw=true"
+				+ "&sortby=age" + "&sorttype=ASC&" + "condensed=true" + "&bynotreportable=true&")).andDo(print());
+	}
+
+	@Test
+	public void testgetfindIntervalHours() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		String labId = "f450237e-20a3-4bf1-b64d-9ecaab16be7a";
+		SignedOutType type = SignedOutType.MANUAL;
+		ReportConfiguration config = ReportConfiguration.NIPS_PLUS;
+		boolean signedOut = true;
+		ReportType reportType = ReportType.STANDARD;
+		String patientId = "1L";
+		String firstName = "Juno_test";
+		String lastName = "User";
+		String email = "no-email@junodx.com";
+		String sampleNumber = "123455";
+		String batchRunId = "8L";
+		String labOrderId = "76c97d43-347f-4132-ba18-ddf3b313c226";
+		String orderNumber = "1234";
+		boolean isAvailable = true;
+		boolean upcomingOnly = true;
+		boolean reportable = true;
+		boolean approved = true;
+		boolean condensed = true;
+		boolean retest = false;
+		boolean redraw = true;
+		TestReportSortBy sortBy = TestReportSortBy.age;
+		SortType sortDirection = SortType.ASC;
+		assertEquals(approved, DataBuilderOrder.mockTestReport().isApproved());
+		assertEquals(isAvailable, DataBuilderOrder.mockTestReport().isAvailable());
+		assertEquals(reportable, DataBuilderOrder.mockTestReport().isReportable());
+		assertEquals(config, DataBuilderOrder.mockTestReport().getReportConfiguration());
+		assertEquals(orderNumber, DataBuilderOrder.mockTestReport().getOrderNumber());
+		assertEquals(sampleNumber, DataBuilderOrder.mockTestReport().getSampleNumber());
+		assertEquals(batchRunId, DataBuilderOrder.mockTestReport().getBatchRunId());
+		assertEquals(labOrderId, DataBuilderOrder.mockTestReport().getLaboratoryOrderId());
+		assertEquals(patientId, DataBuilderOrder.mockTestReport().getPatient().getId());
+		assertEquals(firstName, DataBuilderOrder.mockTestReport().getPatient().getFirstName());
+		assertEquals(lastName, DataBuilderOrder.mockTestReport().getPatient().getLastName());
+		assertEquals(email, DataBuilderOrder.mockTestReport().getPatient().getEmail());
+		assertEquals(signedOut, DataBuilderOrder.mockTestReport().isSignedOut());
+		assertEquals(labId, DataBuilderOrder.mockLaboratory().getId());
+		assertEquals(reportType, DataBuilderOrder.mockTestReport().getReportType());
+		assertEquals(type, DataBuilderOrder.mockTestReport().getSignedOutType());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		when(testReportService.search(Optional.of(labId), Optional.of(type), Optional.of(config),
+				Optional.of(reportType), Optional.of(signedOut), Optional.of(true), Optional.of(patientId),
+				Optional.of(firstName), Optional.of(lastName), Optional.of(email), Optional.of(sampleNumber),
+				Optional.of(batchRunId), Optional.of(labOrderId), Optional.of(orderNumber), Optional.of(isAvailable),
+				Optional.of(upcomingOnly), Optional.of(reportable), Optional.of(retest), Optional.of(redraw),
+				Optional.of(approved), Optional.of(sortBy), Optional.of(sortDirection), Optional.of(condensed),
+				Optional.of(Calendar.getInstance()), paging)).thenReturn(pages);
+		mockMvc.perform(get("/api/labs/reports" + "?page=5&size=5" + "&labid=f450237e-20a3-4bf1-b64d-9ecaab16be7a"
+				+ "&interval=1" + "&units=HOURS" + "&bytype=MANUAL" + "&byreport=NIPS_PLUS" + "&byreporttype=STANDARD"
+				+ "&bysignedout=true" + "&byapproved=true" + "&byunreportedsecondaryresult=true" + "&bypatient=1L"
+				+ "&byfirstname=Juno_test" + "&bylastname=User" + "&byemail=no-email@junodx.com"
+				+ "&bysamplenumber=123455" + "&bybatchrunid=8L" + "&bylaborder=76c97d43-347f-4132-ba18-ddf3b313c226"
+				+ "&byordernumber=1234" + "&isavailable=true" + "&upcomingonly=true&isretest=true&isredraw=true"
+				+ "&sortby=age" + "&sorttype=ASC&" + "condensed=true" + "&bynotreportable=true&")).andDo(print());
+	}
+
+	@Test
+	public void testgetfindIntervalSeconds() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		String labId = "f450237e-20a3-4bf1-b64d-9ecaab16be7a";
+		SignedOutType type = SignedOutType.MANUAL;
+		ReportConfiguration config = ReportConfiguration.NIPS_PLUS;
+		boolean signedOut = true;
+		ReportType reportType = ReportType.STANDARD;
+		String patientId = "1L";
+		String firstName = "Juno_test";
+		String lastName = "User";
+		String email = "no-email@junodx.com";
+		String sampleNumber = "123455";
+		String batchRunId = "8L";
+		String labOrderId = "76c97d43-347f-4132-ba18-ddf3b313c226";
+		String orderNumber = "1234";
+		boolean isAvailable = true;
+		boolean upcomingOnly = true;
+		boolean reportable = true;
+		boolean approved = true;
+		boolean condensed = true;
+		boolean retest = false;
+		boolean redraw = true;
+		TestReportSortBy sortBy = TestReportSortBy.age;
+		SortType sortDirection = SortType.ASC;
+		assertEquals(approved, DataBuilderOrder.mockTestReport().isApproved());
+		assertEquals(isAvailable, DataBuilderOrder.mockTestReport().isAvailable());
+		assertEquals(reportable, DataBuilderOrder.mockTestReport().isReportable());
+		assertEquals(config, DataBuilderOrder.mockTestReport().getReportConfiguration());
+		assertEquals(orderNumber, DataBuilderOrder.mockTestReport().getOrderNumber());
+		assertEquals(sampleNumber, DataBuilderOrder.mockTestReport().getSampleNumber());
+		assertEquals(batchRunId, DataBuilderOrder.mockTestReport().getBatchRunId());
+		assertEquals(labOrderId, DataBuilderOrder.mockTestReport().getLaboratoryOrderId());
+		assertEquals(patientId, DataBuilderOrder.mockTestReport().getPatient().getId());
+		assertEquals(firstName, DataBuilderOrder.mockTestReport().getPatient().getFirstName());
+		assertEquals(lastName, DataBuilderOrder.mockTestReport().getPatient().getLastName());
+		assertEquals(email, DataBuilderOrder.mockTestReport().getPatient().getEmail());
+		assertEquals(signedOut, DataBuilderOrder.mockTestReport().isSignedOut());
+		assertEquals(labId, DataBuilderOrder.mockLaboratory().getId());
+		assertEquals(reportType, DataBuilderOrder.mockTestReport().getReportType());
+		assertEquals(type, DataBuilderOrder.mockTestReport().getSignedOutType());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		when(testReportService.search(Optional.of(labId), Optional.of(type), Optional.of(config),
+				Optional.of(reportType), Optional.of(signedOut), Optional.of(true), Optional.of(patientId),
+				Optional.of(firstName), Optional.of(lastName), Optional.of(email), Optional.of(sampleNumber),
+				Optional.of(batchRunId), Optional.of(labOrderId), Optional.of(orderNumber), Optional.of(isAvailable),
+				Optional.of(upcomingOnly), Optional.of(reportable), Optional.of(retest), Optional.of(redraw),
+				Optional.of(approved), Optional.of(sortBy), Optional.of(sortDirection), Optional.of(condensed),
+				Optional.of(Calendar.getInstance()), paging)).thenReturn(pages);
+		mockMvc.perform(get("/api/labs/reports" + "?page=5&size=5" + "&labid=f450237e-20a3-4bf1-b64d-9ecaab16be7a"
+				+ "&interval=1" + "&units=SECONDS" + "&bytype=MANUAL" + "&byreport=NIPS_PLUS" + "&byreporttype=STANDARD"
+				+ "&bysignedout=true" + "&byapproved=true" + "&byunreportedsecondaryresult=true" + "&bypatient=1L"
+				+ "&byfirstname=Juno_test" + "&bylastname=User" + "&byemail=no-email@junodx.com"
+				+ "&bysamplenumber=123455" + "&bybatchrunid=8L" + "&bylaborder=76c97d43-347f-4132-ba18-ddf3b313c226"
+				+ "&byordernumber=1234" + "&isavailable=true" + "&upcomingonly=true&isretest=true&isredraw=true"
+				+ "&sortby=age" + "&sorttype=ASC&" + "condensed=true" + "&bynotreportable=true&")).andDo(print());
+	}
+
+	@Test
+	public void testgetfindIntervalDays() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		String labId = "f450237e-20a3-4bf1-b64d-9ecaab16be7a";
+		SignedOutType type = SignedOutType.MANUAL;
+		ReportConfiguration config = ReportConfiguration.NIPS_PLUS;
+		boolean signedOut = true;
+		ReportType reportType = ReportType.STANDARD;
+		String patientId = "1L";
+		String firstName = "Juno_test";
+		String lastName = "User";
+		String email = "no-email@junodx.com";
+		String sampleNumber = "123455";
+		String batchRunId = "8L";
+		String labOrderId = "76c97d43-347f-4132-ba18-ddf3b313c226";
+		String orderNumber = "1234";
+		boolean isAvailable = true;
+		boolean upcomingOnly = true;
+		boolean reportable = true;
+		boolean approved = true;
+		boolean condensed = true;
+		boolean retest = false;
+		boolean redraw = true;
+		TestReportSortBy sortBy = TestReportSortBy.age;
+		SortType sortDirection = SortType.ASC;
+		assertEquals(approved, DataBuilderOrder.mockTestReport().isApproved());
+		assertEquals(isAvailable, DataBuilderOrder.mockTestReport().isAvailable());
+		assertEquals(reportable, DataBuilderOrder.mockTestReport().isReportable());
+		assertEquals(config, DataBuilderOrder.mockTestReport().getReportConfiguration());
+		assertEquals(orderNumber, DataBuilderOrder.mockTestReport().getOrderNumber());
+		assertEquals(sampleNumber, DataBuilderOrder.mockTestReport().getSampleNumber());
+		assertEquals(batchRunId, DataBuilderOrder.mockTestReport().getBatchRunId());
+		assertEquals(labOrderId, DataBuilderOrder.mockTestReport().getLaboratoryOrderId());
+		assertEquals(patientId, DataBuilderOrder.mockTestReport().getPatient().getId());
+		assertEquals(firstName, DataBuilderOrder.mockTestReport().getPatient().getFirstName());
+		assertEquals(lastName, DataBuilderOrder.mockTestReport().getPatient().getLastName());
+		assertEquals(email, DataBuilderOrder.mockTestReport().getPatient().getEmail());
+		assertEquals(signedOut, DataBuilderOrder.mockTestReport().isSignedOut());
+		assertEquals(labId, DataBuilderOrder.mockLaboratory().getId());
+		assertEquals(reportType, DataBuilderOrder.mockTestReport().getReportType());
+		assertEquals(type, DataBuilderOrder.mockTestReport().getSignedOutType());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		when(testReportService.search(Optional.of(labId), Optional.of(type), Optional.of(config),
+				Optional.of(reportType), Optional.of(signedOut), Optional.of(true), Optional.of(patientId),
+				Optional.of(firstName), Optional.of(lastName), Optional.of(email), Optional.of(sampleNumber),
+				Optional.of(batchRunId), Optional.of(labOrderId), Optional.of(orderNumber), Optional.of(isAvailable),
+				Optional.of(upcomingOnly), Optional.of(reportable), Optional.of(retest), Optional.of(redraw),
+				Optional.of(approved), Optional.of(sortBy), Optional.of(sortDirection), Optional.of(condensed),
+				Optional.of(Calendar.getInstance()), paging)).thenReturn(pages);
+		mockMvc.perform(get("/api/labs/reports" + "?page=5&size=5" + "&labid=f450237e-20a3-4bf1-b64d-9ecaab16be7a"
+				+ "&interval=1" + "&units=DAYS" + "&bytype=MANUAL" + "&byreport=NIPS_PLUS" + "&byreporttype=STANDARD"
+				+ "&bysignedout=true" + "&byapproved=true" + "&byunreportedsecondaryresult=true" + "&bypatient=1L"
+				+ "&byfirstname=Juno_test" + "&bylastname=User" + "&byemail=no-email@junodx.com"
+				+ "&bysamplenumber=123455" + "&bybatchrunid=8L" + "&bylaborder=76c97d43-347f-4132-ba18-ddf3b313c226"
+				+ "&byordernumber=1234" + "&isavailable=true" + "&upcomingonly=true&isretest=true&isredraw=true"
+				+ "&sortby=age" + "&sorttype=ASC&" + "condensed=true" + "&bynotreportable=true&")).andDo(print());
+	}
+
+	@Test
+	public void testfindException() throws Exception {
+		Pageable paging = PageRequest.of(5, 5);
+		List<OrderBatchDto> transitionOrders = new ArrayList<>();
+		transitionOrders.add(DataBuilderOrder.MockOrderBatchDto());
+		List<TestReport> testReports = new ArrayList<>();
+		testReports.add(DataBuilderOrder.mockTestReport());
+		final Page<TestReport> pages = new PageImpl<>(testReports, paging, 5);
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxPageSize", 20);
+		when(testReportService.getAllTestReports(paging)).thenReturn(pages);
+		mockMvc.perform(get("/api/labs/reports")).andExpect(status().isNotFound()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsCatchException() throws Exception {
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+//		when(testReportService.approveTestReports(Mockito.any(), Mockito.anyString(), Mockito.any()))
+//				.thenReturn(DataBuilderOrder.testReports);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequest());
+		System.out.println(inputJson);
+		doThrow(new NoSuchElementException()).when(testReportService).approveTestReports(Mockito.any(),
+				Mockito.anyString(), Mockito.any());
+
+		this.mockMvc.perform(post("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionCreateException() throws Exception {
+		String request = "{\"reports\" : [\"One\", \"Two\", \"Three\"]}";
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ObjectMapper objmapper = new ObjectMapper();
+		String inputJson = objmapper.writeValueAsString(request);
+		System.out.println(inputJson);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		JsonNode jsonNode = Mockito.spy(JsonNode.class);
+		when(mapper.readTree(request)).thenReturn(jsonNode);
+		TestReportUpdateActions[] newEnumValues = TestReportUpdateActions.APPROVE.values();
+		try (MockedStatic mockStatic = mockStatic(TestReportUpdateActions.class)) {
+			mockStatic.when(TestReportUpdateActions::values).thenReturn(newEnumValues);
+			mockedValueTestReportUpdateActions = newEnumValues[newEnumValues.length - 7];
+			mockStatic.when(() -> TestReportUpdateActions.valueOf(any()))
+					.thenReturn(mockedValueTestReportUpdateActions);
+			Mockito.when(jsonNode.get("action")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("APPROVE");
+			Mockito.when(jsonNode.get("sequencingRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("sequencingRunIdss");
+			Mockito.when(jsonNode.get("userId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("userIdss");
+			Mockito.when(jsonNode.get("name")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("namess");
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			List<JsonNode> datasets = StreamSupport.stream(jsonNode.get("reports").spliterator(), true)
+					.collect(Collectors.toList());
+			datasets.add(jsonNode);
+			Iterator<JsonNode> iterator = datasets.iterator();
+			Iterator<JsonNode> iterators = jsonNode.get("reports").elements();
+			when(iterators).thenReturn(iterator);
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("reportssss");
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+			when(testReportService.approveTestReports(Mockito.any(), Mockito.anyString(), Mockito.any()))
+					.thenReturn(DataBuilderOrder.testReports);
+			this.mockMvc.perform(post("/api/labs/reports").content(request).contentType(MediaType.APPLICATION_JSON))
+					.andExpect(status().isBadRequest()).andDo(print());
+		}
+	}
+
+	@Test
+	public void testReportActionsCreatetestException() throws Exception {
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		when(testReportService.createTestReports(Mockito.anyString(), Mockito.any(), Mockito.any()))
+				.thenReturn(DataBuilderOrder.testReports);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequesttPipe());
+		System.out.println(inputJson);
+		this.mockMvc.perform(post("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsCreatetestReportAException() throws Exception {
+		// DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		when(testReportService.createTestReports(Mockito.anyString(), Mockito.any(), Mockito.any())).thenReturn(null);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestCreateAction());
+		System.out.println(inputJson);
+		this.mockMvc.perform(post("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsretestException() throws Exception {
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		when(testReportService.requestReTestForTestReports(DataBuilderOrder.testReports, RetestActionType.REDRAW, true,
+				"notes", "12345", DataBuilder.userDetailsImpl)).thenReturn(DataBuilderOrder.testReports);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestRetestException());
+		System.out.println(inputJson);
+		this.mockMvc.perform(post("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testupdateApprove() throws Exception {
+		DataBuilderOrder.testReportEmpty.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		when(testReportService.approveTestReports(Mockito.any(), Mockito.anyString(), Mockito.any()))
+				.thenReturn(DataBuilderOrder.testReportEmpty);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequest());
+		System.out.println(inputJson);
+		this.mockMvc.perform(patch("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testupdateApproveException() throws Exception {
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		when(testReportService.approveTestReports(Mockito.any(), Mockito.anyString(), Mockito.any())).thenReturn(null);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequest());
+		System.out.println(inputJson);
+		this.mockMvc.perform(patch("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testupdateApproveExceptions() throws Exception {
+		// DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		// ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize",
+		// 20);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper
+				.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestWithoutTestReportAction());
+		System.out.println(inputJson);
+		this.mockMvc.perform(patch("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsupdateApproveExceptions() throws Exception {
+		// DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		// ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize",
+		// 20);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestWithoutTestReport());
+		System.out.println(inputJson);
+		this.mockMvc.perform(patch("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsRetestAException() throws Exception {
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		when(testReportService.requestReTestForTestReports(DataBuilderOrder.testReports, RetestActionType.REDRAW, true,
+				"notes", "12345", DataBuilder.userDetailsImpl)).thenReturn(DataBuilderOrder.testReports);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestRetestException());
+		System.out.println(inputJson);
+		this.mockMvc.perform(patch("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsRetestUserIdException() throws Exception {
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		when(testReportService.requestReTestForTestReports(DataBuilderOrder.testReports, RetestActionType.REDRAW, true,
+				"notes", "12345", DataBuilder.userDetailsImpl)).thenReturn(DataBuilderOrder.testReports);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestRetestExceptions());
+		System.out.println(inputJson);
+		this.mockMvc.perform(patch("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testupdateSignout() throws Exception {
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		when(testReportService.signOutTestReports(Mockito.any(), Mockito.anyString(), Mockito.any()))
+				.thenReturn(DataBuilderOrder.testReports);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestSignout());
+		System.out.println(inputJson);
+		this.mockMvc.perform(patch("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testupdateRestest() throws Exception {
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		when(testReportService.requestReTestForTestReports(DataBuilderOrder.testReports, RetestActionType.REDRAW, true,
+				"notes", "12345", DataBuilder.userDetailsImpl)).thenReturn(DataBuilderOrder.testReports);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestsss());
+		System.out.println(inputJson);
+		this.mockMvc.perform(patch("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsReportsPageSizeActionExceptions() throws Exception {
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestWithoutTestReports());
+		System.out.println(inputJson);
+		this.mockMvc.perform(patch("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testgetTestReportResults() throws Exception {
+		this.mockMvc.perform(get("/api/labs/reports/results").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testgetTestReportResultslabId() throws Exception {
+		this.mockMvc.perform(get("/api/labs/reports/results" + "?labId=f450237e-20a3-4bf1-b64d-9ecaab16be7a")
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testgetAwaitingReports() throws Exception {
+		this.mockMvc.perform(get("/api/labs/reports/results/awaiting").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testgetAwaitingReportsLabId() throws Exception {
+		this.mockMvc.perform(get("/api/labs/reports/results/awaiting" + "?labId=f450237e-20a3-4bf1-b64d-9ecaab16be7a")
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testgetAwaitingReportsTypes() throws Exception {
+		this.mockMvc.perform(get("/api/labs/reports/results/awaiting" + "?reportType=STANDARD")
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testdelete() throws Exception {
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		verify(testReportService, times(0)).delete("2L", DataBuilderOrder.userDetailsImpl);
+		String reportId = "2L";
+		assertEquals(reportId, DataBuilderOrder.mockTestReport().getId());
+		this.mockMvc.perform(delete("/api/labs/reports/{reportId}" + "?reportId=2L", reportId)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(print());
+
+	}
+
+	@Test
+	public void testdeleteException() throws Exception {
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		// verify(testReportService, times(0)).delete(null,
+		// DataBuilderOrder.userDetailsImpl);
+		String reportId = "2L";
+		doThrow(new NoSuchElementException()).when(testReportService).delete(Mockito.anyString(), Mockito.any());
+		// assertEquals(reportId, DataBuilderOrder.mockTestReport().getId());
+		this.mockMvc.perform(delete("/api/labs/reports/{reportId}", reportId).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testupdateViewed() throws Exception {
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		String reportId = "2L";
+		String patientId = "1L";
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestss());
+		System.out.println(inputJson);
+		this.mockMvc
+				.perform(post("/api/labs/reports/{reportId}/viewed" + "?reportId=2L&patientId=1L", reportId, patientId)
+						.content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andDo(print());
+
+	}
+
+	@Test
+	public void testupdateViewedException() throws Exception {
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		String reportId = "2L";
+		String patientId = "1L";
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestss());
+		System.out.println(inputJson);
+		doThrow(new NoSuchElementException()).when(testReportService)
+				.updateTestReportPatientViewedResult(Mockito.anyString(), Mockito.anyString(), Mockito.any());
+		this.mockMvc
+				.perform(post("/api/labs/reports/{reportId}/viewed" + "?reportId=2L&patientId=5L", reportId, patientId)
+						.content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsApprovetestException() throws Exception {
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		when(testReportService.approveTestReports(Mockito.any(), Mockito.anyString(), Mockito.any())).thenReturn(null);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequest());
+		System.out.println(inputJson);
+		this.mockMvc.perform(post("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsReportsExceptions() throws Exception {
+		// DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		// ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize",
+		// 20);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestWithoutTestReport());
+		System.out.println(inputJson);
+		this.mockMvc.perform(post("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsReportsPageSizeExceptions() throws Exception {
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		DataBuilderOrder.testReportss.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 20);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestWithoutTestReports());
+		System.out.println(inputJson);
+		this.mockMvc.perform(post("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsReportGetActionExceptions() throws Exception {
+		// DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		// ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize",
+		// 20);
+		ObjectMapper mapper = new ObjectMapper();
+		String inputJson = mapper
+				.writeValueAsString(DataBuilderOrder.mockTestReportUpdateRequestWithoutTestReportAction());
+		System.out.println(inputJson);
+		this.mockMvc.perform(post("/api/labs/reports").content(inputJson).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+	@Test
+	public void testgeneratePdfDocument() throws Exception {
+		String reportId = "2L";
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		when(testReportService.generatePdfDocument(Mockito.anyString(), Optional.of(Mockito.anyBoolean()),
+				Mockito.any())).thenReturn("key");
+		// ResponseEntity<?> generatePdfDocument =
+		// testReportController.generatePdfDocument(reportId, Optional.of(true));
+		this.mockMvc.perform(get("/api/labs/reports/pdf/generate/{reportId}" 
+		+ "?reportId=2L&withsignature=true", reportId)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(print());
+	}
+
+	@Test
+	public void testReportActionsretestMaxException() throws Exception {
+		String request = new Gson().toJson(DataBuilderOrder.mockTestReport().getId());
+		DataBuilderOrder.testReports.add(DataBuilderOrder.mockTestReport());
+		SecurityContextHolder.setContext(securityContext);
+		when((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn((UsernamePasswordAuthenticationToken) DataBuilder.usernamePasswordAuthenticationToken);
+		ObjectMapper objmapper = new ObjectMapper();
+		String inputJson = objmapper.writeValueAsString(request);
+		System.out.println(inputJson);
+		mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		JsonNode jsonNode = Mockito.spy(JsonNode.class);
+		when(mapper.readTree(request)).thenReturn(jsonNode);
+		TestReportUpdateActions[] newEnumValues = TestReportUpdateActions.APPROVE.values();
+		try (MockedStatic myMockedCreate = mockStatic(TestReportUpdateActions.class)) {
+			myMockedCreate.when(TestReportUpdateActions::values).thenReturn(newEnumValues);
+			mockedValueTestReportUpdateActions = newEnumValues[newEnumValues.length - 5];
+			myMockedCreate.when(() -> TestReportUpdateActions.valueOf(any()))
+					.thenReturn(mockedValueTestReportUpdateActions);
+			Mockito.when(jsonNode.get("action")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("APPROVE");
+			Mockito.when(jsonNode.get("pipelineRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("pipelineRunIdss");
+			Mockito.when(jsonNode.get("sequencingRunId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("sequencingRunIdss");
+			Mockito.when(jsonNode.get("userId")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("userIdss");
+			Mockito.when(jsonNode.get("name")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("namess");
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			List<JsonNode> datasets = StreamSupport.stream(jsonNode.get("reports").spliterator(), true)
+					.collect(Collectors.toList());
+			datasets.add(jsonNode);
+			Iterator<JsonNode> iterator = datasets.iterator();
+			Iterator<JsonNode> iterators = jsonNode.get("reports").elements();
+			when(iterators).thenReturn(iterator);
+			Mockito.when(jsonNode.get("reports")).thenReturn(jsonNode);
+			Mockito.when(jsonNode.textValue()).thenReturn("reportssss");
+			Mockito.when(jsonNode.isArray()).thenReturn(true);
+			ReflectionTestUtils.setField(testReportController, "maxTestReportPostSize", 0);
+			when(testReportService.setTestReportToNotReportable(Mockito.any(), Mockito.anyString(), Mockito.any()))
+					.thenReturn(DataBuilderOrder.mockTestReport());
+			this.mockMvc.perform(post("/api/labs/reports").content(request).contentType(MediaType.APPLICATION_JSON))
+					.andExpect(status().isBadRequest()).andDo(print());
+
+		}
+	}
+
+}

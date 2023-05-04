@@ -1,0 +1,172 @@
+package com.javatechie.jpa.controller;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.javatechie.jpa.dto.APIResponse;
+import com.javatechie.jpa.entity.Product;
+import com.javatechie.jpa.repository.ProductRepository;
+import com.javatechie.jpa.service.ProductService;
+
+
+
+@RestController
+@RequestMapping("/products")
+public class ProductController {
+	 @Autowired
+	    private ProductService service;
+	 @Autowired
+		private ProductRepository repository;
+	 @RequestMapping(value = "/listPageable", method = RequestMethod.GET)
+		Page<Product> employeesPageable(Pageable pageable) {
+			return service.employeesPageable(pageable);
+
+		}
+	 
+	 
+	    @GetMapping
+	    private APIResponse<List<Product>> getProducts() {
+	        List<Product> allProducts = service.findAllProducts();
+	        return new APIResponse<>(allProducts.size(), allProducts);
+	    }
+
+	    @GetMapping("/{field}")
+	    private APIResponse<List<Product>> getProductsWithSort(@PathVariable String field) {
+	        List<Product> allProducts = service.findProductsWithSorting(field);
+	        return new APIResponse<>(allProducts.size(), allProducts);
+	    }
+
+	    @GetMapping("/pagination/{offset}/{pageSize}")
+	    private APIResponse<Page<Product>> getProductsWithPagination(@PathVariable int offset, @PathVariable int pageSize) {
+	        Page<Product> productsWithPagination = service.findProductsWithPagination(offset, pageSize);
+	        return new APIResponse<>(productsWithPagination.getSize(), productsWithPagination);
+	    }
+
+	    @GetMapping("/paginationAndSort/{offset}/{pageSize}/{field}")
+	    private APIResponse<Page<Product>> getProductsWithPaginationAndSort(@PathVariable int offset, @PathVariable int pageSize,@PathVariable String field) {
+	        Page<Product> productsWithPagination = service.findProductsWithPaginationAndSorting(offset, pageSize, field);
+	        return new APIResponse<>(productsWithPagination.getSize(), productsWithPagination);
+	    }
+
+		/**
+		 * getContent() to retrieve the List of items in the page. getNumber() for
+		 * current Page. getTotalElements() for total items stored in database.
+		 * getTotalPages() for number of total pages.
+		 * 
+		 * @param title
+		 * @param page
+		 * @param size
+		 * @return
+		 */
+		@GetMapping("/tutorials")
+		public ResponseEntity<Map<String, Object>> getAllTutorials(@RequestParam(required = false) String title,
+				@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size) {
+			try {
+				List<Product> tutorials = new ArrayList<Product>();
+				Pageable paging = PageRequest.of(page, size);
+
+				Page<Product> pageTuts;
+				if (title == null)
+					pageTuts = repository.findAll(paging);
+				else
+					pageTuts = repository.findByTitleContaining(title, paging);
+				tutorials = pageTuts.getContent();
+				Map<String, Object> response = new HashMap<>();
+				response.put("tutorials", tutorials);
+				response.put("currentPage", pageTuts.getNumber());
+				response.put("totalItems", pageTuts.getTotalElements());
+				response.put("totalPages", pageTuts.getTotalPages());
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			} catch (Exception e) {
+				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
+		/**
+		 * getContent() to retrieve the List of items in the page. getNumber() for
+		 * current Page. getTotalElements() for total items stored in database.
+		 * getTotalPages() for number of total pages.
+		 * 
+		 * @param title
+		 * @param page
+		 * @param size
+		 * @return
+		 */
+		@GetMapping("/tutorials/published")
+		public ResponseEntity<Map<String, Object>> findByPublished(@RequestParam(defaultValue = "0") int page,
+				@RequestParam(defaultValue = "3") int size) {
+			try {
+				List<Product> tutorials = new ArrayList<Product>();
+				Pageable paging = PageRequest.of(page, size);
+
+				Page<Product> pageTuts = repository.findByPublished(true, paging);
+				tutorials = pageTuts.getContent();
+
+				Map<String, Object> response = new HashMap<>();
+				response.put("tutorials", tutorials);
+				response.put("currentPage", pageTuts.getNumber());
+				response.put("totalItems", pageTuts.getTotalElements());
+				response.put("totalPages", pageTuts.getTotalPages());
+
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			} catch (Exception e) {
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
+		@PostMapping
+		public ResponseEntity<Product> addEmployee(@RequestBody Product employee) {
+			return new ResponseEntity<>(repository.save(employee), HttpStatus.OK);
+		}
+		
+		@PostMapping("/upload/db")
+		public ResponseEntity uploadToDB(@RequestParam("file") MultipartFile file) {
+			Product doc = new Product();
+			String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+			doc.setDocName(fileName);
+			try {
+				doc.setFile(file.getBytes());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			repository.save(doc);
+			String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+					.path("/files/download/")
+					.path(fileName).path("/db")
+					.toUriString();
+			return ResponseEntity.ok(fileDownloadUri);
+		}
+		
+		
+		@GetMapping("/download/{fileName:.+}/db")
+		public ResponseEntity downloadFromDB(@PathVariable String fileName) {
+			Product document = repository.findByDocName(fileName);
+			return ResponseEntity.ok()
+					//.contentType(MediaType.parseMediaType(contentType))
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+					.body(document.getFile());
+		}
+
+}

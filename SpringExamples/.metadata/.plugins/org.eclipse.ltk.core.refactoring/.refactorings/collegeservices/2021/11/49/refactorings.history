@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;Status.java&apos; to &apos;libraryservice/src/main/java/com.wavelabs.library.demo.entity&apos;&#x0D;&#x0A;- Original project: &apos;collegeservices&apos;&#x0D;&#x0A;- Destination element: &apos;libraryservice/src/main/java/com.wavelabs.library.demo.entity&apos;&#x0D;&#x0A;- Original element: &apos;com.college.studentservices.entities.Status.java&apos;" description="Copy compilation unit" destination="=libraryservice/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.wavelabs.library.demo.entity" element1="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.college.studentservices.entities{Status.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1638279567759" units="1" version="1.0"/>
+</session>

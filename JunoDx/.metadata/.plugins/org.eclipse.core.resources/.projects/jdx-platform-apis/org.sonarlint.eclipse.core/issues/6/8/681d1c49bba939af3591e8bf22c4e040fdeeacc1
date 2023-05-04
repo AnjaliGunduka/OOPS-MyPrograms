@@ -1,0 +1,523 @@
+
+]
+java:S2699Ö"-Add at least one assertion to this test case.(¤Ôù”HÜ£RBLOCKERZ
+CODE_SMELL
+]
+java:S2699Ä"-Add at least one assertion to this test case.(¤Î‹ÏHİ£RBLOCKERZ
+CODE_SMELL
+b
+java:S2699—"-Add at least one assertion to this test case.(Úî‘ÖşÿÿÿÿHŞ£RBLOCKERZ
+CODE_SMELL
+b
+java:S2699›"-Add at least one assertion to this test case.(û®…¹ûÿÿÿÿHß£RBLOCKERZ
+CODE_SMELL
+]
+java:S2699ú"-Add at least one assertion to this test case.(ÒåÒéHà£RBLOCKERZ
+CODE_SMELL
+]
+java:S2699†"-Add at least one assertion to this test case.(Ü¥ÖÜHá£RBLOCKERZ
+CODE_SMELL
+K
+java:S5786Á"Remove this 'public' modifier.(Œˆå¼Hâ£RINFOZ
+CODE_SMELL
+K
+java:S5786Ø"Remove this 'public' modifier.(‚É¾ÙHä£RINFOZ
+CODE_SMELL
+K
+java:S5786ç"Remove this 'public' modifier.(±İ—©Hæ£RINFOZ
+CODE_SMELL
+K
+java:S5786¯"Remove this 'public' modifier.(àƒÜ”Hè£RINFOZ
+CODE_SMELL
+P
+java:S5786¼"Remove this 'public' modifier.(†ô†©ıÿÿÿÿHê£RINFOZ
+CODE_SMELL
+P
+java:S5786Ê"Remove this 'public' modifier.(­ğÀøÿÿÿÿHì£RINFOZ
+CODE_SMELL
+P
+java:S5786Ú"Remove this 'public' modifier.(ˆ‚Ï¥ıÿÿÿÿHî£RINFOZ
+CODE_SMELL
+J
+java:S5786ì"Remove this 'public' modifier.(„â–5Hğ£RINFOZ
+CODE_SMELL
+K
+java:S5786ü"Remove this 'public' modifier.(»˜œŞHò£RINFOZ
+CODE_SMELL
+P
+java:S5786Œ"Remove this 'public' modifier.(€ÀÒ‰ÿÿÿÿÿHô£RINFOZ
+CODE_SMELL
+P
+java:S5786¹"Remove this 'public' modifier.(ŞÛÂ‹úÿÿÿÿHö£RINFOZ
+CODE_SMELL
+P
+java:S5786Å"Remove this 'public' modifier.(¤ÙÖĞıÿÿÿÿHø£RINFOZ
+CODE_SMELL
+P
+java:S5786Ò"Remove this 'public' modifier.(ñÒ—³ÿÿÿÿÿHú£RINFOZ
+CODE_SMELL
+P
+java:S5786á"Remove this 'public' modifier.(¦¢ĞØÿÿÿÿÿHü£RINFOZ
+CODE_SMELL
+P
+java:S5786ï"Remove this 'public' modifier.(äË†ÙüÿÿÿÿHş£RINFOZ
+CODE_SMELL
+K
+java:S5786ş"Remove this 'public' modifier.(ÜŒ¦„H€¤RINFOZ
+CODE_SMELL
+P
+java:S5786"Remove this 'public' modifier.(¼Ÿ—“şÿÿÿÿH‚¤RINFOZ
+CODE_SMELL
+P
+java:S5786 "Remove this 'public' modifier.(ÃĞ×æüÿÿÿÿH„¤RINFOZ
+CODE_SMELL
+P
+java:S5786µ"Remove this 'public' modifier.(©¾Í•øÿÿÿÿH†¤RINFOZ
+CODE_SMELL
+K
+java:S5786Í"Remove this 'public' modifier.(±Ö¦§Hˆ¤RINFOZ
+CODE_SMELL
+K
+java:S5786Ö"Remove this 'public' modifier.(¤Ôù”HŠ¤RINFOZ
+CODE_SMELL
+K
+java:S5786á"Remove this 'public' modifier.(ŞÏ°HŒ¤RINFOZ
+CODE_SMELL
+P
+java:S5786„"Remove this 'public' modifier.(¶û’ÅüÿÿÿÿH¤RINFOZ
+CODE_SMELL
+K
+java:S5786Œ"Remove this 'public' modifier.(„½ÿƒH¤RINFOZ
+CODE_SMELL
+P
+java:S5786•"Remove this 'public' modifier.(–¾˜ÔùÿÿÿÿH’¤RINFOZ
+CODE_SMELL
+P
+java:S5786"Remove this 'public' modifier.(¾ñ³ÔşÿÿÿÿH”¤RINFOZ
+CODE_SMELL
+P
+java:S5786°"Remove this 'public' modifier.(šˆÛ…şÿÿÿÿH–¤RINFOZ
+CODE_SMELL
+K
+java:S5786Ä"Remove this 'public' modifier.(¤Î‹ÏH˜¤RINFOZ
+CODE_SMELL
+P
+java:S5786ø"Remove this 'public' modifier.(¼›™ùÿÿÿÿHš¤RINFOZ
+CODE_SMELL
+K
+java:S5786‚"Remove this 'public' modifier.(®®£ÙHœ¤RINFOZ
+CODE_SMELL
+K
+java:S5786"Remove this 'public' modifier.(ş°§çH¤RINFOZ
+CODE_SMELL
+P
+java:S5786—"Remove this 'public' modifier.(Úî‘ÖşÿÿÿÿH ¤RINFOZ
+CODE_SMELL
+P
+java:S5786¥"Remove this 'public' modifier.(Ûù‘âûÿÿÿÿH¢¤RINFOZ
+CODE_SMELL
+P
+java:S5786¯"Remove this 'public' modifier.(ÅäùõøÿÿÿÿH¤¤RINFOZ
+CODE_SMELL
+P
+java:S5786»"Remove this 'public' modifier.(æÏÖ³úÿÿÿÿH¦¤RINFOZ
+CODE_SMELL
+J
+java:S5786á"Remove this 'public' modifier.(¯·£H¨¤RINFOZ
+CODE_SMELL
+K
+java:S5786ë"Remove this 'public' modifier.(Â ã–Hª¤RINFOZ
+CODE_SMELL
+J
+java:S5786õ"Remove this 'public' modifier.(Ëÿ¹pH¬¤RINFOZ
+CODE_SMELL
+P
+java:S5786ÿ"Remove this 'public' modifier.(ÑöÒ¿ÿÿÿÿÿH®¤RINFOZ
+CODE_SMELL
+P
+java:S5786‰"Remove this 'public' modifier.(×”şÿÿÿÿH°¤RINFOZ
+CODE_SMELL
+K
+java:S5786–"Remove this 'public' modifier.(­—óğH²¤RINFOZ
+CODE_SMELL
+P
+java:S5786¤"Remove this 'public' modifier.(¶¹»ùÿÿÿÿH´¤RINFOZ
+CODE_SMELL
+J
+java:S5786³"Remove this 'public' modifier.(´ÛÕIH¶¤RINFOZ
+CODE_SMELL
+P
+java:S5786Ã"Remove this 'public' modifier.(™…èûÿÿÿÿH¸¤RINFOZ
+CODE_SMELL
+P
+java:S5786Ì"Remove this 'public' modifier.(ñß„½ıÿÿÿÿHº¤RINFOZ
+CODE_SMELL
+P
+java:S5786Ü"Remove this 'public' modifier.(•œÌ‰şÿÿÿÿH¼¤RINFOZ
+CODE_SMELL
+P
+java:S5786å"Remove this 'public' modifier.(ËÅĞÙúÿÿÿÿH¾¤RINFOZ
+CODE_SMELL
+P
+java:S5786î"Remove this 'public' modifier.(ÄÑå‡ÿÿÿÿÿHÀ¤RINFOZ
+CODE_SMELL
+K
+java:S5786…"Remove this 'public' modifier.(ŸÃì‘HÂ¤RINFOZ
+CODE_SMELL
+K
+java:S5786£"Remove this 'public' modifier.(İû“¿HÄ¤RINFOZ
+CODE_SMELL
+K
+java:S5786ª"Remove this 'public' modifier.(ÖĞ¨œHÆ¤RINFOZ
+CODE_SMELL
+P
+java:S5786³"Remove this 'public' modifier.(†ê¬ÄÿÿÿÿÿHÈ¤RINFOZ
+CODE_SMELL
+P
+java:S5786¼"Remove this 'public' modifier.(”ŒÑıÿÿÿÿHÊ¤RINFOZ
+CODE_SMELL
+P
+java:S5786Æ"Remove this 'public' modifier.(–”ÜûÿÿÿÿHÌ¤RINFOZ
+CODE_SMELL
+K
+java:S5786Ø"Remove this 'public' modifier.(æû›öHÎ¤RINFOZ
+CODE_SMELL
+K
+java:S5786è"Remove this 'public' modifier.(ÀÚ³óHĞ¤RINFOZ
+CODE_SMELL
+P
+java:S5786ï"Remove this 'public' modifier.(ÊÀØ§úÿÿÿÿHÒ¤RINFOZ
+CODE_SMELL
+P
+java:S5786÷"Remove this 'public' modifier.(é†ã€ûÿÿÿÿHÔ¤RINFOZ
+CODE_SMELL
+P
+java:S5786€	"Remove this 'public' modifier.(ÚåÀÙüÿÿÿÿHÖ¤RINFOZ
+CODE_SMELL
+K
+java:S5786Š	"Remove this 'public' modifier.(ˆßşÈHØ¤RINFOZ
+CODE_SMELL
+P
+java:S5786“	"Remove this 'public' modifier.(±³ƒ™şÿÿÿÿHÚ¤RINFOZ
+CODE_SMELL
+K
+java:S5786©	"Remove this 'public' modifier.(æŠ‡HÜ¤RINFOZ
+CODE_SMELL
+K
+java:S5786°	"Remove this 'public' modifier.(’¤‡¤HŞ¤RINFOZ
+CODE_SMELL
+P
+java:S5786¸	"Remove this 'public' modifier.(ÛÕüéùÿÿÿÿHà¤RINFOZ
+CODE_SMELL
+K
+java:S5786Á	"Remove this 'public' modifier.(—á÷İHâ¤RINFOZ
+CODE_SMELL
+K
+java:S5786Ì	"Remove this 'public' modifier.(§«Ñ…Hä¤RINFOZ
+CODE_SMELL
+K
+java:S5786Ù	"Remove this 'public' modifier.(¥åéåHæ¤RINFOZ
+CODE_SMELL
+P
+java:S5786í	"Remove this 'public' modifier.(úŠÓşÿÿÿÿHè¤RINFOZ
+CODE_SMELL
+K
+java:S5786ô	"Remove this 'public' modifier.(ÕõæHê¤RINFOZ
+CODE_SMELL
+J
+java:S5786ü	"Remove this 'public' modifier.(‚¨;Hì¤RINFOZ
+CODE_SMELL
+J
+java:S5786†
+"Remove this 'public' modifier.(½æƒ(Hî¤RINFOZ
+CODE_SMELL
+K
+java:S5786’
+"Remove this 'public' modifier.(Ç¯ÏÛHğ¤RINFOZ
+CODE_SMELL
+K
+java:S5786©
+"Remove this 'public' modifier.(Èö´æHò¤RINFOZ
+CODE_SMELL
+P
+java:S5786°
+"Remove this 'public' modifier.(„ÀùôûÿÿÿÿHô¤RINFOZ
+CODE_SMELL
+P
+java:S5786¸
+"Remove this 'public' modifier.(øµø²üÿÿÿÿHö¤RINFOZ
+CODE_SMELL
+P
+java:S5786Á
+"Remove this 'public' modifier.(šàÑ·øÿÿÿÿHø¤RINFOZ
+CODE_SMELL
+K
+java:S5786Ì
+"Remove this 'public' modifier.(Óÿì¸Hú¤RINFOZ
+CODE_SMELL
+K
+java:S5786Ù
+"Remove this 'public' modifier.(×¾¨Hü¤RINFOZ
+CODE_SMELL
+K
+java:S5786ø
+"Remove this 'public' modifier.(´Ó ßHş¤RINFOZ
+CODE_SMELL
+P
+java:S5786ÿ
+"Remove this 'public' modifier.(şÚ–ÜøÿÿÿÿH€¥RINFOZ
+CODE_SMELL
+K
+java:S5786ˆ"Remove this 'public' modifier.(´×“ùH‚¥RINFOZ
+CODE_SMELL
+P
+java:S5786‘"Remove this 'public' modifier.(ı³üÿÿÿÿH„¥RINFOZ
+CODE_SMELL
+P
+java:S5786›"Remove this 'public' modifier.(û®…¹ûÿÿÿÿH†¥RINFOZ
+CODE_SMELL
+K
+java:S5786©"Remove this 'public' modifier.(ñ™†—Hˆ¥RINFOZ
+CODE_SMELL
+K
+java:S5786Ô"Remove this 'public' modifier.(Š¦Ö¡HŠ¥RINFOZ
+CODE_SMELL
+J
+java:S5786Ú"Remove this 'public' modifier.(‚ä‡)HŒ¥RINFOZ
+CODE_SMELL
+K
+java:S5786â"Remove this 'public' modifier.(Ï¯‹­H¥RINFOZ
+CODE_SMELL
+K
+java:S5786ë"Remove this 'public' modifier.(÷èïH¥RINFOZ
+CODE_SMELL
+K
+java:S5786ú"Remove this 'public' modifier.(ÒåÒéH’¥RINFOZ
+CODE_SMELL
+K
+java:S5786†"Remove this 'public' modifier.(Ü¥ÖÜH”¥RINFOZ
+CODE_SMELL
+J
+java:S5786^"Remove this 'public' modifier.(Úü´´H–¥RINFOZ
+CODE_SMELL
+
+java:S5778¶"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH˜¥RMAJORZ
+CODE_SMELL
+
+java:S5778Ä"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH›¥RMAJORZ
+CODE_SMELL
+
+java:S5778Ô"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH¥RMAJORZ
+CODE_SMELL
+
+java:S5778æ"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH¡¥RMAJORZ
+CODE_SMELL
+
+java:S5778ö"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH¤¥RMAJORZ
+CODE_SMELL
+
+java:S5778†"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH§¥RMAJORZ
+CODE_SMELL
+
+java:S5778½"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHª¥RMAJORZ
+CODE_SMELL
+
+java:S5778Ê"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH®¥RMAJORZ
+CODE_SMELL
+
+java:S5778Ù"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH²¥RMAJORZ
+CODE_SMELL
+
+java:S5778ç"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH¶¥RMAJORZ
+CODE_SMELL
+
+java:S5778ö"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHº¥RMAJORZ
+CODE_SMELL
+
+java:S5778…"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH¾¥RMAJORZ
+CODE_SMELL
+
+java:S5778™"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHÂ¥RMAJORZ
+CODE_SMELL
+
+java:S5778­"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHÆ¥RMAJORZ
+CODE_SMELL
+
+java:S5778Ï"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHÊ¥RMAJORZ
+CODE_SMELL
+
+java:S5778†"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHÏ¥RMAJORZ
+CODE_SMELL
+
+java:S5778"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHÓ¥RMAJORZ
+CODE_SMELL
+
+java:S5778˜"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH×¥RMAJORZ
+CODE_SMELL
+
+java:S5778¤"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHÛ¥RMAJORZ
+CODE_SMELL
+
+java:S5778±"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHß¥RMAJORZ
+CODE_SMELL
+‰
+java:S3415À"VSwap these 2 arguments so they are in the correct order: expected value, actual value.(öç¥åøÿÿÿÿHâ¥RMAJORZ
+CODE_SMELL
+
+java:S5778ú"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHæ¥RMAJORZ
+CODE_SMELL
+
+java:S5778…"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHì¥RMAJORZ
+CODE_SMELL
+
+java:S5778"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHò¥RMAJORZ
+CODE_SMELL
+
+java:S5778§"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHø¥RMAJORZ
+CODE_SMELL
+
+java:S5778³"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHş¥RMAJORZ
+CODE_SMELL
+
+java:S5778ã"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH„¦RMAJORZ
+CODE_SMELL
+
+java:S5778í"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHŠ¦RMAJORZ
+CODE_SMELL
+
+java:S5778÷"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH‘¦RMAJORZ
+CODE_SMELL
+
+java:S5778"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH˜¦RMAJORZ
+CODE_SMELL
+
+java:S5778"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHŸ¦RMAJORZ
+CODE_SMELL
+
+java:S5778œ"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH¦¦RMAJORZ
+CODE_SMELL
+
+java:S5778«"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH­¦RMAJORZ
+CODE_SMELL
+
+java:S5778»"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH´¦RMAJORZ
+CODE_SMELL
+
+java:S5778Ş"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH»¦RMAJORZ
+CODE_SMELL
+
+java:S5778ç"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH¿¦RMAJORZ
+CODE_SMELL
+
+java:S5778ğ"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHÂ¦RMAJORZ
+CODE_SMELL
+ƒ
+java:S3415ú"VSwap these 2 arguments so they are in the correct order: expected value, actual value.(é“ıHÆ¦RMAJORZ
+CODE_SMELL
+ƒ
+java:S3415"VSwap these 2 arguments so they are in the correct order: expected value, actual value.(é“ıHÊ¦RMAJORZ
+CODE_SMELL
+•
+java:S5778¤"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(áõ†¿üÿÿÿÿHÎ¦RMAJORZ
+CODE_SMELL
+
+java:S5778«"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHÑ¦RMAJORZ
+CODE_SMELL
+
+java:S5778´"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHÔ¦RMAJORZ
+CODE_SMELL
+
+java:S5778¾"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH×¦RMAJORZ
+CODE_SMELL
+
+java:S5778É"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHÚ¦RMAJORZ
+CODE_SMELL
+‰
+java:S3415Ô"VSwap these 2 arguments so they are in the correct order: expected value, actual value.(öç¥åøÿÿÿÿHİ¦RMAJORZ
+CODE_SMELL
+•
+java:S5778é"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(¤ûÑùÿÿÿÿHá¦RMAJORZ
+CODE_SMELL
+
+java:S5778ğ"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHä¦RMAJORZ
+CODE_SMELL
+
+java:S5778ù"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHç¦RMAJORZ
+CODE_SMELL
+
+java:S5778ƒ	"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHê¦RMAJORZ
+CODE_SMELL
+
+java:S5778Œ	"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHí¦RMAJORZ
+CODE_SMELL
+
+java:S5778ª	"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHğ¦RMAJORZ
+CODE_SMELL
+
+java:S5778²	"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHó¦RMAJORZ
+CODE_SMELL
+
+java:S5778»	"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHö¦RMAJORZ
+CODE_SMELL
+
+java:S5778Æ	"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHù¦RMAJORZ
+CODE_SMELL
+
+java:S5778Ó	"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHü¦RMAJORZ
+CODE_SMELL
+
+java:S5778î	"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛHÿ¦RMAJORZ
+CODE_SMELL
+•
+java:S5778ö	"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(âÖàèüÿÿÿÿH‚§RMAJORZ
+CODE_SMELL
+•
+java:S5778€
+"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(âÖàèüÿÿÿÿH…§RMAJORZ
+CODE_SMELL
+•
+java:S5778Œ
+"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(âÖàèüÿÿÿÿHˆ§RMAJORZ
+CODE_SMELL
+
+java:S5778ª
+"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH‹§RMAJORZ
+CODE_SMELL
+•
+java:S5778²
+"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(âÖàèüÿÿÿÿH§RMAJORZ
+CODE_SMELL
+•
+java:S5778»
+"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(âÖàèüÿÿÿÿH‘§RMAJORZ
+CODE_SMELL
+•
+java:S5778Æ
+"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(âÖàèüÿÿÿÿH”§RMAJORZ
+CODE_SMELL
+•
+java:S5778Ó
+"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(âÖàèüÿÿÿÿH—§RMAJORZ
+CODE_SMELL
+•
+java:S5778ù
+"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ç¡ÅıûÿÿÿÿHš§RMAJORZ
+CODE_SMELL
+
+java:S5778"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH§RMAJORZ
+CODE_SMELL
+
+java:S5778Š"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH¡§RMAJORZ
+CODE_SMELL
+
+java:S5778”"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH¥§RMAJORZ
+CODE_SMELL
+
+java:S5778Ü"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH©§RMAJORZ
+CODE_SMELL
+
+java:S5778å"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH¬§RMAJORZ
+CODE_SMELL
+
+java:S5778ô"bRefactor the code of the lambda to have only one invocation possibly throwing a runtime exception.(Ÿõ¢ÛH¯§RMAJORZ
+CODE_SMELL

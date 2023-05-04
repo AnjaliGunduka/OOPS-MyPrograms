@@ -1,0 +1,11 @@
+1635314956622	Rename package 'com.model'
+1635315195068	Rename type 'Customer'
+1635315259377	Rename type 'CustomerOrder'
+1635315334655	Rename type 'ShippingAddress'
+1635315621305	Delete element
+1635315625089	Delete element
+1635316033410	Delete element
+1635316096730	Rename type 'CartItem'
+1635316389698	Rename type 'CartItem'
+1635316405310	Delete element
+1635317605968	Rename package 'com.example.demo'

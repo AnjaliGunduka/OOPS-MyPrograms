@@ -1,0 +1,15 @@
+package com.Calci.maths;
+
+
+
+
+public class CalculatorTest {
+
+	@Test
+	void testAdd() {
+		
+		
+		
+	}
+	
+}

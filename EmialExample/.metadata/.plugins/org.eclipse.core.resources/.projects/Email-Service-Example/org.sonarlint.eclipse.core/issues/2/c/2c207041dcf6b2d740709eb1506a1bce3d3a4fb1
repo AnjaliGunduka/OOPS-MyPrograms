@@ -1,0 +1,26 @@
+
+ˆ
+java:S1128"QRemove this unused import 'org.springframework.context.annotation.Configuration'.(¬²Úäşÿÿÿÿ8ï¼ö·ü0H[RMINORZ
+CODE_SMELL
+{
+java:S1128"HRemove this unused import 'org.springframework.context.annotation.Bean'.(‚î‰Ş8–Ñ¥¹ü0HŠRMINORZ
+CODE_SMELL
+„
+java:S1128"LRemove this unused import 'springfox.documentation.builders.ApiInfoBuilder'.(‘ï³øÿÿÿÿ8–Ñ¥¹ü0HŒRMINORZ
+CODE_SMELL
+~
+java:S1128	"KRemove this unused import 'springfox.documentation.builders.PathSelectors'.(âİ¸ñ8–Ñ¥¹ü0HRMINORZ
+CODE_SMELL
+
+java:S1128
+"URemove this unused import 'springfox.documentation.builders.RequestHandlerSelectors'.(òßª¿ıÿÿÿÿ8–Ñ¥¹ü0HRMINORZ
+CODE_SMELL
+|
+java:S1128"DRemove this unused import 'springfox.documentation.service.ApiInfo'.(ŸÈ÷àûÿÿÿÿ8–Ñ¥¹ü0H’RMINORZ
+CODE_SMELL
+}
+java:S1128"JRemove this unused import 'springfox.documentation.spi.DocumentationType'.(ÉêÉ¥8–Ñ¥¹ü0H”RMINORZ
+CODE_SMELL
+
+java:S1128"NRemove this unused import 'springfox.documentation.spring.web.plugins.Docket'.(‡éÔå8–Ñ¥¹ü0H–RMINORZ
+CODE_SMELL

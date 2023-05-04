@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename package &apos;com.springboot.demo&apos; to &apos;com.book.order.service.demo&apos;&#x0D;&#x0A;- Original project: &apos;customer-service&apos;&#x0D;&#x0A;- Original element: &apos;customer-service/src/main/java/com.springboot.demo&apos;&#x0D;&#x0A;- Renamed element: &apos;customer-service/src/main/java/com.book.order.service.demo&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings&#x0D;&#x0A;- Rename subpackages of the package" description="Rename package &apos;com.springboot.demo&apos;" flags="589830" hierarchical="true" id="org.eclipse.jdt.ui.rename.package" input="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.springboot.demo" name="com.book.order.service.demo" qualified="false" references="true" stamp="1635136352036" textual="false" version="1.0"/>
+</session>

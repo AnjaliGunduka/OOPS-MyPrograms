@@ -1,0 +1,18 @@
+package com.example.demo.restcontroller;
+
+
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class Example {
+
+	private static org.slf4j.Logger log=LoggerFactory.getLogger(Example.class);
+	
+	@GetMapping("/getDiscount")
+	public String discount()
+	{
+		return "added discount 15%";
+	}
+}

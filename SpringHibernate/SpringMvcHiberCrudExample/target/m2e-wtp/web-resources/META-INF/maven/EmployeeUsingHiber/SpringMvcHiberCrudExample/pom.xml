@@ -1,0 +1,370 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>EmployeeUsingHiber</groupId>
+  <artifactId>SpringMvcHiberCrudExample</artifactId>
+  <packaging>war</packaging>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>SpringMvcHiberCrudExample Maven Webapp</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-core</artifactId>
+    <version>5.5.7.Final</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-annotations -->
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-annotations</artifactId>
+    <version>3.5.6-Final</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-commons-annotations -->
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-commons-annotations</artifactId>
+    <version>3.3.0.ga</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-entitymanager -->
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-entitymanager</artifactId>
+    <version>5.5.7.Final</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-search-orm -->
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-search-orm</artifactId>
+    <version>5.11.9.Final</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+<dependency>
+    <groupId>org.hibernate.validator</groupId>
+    <artifactId>hibernate-validator</artifactId>
+    <version>7.0.1.Final</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/com.ibm.icu/icu4j -->
+<dependency>
+    <groupId>com.ibm.icu</groupId>
+    <artifactId>icu4j</artifactId>
+    <version>69.1</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
+<dependency>
+    <groupId>javax.xml.bind</groupId>
+    <artifactId>jaxb-api</artifactId>
+    <version>2.3.1</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/javax.xml/jaxb-impl -->
+<dependency>
+    <groupId>javax.xml</groupId>
+    <artifactId>jaxb-impl</artifactId>
+    <version>2.1</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/jaxen/jaxen -->
+<dependency>
+    <groupId>jaxen</groupId>
+    <artifactId>jaxen</artifactId>
+    <version>1.2.0</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/org.jdom/jdom -->
+<dependency>
+    <groupId>org.jdom</groupId>
+    <artifactId>jdom</artifactId>
+    <version>2.0.2</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/javax.transaction/jta -->
+<dependency>
+    <groupId>javax.transaction</groupId>
+    <artifactId>jta</artifactId>
+    <version>1.1</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-core</artifactId>
+    <version>2.14.1</version>
+</dependency>
+<dependency>
+<groupId>junit</groupId>
+<artifactId>junit</artifactId>
+<version>3.8.1</version>
+<scope>test</scope>
+</dependency>
+<dependency>
+<groupId>javax.servlet</groupId>
+<artifactId>javax.servlet-api</artifactId>
+<version>3.1.0</version>
+</dependency>
+
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-core</artifactId>
+<version>4.2.1.RELEASE</version>
+</dependency>
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-webmvc</artifactId>
+<version>4.2.1.RELEASE</version>
+</dependency>
+<dependency>
+<groupId>com.fasterxml.jackson.core</groupId>
+<artifactId>jackson-databind</artifactId>
+<version>2.4.1</version>
+</dependency>
+<!-- Hibernate -->
+<dependency>
+<groupId>org.hibernate</groupId>
+<artifactId>hibernate-core</artifactId>
+<version>4.3.5.Final</version>
+</dependency>
+<dependency>
+<groupId>org.hibernate</groupId>
+<artifactId>hibernate-entitymanager</artifactId>
+<version>4.3.5.Final</version>
+</dependency>
+
+<!-- Apache Commons DBCP -->
+<dependency>
+<groupId>commons-dbcp</groupId>
+<artifactId>commons-dbcp</artifactId>
+<version>1.4</version>
+</dependency>
+<!-- Spring ORM -->
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-orm</artifactId>
+<version>4.2.1.RELEASE</version>
+</dependency>
+
+<!-- AspectJ -->
+<dependency>
+<groupId>org.aspectj</groupId>
+<artifactId>aspectjrt</artifactId>
+<version>1.7.4</version>
+</dependency>
+<dependency>
+<groupId>mysql</groupId>
+<artifactId>mysql-connector-java</artifactId>
+<version>8.0.26</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/jstl/jstl -->
+<dependency>
+<groupId>jstl</groupId>
+<artifactId>jstl</artifactId>
+<version>1.2</version>
+</dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-highlighter -->
+<dependency>
+    <groupId>org.apache.lucene</groupId>
+    <artifactId>lucene-highlighter</artifactId>
+    <version>8.10.0</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/mail/mail -->
+<!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
+<dependency>
+    <groupId>javax.mail</groupId>
+    <artifactId>javax.mail-api</artifactId>
+    <version>1.6.2</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.26</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>4.0.1</version>
+    <scope>provided</scope>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
+<dependency>
+    <groupId>org.quartz-scheduler</groupId>
+    <artifactId>quartz</artifactId>
+    <version>2.3.2</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>1.7.32</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-slf4j-impl</artifactId>
+    <version>2.14.1</version>
+    <scope>test</scope>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-aop -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-aop</artifactId>
+    <version>5.3.10</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-asm -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-asm</artifactId>
+    <version>3.1.4.RELEASE</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-beans -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-beans</artifactId>
+    <version>5.3.10</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-context</artifactId>
+    <version>5.3.10</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-core</artifactId>
+    <version>5.3.10</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-expression -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-expression</artifactId>
+    <version>5.3.10</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-jdbc</artifactId>
+    <version>5.3.10</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/springframework/spring-orm -->
+<dependency>
+    <groupId>springframework</groupId>
+    <artifactId>spring-orm</artifactId>
+    <version>1.2.6</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-tx -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-tx</artifactId>
+    <version>5.3.10</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-web -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-web</artifactId>
+    <version>5.3.10</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>5.3.10</version>
+</dependency>
+<dependency>
+		<groupId>jstl</groupId>
+		<artifactId>jstl</artifactId>
+		<version>1.2</version>
+		<type>jar</type>
+		<scope>compile</scope>
+	</dependency>
+	<dependency>
+		<groupId>taglibs</groupId>
+		<artifactId>standard</artifactId>
+		<version>1.1.2</version>
+		<type>jar</type>
+		<scope>compile</scope>
+	</dependency>
+    
+    
+    
+    
+    
+    
+    <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>4.1.8.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>5.4.10.Final</version>
+		</dependency>
+		<!-- <dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>2.0.0</version>
+		</dependency> -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.25</version>
+		</dependency>
+		<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>4.1.8.RELEASE</version>
+    </dependency>
+    <dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>jstl</artifactId>
+    <version>1.2</version>
+    </dependency>
+    
+    
+  </dependencies>
+  <build>
+    <finalName>SpringMvcHiberCrudExample</finalName>
+    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+      <plugins>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_war_packaging -->
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>3.2.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

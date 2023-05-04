@@ -1,0 +1,20 @@
+
+d
+java:S1612"7Replace this lambda with method reference 'Math::sqrt'.(×¨’‰HºÿRMINORZ
+CODE_SMELL
+e	java:S106"9Replace this use of System.out or System.err by a logger.(ÿþ«ÄH¼ÿRMAJORZ
+CODE_SMELL
+€
+java:S1602"SRemove useless curly braces around statement and then remove useless return keyword(×¨’‰H½ÿRMINORZ
+CODE_SMELL
+†
+java:S4276"YRefactor this code to use the more specialised Functional Interface 'IntToDoubleFunction'(×¨’‰H¾ÿRMINORZ
+CODE_SMELL
+d	java:S106"9Replace this use of System.out or System.err by a logger.(ü„ê!H¿ÿRMAJORZ
+CODE_SMELL
+\
+java:S1611"/Remove the parentheses around the "a" parameter(×¨’‰HÀÿRMINORZ
+CODE_SMELL
+f
+java:S1128"9Remove this unused import 'java.util.function.Predicate'.(ïÍ–¶HÁÿRMINORZ
+CODE_SMELL

@@ -1,0 +1,15 @@
+
+g	java:S1259"<This block of commented-out lines of code should be removed.(œçã¬H±JRMAJORZ
+CODE_SMELL
+y	java:S100&"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ñºØÑH¯JRMINORZ
+CODE_SMELL
+p
+java:S1128"?Remove this unused import 'javax.validation.constraints.Email'.(¸àô¹üÿÿÿÿH´JRMINORZ
+CODE_SMELL
+r
+java:S46844"@Replace this persistent entity with a simple POJO or DTO object.(»¨¦İH°JRCRITICALZVULNERABILITY
+‚
+java:S1128"QRemove this unused import 'org.springframework.web.bind.annotation.RequestParam'.(Â¬À·ùÿÿÿÿH¶JRMINORZ
+CODE_SMELL
+l	java:S125>"<This block of commented-out lines of code should be removed.(éØ»ÚûÿÿÿÿH³JRMAJORZ
+CODE_SMELL

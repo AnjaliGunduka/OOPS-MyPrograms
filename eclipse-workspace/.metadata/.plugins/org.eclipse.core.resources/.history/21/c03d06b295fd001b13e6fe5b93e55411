@@ -1,0 +1,23 @@
+package Classes;
+
+public class StaticMethod {
+	String name;
+	int id;
+	static String names="Anjali";
+
+	public StaticMethod(String name, int id) {
+		super();
+		this.name = name;
+		this.id = id;
+	}
+
+	static void a() {
+		names="Anju";
+		System.out.println(names);
+	}
+
+	public static void main(String[] args) {
+StaticMethod a=new StaticMethod("Anjali",534);
+
+	}
+}

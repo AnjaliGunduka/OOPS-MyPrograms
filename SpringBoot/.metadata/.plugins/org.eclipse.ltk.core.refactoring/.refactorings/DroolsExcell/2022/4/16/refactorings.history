@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;Book.xlsx&apos; to &apos;PaginationUsingDataJapDrools/src/main/resources&apos;&#x0D;&#x0A;- Original project: &apos;ExcelDrolls&apos;&#x0D;&#x0A;- Destination element: &apos;PaginationUsingDataJapDrools/src/main/resources&apos;&#x0D;&#x0A;- Original element: &apos;Book.xlsx&apos;" description="Copy file" destination="=PaginationUsingDataJapDrools/src\/main\/resources=/maven.pomderived=/true=/" element1="src/main/resources/Book.xlsx" files="1" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1649744237454" units="0" version="1.0"/>
+</session>
